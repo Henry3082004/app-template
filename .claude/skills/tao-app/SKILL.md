@@ -24,8 +24,12 @@ kế — người viết xem link rồi yêu cầu sửa sau.
    duyệt, ra link ngay; **"Zalo Mini App"** — chạy trong Zalo, có thêm bản web để xem trước;
    **"Cả hai"** — cùng một app, chạy cả web lẫn trong Zalo. Nói ngắn trong mô tả lựa chọn rằng Zalo
    Mini App cần người viết tự đăng ký tài khoản Zalo Developer (xem Bước 4, loại Z).
+5. **Có bán app này không?** Hỏi chung lượt với câu 3–4, lựa chọn: **"Bán cả Việt Nam và quốc tế"
+   (Recommended)**, **"Chỉ Việt Nam"**, **"Chỉ quốc tế"**, **"Chưa bán"**. Khác "Chưa bán" → làm thêm
+   Bước 7 (đóng gói để bán). Chọn "Chưa bán" thì sau này người viết nhắn "đóng gói bán app này" là
+   chạy Bước 7.
 
-Không hỏi về luồng, bố cục, giọng, cách kiếm tiền.
+Không hỏi về luồng, bố cục, giọng, giá bán.
 
 Sau khi có câu trả lời, nói ngắn gọn: loại app (nhẹ/đầy đủ — xem Bước 4), model + effort + thời
 gian ước tính, rồi làm luôn.
@@ -90,7 +94,9 @@ nào**, và **làm ở bản đầu** hay **để sau** (bản đầu chỉ gi�
   "Sao chép báo lỗi cho Claude" (copy sẵn: lỗi gì, màn hình nào, lúc nào, chi tiết kỹ thuật).
 
 **Phạm vi bản đầu:** chỉ những gì phục vụ việc chính của từng loại người dùng; thứ khác ghi vào
-"Để sau". Chưa thu tiền, chưa thanh toán trong app trừ khi đó chính là việc chính.
+"Để sau". Câu 5 là "Chưa bán" → chưa thu tiền, chưa thanh toán trong app (trừ khi đó chính là việc
+chính). Có bán → app tối thiểu là loại B (thanh toán cần nơi lưu tài khoản và nhận webhook; loại A trên
+claude.ai không bán được), và Bước 7 lo phần thanh toán.
 
 ## Bước 3 — Viết prompt thiết kế (chỉ viết, không tự vẽ)
 
@@ -173,6 +179,44 @@ Commit APP_SPEC.md, DESIGN_PROMPT.md và code. Gửi người viết, ngắn g�
    người viết (nếu có).
 3. **Nội dung DESIGN_PROMPT.md** ngay trong chat để copy, kèm một câu: muốn đẹp hơn thì gửi prompt
    cho Claude Design rồi đưa lại kết quả để Claude chỉnh app theo.
+
+## Bước 7 — Đóng gói để bán (khi câu 5 khác "Chưa bán", hoặc người viết yêu cầu sau)
+
+Làm sau khi app đã chạy (Bước 6). Đọc `BAN_APP.md` để biết người viết đã thiết lập sẵn những tài
+khoản nào (mục "Đã thiết lập"); thiếu tài khoản nào thì làm phần còn lại và ghi rõ việc người viết cần
+làm. Ghi mọi quyết định vào APP_SPEC.md mục "7. Bán".
+
+1. **Gói giá:** tự đề xuất gói Miễn phí (đủ dùng thử việc chính) + gói Trả phí (tháng / năm, giảm ~2
+   tháng khi trả năm). Giá VND cho khách Việt, USD cho khách quốc tế, mức hợp với loại app và đối tượng.
+   Ghi lý do chọn giá; người viết đổi được. Khóa tính năng theo gói ở **server/database** (Row Level
+   Security hoặc kiểm tra phía server), không chỉ ẩn nút ở giao diện.
+2. **Thanh toán** (theo thị trường đã chọn):
+   - Việt Nam: cổng chuyển khoản QR tự xác nhận (PayOS hoặc SePay — theo cái người viết đã đăng ký).
+   - Quốc tế: **Lemon Squeezy** (nền tảng thay người bán lo thuế/hóa đơn quốc tế).
+   - Webhook thanh toán cập nhật gói của người dùng trong database (Supabase Edge Function ở loại B,
+     endpoint server ở loại C). Kiểm tra chữ ký webhook. Người dùng tự hủy gói được.
+   - **Chỉ dùng chế độ thử (test/sandbox).** Chạy thử trọn một lần mua → gói được nâng → hủy → gói hạ.
+     Không tự bật chế độ thật (live): đó là việc người viết bật sau khi xem lại, vì nó thu tiền thật.
+   - Khóa bí mật (API key, webhook secret) chỉ đặt trong biến môi trường, không bao giờ vào code/commit.
+3. **Song ngữ** (khi có khách quốc tế): toàn bộ chữ trong app tách ra file ngôn ngữ vi/en, tự chọn theo
+   ngôn ngữ trình duyệt, có nút đổi ngôn ngữ. Giọng tiếng Anh tương đương giọng tiếng Việt trong spec.
+4. **Trang giới thiệu (landing page)** — cùng phong cách nền của app: câu giá trị chính, ảnh chụp màn
+   hình thật, 3–6 tính năng, bảng giá, câu hỏi thường gặp, nút "Dùng thử miễn phí". Song ngữ nếu có
+   khách quốc tế. Thẻ SEO cơ bản + ảnh chia sẻ mạng xã hội. Có tên miền → landing ở tên miền chính,
+   app ở `app.`; chưa có → dùng domain Netlify.
+5. **Trang bắt buộc:** Điều khoản sử dụng, Chính sách bảo mật, Chính sách hoàn tiền — viết theo đúng
+   cách app thu thập dữ liệu và thu tiền; ghi chú người viết nên nhờ người am hiểu pháp lý xem lại.
+6. **Bộ tài liệu đăng bán** trong thư mục `ban/` (vi + en khi có khách quốc tế):
+   - mô tả ngắn (1 câu) và dài; danh sách tính năng; từ khóa;
+   - ảnh chụp màn hình tự động bằng Playwright (điện thoại + máy tính) với dữ liệu mẫu đẹp;
+   - video demo ngắn (quay luồng chính bằng Playwright);
+   - nội dung đăng **Product Hunt** (tên, câu giới thiệu, mô tả, bình luận đầu tiên của người làm);
+   - nội dung trang bán **AppSumo** (nếu có khách quốc tế) và **Google Play** (nếu đóng gói Android).
+7. **Android (Google Play):** thêm manifest PWA + service worker để app cài được lên màn hình chính;
+   chuẩn bị đóng gói thành app Android (Trusted Web Activity). Thử build file `.aab` nếu môi trường cho
+   phép; không được thì để sẵn cấu hình và hướng dẫn từng lệnh. Nộp lên Play Console là việc người viết.
+8. **Gửi người viết:** link landing page, link app, bảng giá đã chọn, thư mục `ban/`, và **danh sách
+   việc người viết phải tự làm** (bật chế độ thanh toán thật, nộp Google Play, đăng Product Hunt...).
 
 ## Khi người viết yêu cầu sửa
 

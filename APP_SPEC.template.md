@@ -69,6 +69,16 @@ Mỗi việc chính viết dạng `Mở app → ... → Xong` và ghi số lần
 - **Báo lỗi:** — câu mẫu: "____"
 - **Từ phải dùng / cấm dùng:**
 
+## 7. Bán
+
+- **Thị trường:** (Việt Nam / quốc tế / cả hai / chưa bán)
+- **Gói giá:** Miễn phí: ____ — Trả phí: ____đ/tháng, ____đ/năm · $____/month, $____/year — lý do: ____
+- **Thanh toán:** (PayOS / SePay / Lemon Squeezy) — chế độ: thử / thật
+- **Ngôn ngữ:** (vi / vi + en)
+- **Landing page:** ____ — **Trang pháp lý:** Điều khoản / Bảo mật / Hoàn tiền
+- **Nơi đăng bán:** (Product Hunt / AppSumo / Google Play / Zalo) — tài liệu trong `ban/`
+- **Việc người viết cần làm:** ____
+
 ## Để sau (không làm ở bản đầu)
 
 - ____

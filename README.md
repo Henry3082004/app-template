@@ -29,3 +29,4 @@ Sơ đồ đầy đủ: [`QUY_TRINH.md`](QUY_TRINH.md).
 | `CLAUDE.md` | Quy ước Claude phải theo trong mọi app tạo từ template này |
 | `QUY_TRINH.md` | Sơ đồ quy trình tạo app |
 | `TU_SUA_LOI.md` | Cách bật lịch tự sửa lỗi từ Sentry (máy tắt vẫn chạy) |
+| `BAN_APP.md` | Việc thiết lập một lần để bán app (thanh toán, store) + danh sách đã thiết lập |
