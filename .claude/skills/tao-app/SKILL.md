@@ -9,7 +9,7 @@ Người viết app chỉ trả lời những điều **chỉ họ mới biết*
 liền một mạch tới khi có **link web app chạy được**. Không dừng giữa chừng xin duyệt spec hay thiết
 kế — người viết xem link rồi yêu cầu sửa sau.
 
-## Bước 1 — Hỏi (lượt 1: câu 1–2; lượt 2: câu 3 kèm lựa chọn hợp với app vừa mô tả)
+## Bước 1 — Hỏi (lượt 1: câu 1–2; lượt 2: câu 3–4 bằng nút bấm, lựa chọn hợp với app vừa mô tả)
 
 1. **App là gì?** Mô tả một câu, kèm tên tạm nếu có.
 2. **Ai dùng app?** Có mấy loại người dùng; mỗi loại **dùng app để làm gì** (1–2 việc chính).
@@ -20,8 +20,12 @@ kế — người viết xem link rồi yêu cầu sửa sau.
    - **Phong cách:** biến thể trong khuôn khổ phong cách nền (xem "Hình ảnh" bên dưới), vd "Mềm mại,
      nhiều khoảng trắng" / "Ấm áp, có hình minh họa" / "Gọn gàng, chuyên nghiệp".
    Người viết có màu/thương hiệu sẵn thì họ ghi ở ô Other.
+4. **Chạy ở đâu?** Hỏi chung lượt với câu 3, 3 lựa chọn: **"Web" (Recommended)** — mở bằng trình
+   duyệt, ra link ngay; **"Zalo Mini App"** — chạy trong Zalo, có thêm bản web để xem trước;
+   **"Cả hai"** — cùng một app, chạy cả web lẫn trong Zalo. Nói ngắn trong mô tả lựa chọn rằng Zalo
+   Mini App cần người viết tự đăng ký tài khoản Zalo Developer (xem Bước 4, loại Z).
 
-Không hỏi về luồng, bố cục, giọng, cách kiếm tiền, nền tảng.
+Không hỏi về luồng, bố cục, giọng, cách kiếm tiền.
 
 Sau khi có câu trả lời, nói ngắn gọn: loại app (nhẹ/đầy đủ — xem Bước 4), model + effort + thời
 gian ước tính, rồi làm luôn.
@@ -106,6 +110,28 @@ Chọn loại **đơn giản nhất** đáp ứng được việc chính. Phân 
 - Không tạo được ở mọi nơi → báo rõ lý do và việc người viết cần làm, đồng thời đăng bản demo giao
   diện bằng Artifact để vẫn có link xem ngay.
 - Ghi nơi chạy, tên project/service và link vào APP_SPEC.md.
+
+### Loại Z — Zalo Mini App (khi câu 4 chọn "Zalo Mini App" hoặc "Cả hai")
+
+Zalo là **lớp giao diện thêm vào**, không thay A/B/C: phần dữ liệu/server vẫn chọn như trên, nhưng tối
+thiểu là **B** (đăng nhập Zalo cần nơi lưu tài khoản; A trên claude.ai không chạy được trong Zalo).
+Đăng nhập Zalo thật cần server/edge function đổi token Zalo → dùng C, hoặc B kèm Supabase Edge Function.
+
+- Giao diện viết bằng React + `zmp-ui` + `zmp-sdk` (khung giống Gig Việc), dùng chung code cho bản web.
+- Bài học từ Gig Việc, bắt buộc áp dụng:
+  - `<ZMPRouter memoryRouter>` để chạy được cả trong Zalo lẫn dưới đường dẫn con trên web.
+  - Không dùng `<Icon>` của zmp-ui (font icon tải từ CDN của Zalo, lỗi thì hiện chữ rác) → dùng emoji.
+  - Không dùng class kiểu Tailwind nếu không cài Tailwind; tự định nghĩa class trong file CSS.
+  - Gọi `getLocation`/`getAccessToken` của Zalo chỉ chạy được trong Zalo → luôn có phương án dự phòng
+    cho bản web (geolocation của trình duyệt, nút "Đăng nhập demo").
+- **Gửi ngay** link bản web (Netlify) để xem trước, có nút "Đăng nhập demo" thay cho đăng nhập Zalo.
+- **Việc người viết phải tự làm** (cần danh tính thật, Claude không làm thay được) — liệt kê rõ trong
+  tóm tắt và trong APP_SPEC.md mục "Quyết định còn mở":
+  1. Đăng ký Zalo Developer + tạo Mini App → gửi Claude **App ID** và **App Secret**.
+  2. Khai báo domain server/API vào danh sách domain được phép trong Zalo Developer Console.
+  3. Deploy lên Zalo: chạy `zmp login` (quét mã QR bằng Zalo) + `zmp deploy` trên máy mình, hoặc tải
+     bản build lên Zalo Mini App Studio. Claude chuẩn bị sẵn bản build và hướng dẫn từng lệnh.
+- Có App ID/Secret → Claude đặt vào biến môi trường server, bật đăng nhập Zalo thật, kiểm tra lại.
 
 Không hỏi lại giữa chừng. Gặp quyết định không có trong mặc định → chọn phương án an toàn, đơn giản
 nhất, ghi vào "Quyết định còn mở" trong spec.
