@@ -19,9 +19,17 @@
 |---|---|---|---|---|
 | | | | | 1 |
 
+## 1b. Bản đồ việc
+
+Việc phụ suy ngược từ việc chính (trước / trong / sau / tài khoản / quản lý).
+
+| Việc | Thuộc ai | Phục vụ việc chính | Loại | Bản đầu? |
+|---|---|---|---|---|
+| | | | Chính / Trước / Trong / Sau / Tài khoản / Quản lý | Có / Để sau |
+
 ## 2. Luồng chính
 
-Mỗi việc chính viết dạng `Mở app → ... → Xong` và ghi số lần chạm.
+Mỗi việc chính viết dạng `Mở app → ... → Xong` và ghi số lần chạm. Việc phụ chỉ chen vào đúng lúc cần.
 
 ### <Loại người dùng> — <Việc chính>
 - Hiện đang làm bằng: ____ — vướng ở: ____

@@ -11,12 +11,15 @@
     • Ai dùng, để làm gì?
                         │
                         ▼
- 3. Bấm chọn ─────────▶ 4. Viết APP_SPEC.md (tự quyết luồng, nút, cảm giác bấm, giọng)
-    • Màu chủ đạo          Phong cách nền: nhẹ nhàng, dễ chịu, đơn giản
-    • Phong cách           mà đầy đủ, bo tròn góc
-    • Chạy ở đâu:       5. Viết DESIGN_PROMPT.md
-      Web / Zalo /      6. Chọn nơi chạy:
-      Cả hai               A. Nhẹ               → claude.ai
+ 3. Bấm chọn ─────────▶ 4. Viết APP_SPEC.md
+    • Màu chủ đạo          • Bản đồ việc: suy ngược từ việc chính ra việc phụ
+    • Phong cách             (tạo hồ sơ, đăng tin, sửa, hủy, đánh giá...)
+    • Chạy ở đâu:          • Tự quyết luồng, nút, cảm giác bấm, giọng
+      Web / Zalo /         • Phong cách nền: nhẹ nhàng, dễ chịu, đơn giản
+      Cả hai                 mà đầy đủ, bo tròn góc
+                        5. Viết DESIGN_PROMPT.md
+                        6. Chọn nơi chạy:
+                           A. Nhẹ               → claude.ai
                            B. Tài khoản+dữ liệu → Supabase + Netlify
                            C. Cần server        → Railway/Render + Supabase + Netlify
                            Z. Có Zalo           → thêm giao diện Zalo Mini App
@@ -25,7 +28,7 @@
                         8. Tự kiểm tra: đi hết luồng, chụp mọi màn hình, lỗi thì tự sửa
                         │
                         ▼
- 9. Nhận: link app + tóm tắt + prompt thiết kế
+ 9. Nhận: link app + tóm tắt (kèm bản đồ việc) + prompt thiết kế
     (có Zalo: link bản web xem trước + danh sách việc cần làm bên Zalo)
                         │
 10. (Tùy chọn) Sửa ─────┘

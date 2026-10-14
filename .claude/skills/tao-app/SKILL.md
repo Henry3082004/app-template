@@ -36,8 +36,26 @@ Chép `APP_SPEC.template.md` thành `APP_SPEC.md` và điền đầy đủ. Mụ
 còn lại suy ra từ mục đích app và người dùng theo các mặc định dưới đây. Có lý do rõ ràng để làm
 khác (vd: công cụ văn phòng dùng trên máy tính) thì làm khác và ghi lý do vào spec.
 
+**Bản đồ việc (suy ngược từ việc chính — làm trước khi vẽ luồng):**
+Người viết chỉ nói việc chính. Với **từng việc chính của từng loại người dùng**, tự đi qua checklist:
+- **Trước:** để làm được việc này cần sẵn có gì (hồ sơ, tin đăng, sản phẩm, danh mục, địa chỉ...)? Ai
+  tạo ra nó — chính người này hay **loại người dùng khác**? (vd: sinh viên ứng tuyển → cần tin tuyển
+  dụng → chủ shop phải đăng tin → chủ shop phải có hồ sơ shop.) Lặp lại cho tới khi hết thứ cần có.
+- **Trong:** cần tìm, lọc, chọn, so sánh gì để ra quyết định?
+- **Sau:** xem lại, sửa, hủy, theo dõi trạng thái, nhận thông báo, đánh giá, lịch sử?
+- **Tài khoản:** đăng nhập, đăng xuất, sửa thông tin cá nhân.
+- **Quản lý:** có cần người duyệt nội dung / xử lý vi phạm / xem thống kê không? (thường để sau)
+- **Dữ liệu mẫu:** app mới chưa có dữ liệu thì màn hình đầu có trống trơn không? → cần dữ liệu mẫu
+  hoặc màn hình trống hướng dẫn bước đầu tiên.
+
+Ghi kết quả vào mục "Bản đồ việc" của APP_SPEC.md: mỗi việc phụ ghi **thuộc ai**, **phục vụ việc chính
+nào**, và **làm ở bản đầu** hay **để sau** (bản đầu chỉ giữ việc phụ mà thiếu thì việc chính không làm
+được). Liệt kê bản đồ việc trong bản tóm tắt gửi người viết để họ bổ sung nếu thiếu.
+
 **Luồng chính:**
 - Việc chính hoàn thành với **ít lần chạm nhất có thể**; màn hình đầu tiên là nơi làm việc chính.
+- Việc phụ không được chặn đường việc chính: chỉ yêu cầu đúng lúc cần (vd: chỉ bắt tạo hồ sơ khi bấm
+  ứng tuyển lần đầu, và chỉ hỏi vài trường tối thiểu — phần còn lại điền sau).
 - Cho xem trước, chỉ đăng nhập khi thật sự cần (vd: lúc gửi/lưu dữ liệu).
 - Chỉ hỏi người dùng thông tin khi cần, form ngắn, tự điền sẵn những gì đã biết.
 
