@@ -1,7 +1,8 @@
 # APP_SPEC — <Tên app>
 
-> Bản đặc tả do `/tao-app` tạo ra từ câu trả lời của người viết app. Mọi màn hình, nút bấm, màu
-> sắc, câu chữ khi build phải khớp file này. Muốn làm khác → hỏi người viết, sửa file này trước.
+> Bản đặc tả do `/tao-app` tạo ra. Mục 0–1 lấy từ câu trả lời của người viết app; các mục còn lại
+> do Claude quyết theo mặc định tốt nhất, người viết đổi được. Mọi màn hình, nút bấm, màu sắc, câu
+> chữ khi build phải khớp file này. Muốn làm khác → sửa file này trước.
 
 **Trạng thái:** Nháp / Đã chốt ngày ____
 **Người viết app:** ____
@@ -59,6 +60,10 @@ Mỗi việc chính viết dạng `Mở app → ... → Xong` và ghi số lần
 - **Hướng dẫn người mới:**
 - **Báo lỗi:** — câu mẫu: "____"
 - **Từ phải dùng / cấm dùng:**
+
+## Để sau (không làm ở bản đầu)
+
+- ____
 
 ## Quyết định còn mở
 

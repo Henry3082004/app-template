@@ -1,118 +1,88 @@
 ---
 name: tao-app
-description: Bắt đầu một app mới. Hỏi người viết app lần lượt 6 nhóm câu hỏi (người dùng, luồng chính, bố cục & nút bấm, hình ảnh, cảm giác khi bấm, giọng giao tiếp), ghi kết quả vào APP_SPEC.md, chốt với người viết, rồi viết DESIGN_PROMPT.md (prompt gửi Claude Design) trước khi viết bất kỳ dòng code nào. Dùng khi người dùng gõ /tao-app, hoặc nói muốn tạo/làm/build một app mới mà repo chưa có APP_SPEC.md đã chốt.
+description: Bắt đầu một app mới. Chỉ hỏi người viết app là gì và ai dùng / dùng để làm gì; mọi thứ còn lại (luồng, bố cục, hình ảnh, cảm giác khi bấm, giọng văn) Claude tự quyết theo mặc định tốt nhất, ghi vào APP_SPEC.md, cho người viết xem lướt và đổi nếu muốn, rồi viết DESIGN_PROMPT.md (prompt gửi Claude Design) trước khi viết bất kỳ dòng code nào. Dùng khi người dùng gõ /tao-app, hoặc nói muốn tạo/làm/build một app mới mà repo chưa có APP_SPEC.md đã chốt.
 ---
 
-# /tao-app — Hỏi đủ trước khi build
+# /tao-app — Hỏi ít, quyết hộ phần còn lại
 
-Mục tiêu: app làm ra đúng ý người viết ngay từ bản đầu. **Không viết code, không dựng khung
-dự án cho tới khi APP_SPEC.md đã được người viết chốt.**
+Người viết app chỉ cần trả lời những điều **chỉ họ mới biết**: app để làm gì, ai dùng, dùng để làm
+gì. Những thứ có sẵn đáp án tốt nhất (số chạm, vị trí nút, cách báo lỗi, màu, giọng văn...) thì
+Claude tự quyết, không hỏi. **Không viết code cho tới khi APP_SPEC.md đã chốt.**
 
-## Cách hỏi
+## Bước 1 — Hỏi (một lượt, tối đa 2 lượt nếu cần làm rõ)
 
-- Hỏi **từng nhóm một**, theo đúng thứ tự bên dưới. Hết nhóm này mới sang nhóm sau.
-- Mỗi lượt chỉ 2–4 câu. Dùng tool `AskUserQuestion` khi câu hỏi có lựa chọn rõ ràng (đưa gợi ý sẵn,
-  lựa chọn khuyên dùng đặt đầu tiên và ghi "(Khuyên dùng)"); câu cần mô tả tự do thì hỏi bằng lời.
-- Dựa vào câu trả lời trước để hỏi câu sau cho sát (vd: đã biết có 2 loại người dùng thì nhóm 2
-  hỏi luồng chính cho **từng** loại).
-- Nói tiếng Việt, ngắn gọn, không dùng thuật ngữ khó. Người viết không cần biết code.
-- Câu trả lời mơ hồ ("đẹp là được", "tùy bạn") → đề xuất 2–3 phương án cụ thể để chọn, không tự đoán.
-- Đầu mỗi nhóm nói rõ đang ở nhóm mấy/6 để người viết biết còn bao nhiêu.
+Hỏi bằng tiếng Việt, ngắn gọn, không thuật ngữ:
 
-## Nhóm 0 — Thông tin chung (hỏi nhanh trước)
+1. **App là gì?** Mô tả một câu, kèm tên tạm nếu có.
+2. **Ai dùng app?** Có mấy loại người dùng; mỗi loại **dùng app để làm gì** (1–2 việc chính).
 
-- Tên app (tạm thời cũng được) và mô tả app trong **một câu**.
-- Chạy trên đâu: web trên điện thoại, web trên máy tính, Zalo Mini App, app Android/iOS?
-- Dùng để kinh doanh thế nào (bán thuê bao, thu phí giao dịch, miễn phí...)? — chỉ để hiểu ưu tiên.
+Chỉ hỏi thêm khi câu trả lời thiếu thứ không thể tự suy ra (vd: không rõ có mấy loại người dùng).
+Không hỏi về luồng, bố cục, màu, giọng, cách kiếm tiền.
 
-## Nhóm 1/6 — Người dùng
+## Bước 2 — Tự quyết phần còn lại
 
-- Có **mấy loại** người dùng? (vd: sinh viên + chủ shop; khách + nhân viên + quản lý)
-- Với **mỗi loại**: họ là ai (tuổi, nghề, mức thạo công nghệ), dùng app **để đạt được điều gì**,
-  dùng bao lâu một lần, trong hoàn cảnh nào (đang đi đường, ngồi văn phòng, vừa làm vừa xem...).
-- Loại người dùng nào quan trọng nhất (app phải phục vụ tốt nhất cho ai trước)?
+Suy ra từ mục đích app và người dùng, áp các mặc định dưới đây. Có lý do rõ ràng để làm khác
+(vd: app nội bộ văn phòng dùng trên máy tính) thì làm khác và ghi lý do vào spec.
 
-## Nhóm 2/6 — Luồng chính (từ lúc mở app tới lúc xong việc)
+**Nền tảng:** web chạy tốt trên điện thoại (nhanh ra mắt nhất). Cần chạy trong Zalo → Zalo Mini App.
 
-Với **từng** loại người dùng:
-- Việc **quan trọng nhất** họ mở app để làm là gì? (chỉ 1–2 việc)
-- Hiện họ đang làm việc đó bằng cách nào (giấy, Zalo, Excel...) và vướng ở đâu?
-- Lần đầu mở app: phải đăng nhập/đăng ký ngay, hay được xem trước rồi mới đăng nhập?
+**Luồng chính:**
+- Việc chính hoàn thành với **ít lần chạm nhất có thể**; màn hình đầu tiên là nơi làm việc chính.
+- Cho xem trước, chỉ đăng nhập khi thật sự cần (vd: lúc gửi/lưu dữ liệu).
+- Chỉ hỏi người dùng thông tin khi cần, form ngắn, tự điền sẵn những gì đã biết.
 
-Sau khi hỏi xong, **tự vẽ luồng** cho từng việc chính theo dạng `Mở app → ... → Xong` và đưa
-người viết duyệt. Áp nguyên tắc:
-- Việc chính hoàn thành trong **tối đa 3 lần chạm** sau khi mở app, nếu được.
-- Màn hình đầu tiên sau đăng nhập phải là nơi làm việc chính, không phải trang giới thiệu.
-- Chỉ hỏi người dùng thông tin khi thật sự cần, không bắt điền form dài ngay từ đầu.
-- Mỗi màn hình chỉ có **một hành động chính**.
+**Bố cục và nút bấm:**
+- Mặc định dùng một tay trên điện thoại: thanh điều hướng dưới đáy; nút chính ở nửa dưới, to (≥48px),
+  rộng hết chiều ngang; mỗi màn hình một hành động chính.
+- Đăng xuất và hành động nguy hiểm (xóa, hủy) để xa nút chính, luôn hỏi xác nhận.
+- Thông tin quan trọng nhất với người dùng (giá, thời gian, trạng thái) đặt nổi bật trên cùng mỗi thẻ.
 
-## Nhóm 3/6 — Bố cục và nút bấm
+**Hình ảnh:**
+- Chọn một màu chủ đạo hợp tính chất app (tránh trùng màu thương hiệu lớn như xanh Zalo), kèm màu
+  nhạt đi kèm và màu đỏ cho lỗi/gấp. Nền sáng, thẻ trắng bo góc, tối giản. Không dark mode ở bản đầu.
+- Icon nhỏ dùng emoji (không phụ thuộc font/CDN bên ngoài). Logo tạm: ô vuông bo góc chữ viết tắt.
 
-- Người dùng cầm máy **một tay hay hai tay**? Màn hình điện thoại, máy tính bảng hay máy tính?
-- Thanh điều hướng: dưới đáy (dễ bấm bằng ngón cái, khuyên dùng cho điện thoại) hay menu bên cạnh?
-- Những nút nào cần **luôn nhìn thấy**, nút nào giấu vào menu được?
+**Cảm giác khi bấm:**
+- Nút chính đổi màu khi nhấn, rung nhẹ trên điện thoại hỗ trợ; nút thường không rung.
+- Chuyển trang trượt nhanh (~0,2s). Đang tải → khung xám chờ (skeleton).
+- Xong việc chính → màn xác nhận ngắn (dấu tích + câu nói bước tiếp theo).
 
-Nguyên tắc mặc định (nói cho người viết biết, cho phép đổi):
-- Nút hành động chính đặt ở **nửa dưới màn hình**, trong vùng ngón cái chạm tới; to, đủ dễ bấm
-  (tối thiểu 44×44px), rộng hết chiều ngang nếu là hành động quan trọng nhất của màn hình.
-- Hành động nguy hiểm (xóa, hủy, đăng xuất) để xa nút chính và luôn hỏi xác nhận.
-- Thông tin quan trọng nhất (giá, trạng thái, thời gian) đặt trên cùng của mỗi thẻ/màn hình.
+**Giọng giao tiếp:**
+- Xưng "bạn", thân thiện, ngắn gọn; emoji vừa phải.
+- Không màn giới thiệu; chỗ dễ bối rối hiện một dòng gợi ý lần đầu.
+- Báo lỗi luôn kèm cách sửa, không hiện mã lỗi kỹ thuật. Chế độ demo/thử nghiệm có thêm nút
+  "Sao chép báo lỗi cho Claude" (copy sẵn: lỗi gì, màn hình nào, lúc nào, chi tiết kỹ thuật).
 
-## Nhóm 4/6 — Hình ảnh
+**Phạm vi bản đầu:** chỉ những gì phục vụ việc chính của từng loại người dùng; thứ khác ghi vào
+"Để sau" trong spec. Chưa thu tiền, chưa thanh toán trong app trừ khi đó chính là việc chính.
 
-- Màu chủ đạo: đã có màu thương hiệu chưa? Nếu chưa, muốn cảm giác gì (tươi trẻ, tin cậy, sang
-  trọng, vui nhộn) → đề xuất 2–3 bộ màu cụ thể để chọn.
-- Phong cách: tối giản, nhiều hình ảnh, hay kiểu thẻ (card)? Bo góc nhiều hay vuông vức?
-- Dùng ảnh thật, hình minh họa, hay chỉ icon? Có logo chưa?
-- Có app nào người viết thích giao diện để tham khảo không? (tên app hoặc ảnh chụp màn hình)
-- Có cần chế độ tối (dark mode) không?
+## Bước 3 — Ghi spec và cho xem lướt
 
-## Nhóm 5/6 — Cảm giác khi bấm
+1. Chép `APP_SPEC.template.md` thành `APP_SPEC.md`, điền đầy đủ. Mục 0–1 lấy từ câu trả lời; các
+   mục còn lại là quyết định của Claude.
+2. Tóm tắt trong chat thật ngắn (5–7 dòng): người dùng, luồng chính và số chạm, màu, giọng, những gì
+   để sau. Nói rõ: "Muốn đổi gì cứ nói, không thì mình chốt."
+3. Người viết đổi gì → sửa spec rồi tóm tắt lại phần đổi. Đồng ý (hoặc không phản đối) → ghi ngày
+   chốt vào APP_SPEC.md.
 
-- Khi bấm nút: có **rung nhẹ** (trên điện thoại) không? Nút có hiệu ứng lún/đổi màu khi nhấn không?
-- Chuyển trang: trượt mượt, mờ dần, hay chuyển ngay không hiệu ứng (nhanh nhất)?
-- Khi làm xong việc chính (đặt hàng, ứng tuyển...): báo thành công kiểu gì — dòng thông báo nhỏ,
-  màn hình chúc mừng, hay hiệu ứng vui (pháo giấy...)?
-- Khi đang tải: vòng xoay, khung xám chờ (skeleton), hay thanh tiến trình?
+## Bước 4 — Prompt thiết kế
 
-## Nhóm 6/6 — Giọng giao tiếp
+Viết `DESIGN_PROMPT.md` ở gốc repo: một prompt hoàn chỉnh, tự đứng được, để người viết copy dán vào
+Claude Design. Gồm: mô tả app và người dùng; khung hình (vd điện thoại 390×844) và nguyên tắc bố cục;
+phong cách (mã màu, bo góc, icon); **danh sách từng màn hình** theo từng loại người dùng bám đúng
+luồng chính, mỗi màn ghi nội dung, nút chính và câu chữ mẫu đúng giọng; các trạng thái (đang tải,
+trống, lỗi, thành công, gợi ý lần đầu); ghi chú tương tác; phần cần bàn giao (màn hình + trang thành
+phần). Dữ liệu mẫu thực tế, đúng ngôn ngữ app. Không thêm gì spec không có.
+Đưa nội dung prompt ngay trong chat để copy được luôn.
 
-- Xưng hô với người dùng: **bạn/mình**, anh/chị/em, quý khách, hay không xưng hô?
-- Giọng: thân thiện vui vẻ, lịch sự trang trọng, hay ngắn gọn chuyên nghiệp?
-  → đưa 2–3 câu ví dụ cùng một nội dung viết theo từng giọng để người viết chọn.
-- Người dùng mới: có cần màn hình hướng dẫn lần đầu không, hay để họ tự khám phá kèm gợi ý nhỏ?
-- Báo lỗi thế nào: chỉ nói lỗi, hay nói lỗi **kèm cách sửa**? (khuyên dùng: luôn kèm cách sửa,
-  không bao giờ hiện thông báo kỹ thuật như "Error 500")
-- Có từ ngữ nào **phải dùng** hoặc **cấm dùng** không? (bắt buộc hỏi — nếu đã hỏi 4 câu trong
-  lượt đầu của nhóm này thì hỏi câu này ở một lượt riêng, không được bỏ qua)
+## Bước 5 — Trước khi build
 
-## Sau khi hỏi xong
-
-1. Điền đầy đủ `APP_SPEC.md` ở gốc repo theo mẫu `APP_SPEC.template.md` (chép mẫu ra rồi điền).
-   Mục nào người viết chưa quyết thì ghi rõ "Chưa quyết — tạm dùng: ..." chứ không bỏ trống.
-2. Tóm tắt lại cho người viết trong chat: số loại người dùng, việc chính của từng loại, luồng
-   chính (số lần chạm), màu, giọng — ngắn gọn, dễ đọc.
-3. Hỏi người viết chốt. Có chỉnh sửa → sửa APP_SPEC.md rồi tóm tắt lại.
-4. Chốt xong → ghi ngày chốt vào APP_SPEC.md.
-5. Viết `DESIGN_PROMPT.md` ở gốc repo: một prompt hoàn chỉnh, tự đứng được, để người viết copy
-   dán vào Claude Design. Gồm:
-   - mô tả app 2–3 câu và người dùng;
-   - khung hình (vd điện thoại 390×844) và nguyên tắc bố cục từ nhóm 3 (vị trí nút chính, điều hướng);
-   - phong cách từ nhóm 4 (mã màu, bo góc, ảnh/icon, dark mode);
-   - **danh sách từng màn hình** theo từng loại người dùng, bám đúng luồng nhóm 2, mỗi màn ghi rõ nội
-     dung, nút chính và câu chữ mẫu đúng giọng nhóm 6;
-   - các trạng thái chung: đang tải, trống, lỗi, thành công, gợi ý lần đầu (theo nhóm 5 và 6);
-   - ghi chú tương tác (rung, chuyển trang) và phần cần bàn giao (màn hình + trang thành phần).
-   Dữ liệu mẫu phải thực tế, đúng ngôn ngữ của app. Không thêm gì spec không có.
-   Đưa nội dung prompt cho người viết ngay trong chat để copy được luôn.
-6. Commit APP_SPEC.md + DESIGN_PROMPT.md, rồi mới lập kế hoạch build.
-   Trước khi build, nêu model nên dùng, mức effort và thời gian ước tính.
-   Có thiết kế từ Claude Design gửi lại → build bám theo thiết kế đó và APP_SPEC.md.
-   Spec đổi → viết lại DESIGN_PROMPT.md.
+Commit APP_SPEC.md + DESIGN_PROMPT.md. Nêu model nên dùng, mức effort, thời gian ước tính rồi mới
+build. Có thiết kế từ Claude Design gửi lại → build bám theo thiết kế đó và APP_SPEC.md.
+Spec đổi → cập nhật APP_SPEC.md trước, viết lại DESIGN_PROMPT.md, rồi mới sửa code.
 
 ## Trong lúc build
 
-- Mọi màn hình, nút, màu, câu chữ phải khớp APP_SPEC.md. Muốn làm khác → hỏi người viết trước.
-- Người viết đổi ý giữa chừng → cập nhật APP_SPEC.md trước, rồi mới sửa code.
-- Mỗi màn hình làm xong: chụp màn hình (Playwright, kích thước điện thoại) và đối chiếu với spec:
-  đếm số lần chạm của luồng chính, kiểm tra nút chính nằm nửa dưới màn hình, câu chữ đúng giọng.
+- Mọi màn hình, nút, màu, câu chữ phải khớp APP_SPEC.md. Muốn làm khác → sửa spec trước.
+- Mỗi màn hình làm xong: chụp màn hình (Playwright, kích thước điện thoại), đối chiếu spec: số chạm
+  của luồng chính, nút chính ở nửa dưới, câu chữ đúng giọng.
