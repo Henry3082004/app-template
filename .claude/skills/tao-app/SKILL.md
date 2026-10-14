@@ -9,6 +9,16 @@ Người viết app chỉ trả lời những điều **chỉ họ mới biết*
 liền một mạch tới khi có **link web app chạy được**. Không dừng giữa chừng xin duyệt spec hay thiết
 kế — người viết xem link rồi yêu cầu sửa sau.
 
+## Cấu trúc repo (đọc trước)
+
+Repo này là **repo chung cho mọi app** của người viết (môi trường cloud không cho Claude tạo repo
+GitHub mới). Phần gốc chứa quy tắc chung (skill này, `CLAUDE.md`, `QUY_TRINH.md`, `BAN_APP.md`,
+`TU_SUA_LOI.md`, `APP_SPEC.template.md`). **Mỗi app là một thư mục `apps/<slug>/`** (slug: tên app
+không dấu, chữ thường, nối bằng gạch ngang, vd `apps/viec-thoi-vu/`). Mọi file của một app — code,
+`APP_SPEC.md`, `DESIGN_PROMPT.md`, `PROGRESS.md`, thư mục `ban/` — nằm trong thư mục của app đó.
+Không sửa thư mục của app khác khi đang làm một app. Khi deploy, trỏ thư mục gốc build (base
+directory) của Netlify/Railway/Render vào `apps/<slug>/`.
+
 ## Bước 1 — Hỏi (lượt 1: câu 1–2; lượt 2: câu 3–4 bằng nút bấm, lựa chọn hợp với app vừa mô tả)
 
 1. **App là gì?** Mô tả một câu, kèm tên tạm nếu có.
@@ -36,7 +46,7 @@ gian ước tính, rồi làm luôn.
 
 ## Bước 2 — Tự quyết và ghi APP_SPEC.md
 
-Chép `APP_SPEC.template.md` thành `APP_SPEC.md` và điền đầy đủ. Mục 0–1 lấy từ câu trả lời; các mục
+Tạo thư mục `apps/<slug>/`. Chép `APP_SPEC.template.md` thành `apps/<slug>/APP_SPEC.md` và điền đầy đủ. Mục 0–1 lấy từ câu trả lời; các mục
 còn lại suy ra từ mục đích app và người dùng theo các mặc định dưới đây. Có lý do rõ ràng để làm
 khác (vd: công cụ văn phòng dùng trên máy tính) thì làm khác và ghi lý do vào spec.
 
@@ -100,7 +110,7 @@ claude.ai không bán được), và Bước 7 lo phần thanh toán.
 
 ## Bước 3 — Viết prompt thiết kế (chỉ viết, không tự vẽ)
 
-Viết `DESIGN_PROMPT.md` ở gốc repo: prompt hoàn chỉnh, tự đứng được, để người viết **tự** copy dán
+Viết `DESIGN_PROMPT.md` trong thư mục app: prompt hoàn chỉnh, tự đứng được, để người viết **tự** copy dán
 vào Claude Design nếu muốn thiết kế đẹp hơn. Claude không tự tạo thiết kế trên canvas. Gồm: mô tả app
 và người dùng; khung hình (vd điện thoại 390×844) và nguyên tắc bố cục; phong cách (mã màu, bo góc,
 icon); **danh sách từng màn hình** theo từng loại người dùng bám đúng luồng chính, mỗi màn ghi nội

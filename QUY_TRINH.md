@@ -3,8 +3,8 @@
 ```
  BẠN                         CLAUDE (tự động, không hỏi lại)
  ───                         ──────────────────────────────
- 1. Use this template  ─┐
-    + gõ /tao-app       │
+ 1. Gõ /tao-app ───────▶ (tự tạo thư mục apps/<tên-app>/ trong repo chung)
+                        │
                         ▼
  2. Trả lời 2 câu
     • App là gì?
@@ -75,7 +75,7 @@
  S3. Bạn nhận thông báo điện thoại: lỗi gì, sửa gì, lỗi nào chưa sửa được
 ```
 
-**Phần bạn phải làm:** bấm 1 lần tạo repo, trả lời 2 câu, bấm chọn màu, phong cách, nơi chạy và có
+**Phần bạn phải làm:** gõ /tao-app, trả lời 2 câu, bấm chọn màu, phong cách, nơi chạy và có
 bán không. Nếu chọn Zalo thì thêm Z1–Z3; nếu bán thì thiết lập B1–B7 một lần và tự bật thanh toán thật
 cho từng app. Còn lại Claude tự làm.
 
