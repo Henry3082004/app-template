@@ -121,8 +121,11 @@ Chọn loại **đơn giản nhất** đáp ứng được việc chính. Phân 
   chung project với schema riêng cho app). Bật Row Level Security cho mọi bảng, kiểm tra
   `get_advisors` trước khi gửi link. Frontend gọi Supabase bằng publishable key, deploy lên Netlify.
 - **Loại C:** server dựng theo khung NestJS + Prisma + Dockerfile như Gig Việc. Thử Railway trước;
-  không tạo được service (hết hạn mức) → Render (`create_web_service`). Bật Sentry cho cả server và
-  frontend để Claude đọc được lỗi thật của người dùng.
+  không tạo được service (hết hạn mức) → Render (`create_web_service`).
+- **Sentry (loại B và C, bắt buộc):** tạo project Sentry cho app (dùng connector Sentry), gắn SDK vào
+  frontend (và server nếu có), đặt DSN qua biến môi trường. Gắn tên app + môi trường vào mỗi lỗi.
+  Kiểm tra bằng cách cố tình gây một lỗi thử rồi tìm thấy nó trên Sentry trước khi gửi link. Ghi tên
+  project Sentry vào APP_SPEC.md. Xem `TU_SUA_LOI.md` để bật lịch tự sửa lỗi.
 - **Chi phí:** không bao giờ tạo tài nguyên tốn tiền khi chưa hỏi người viết. Tool báo có phí (vd
   Supabase `get_cost` khác 0) → dừng, báo số tiền và hỏi trước khi `confirm_cost`.
 - Không tạo được ở mọi nơi → báo rõ lý do và việc người viết cần làm, đồng thời đăng bản demo giao
