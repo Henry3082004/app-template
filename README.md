@@ -6,9 +6,11 @@ Khung chung để tạo app mới nhanh và đúng ý người viết.
 
 1. Trên GitHub, bấm **Use this template → Create a new repository** để tạo repo cho app mới.
 2. Mở repo mới trong Claude Code, gõ **`/tao-app`**.
-3. Claude chỉ hỏi 2 điều: **app là gì**, và **ai dùng, dùng để làm gì**.
+3. Claude chỉ hỏi 3 điều: **app là gì**, **ai dùng, dùng để làm gì**, và **chọn màu sắc + phong
+   cách** (có sẵn gợi ý để bấm chọn). Mọi app đều theo phong cách nền: nhẹ nhàng, dễ chịu, đơn giản
+   mà đầy đủ, bo tròn góc.
 4. Claude làm liền một mạch, không dừng chờ duyệt:
-   - tự quyết luồng, bố cục, màu, cảm giác khi bấm, giọng văn và ghi vào `APP_SPEC.md`;
+   - tự quyết luồng, bố cục, cảm giác khi bấm, giọng văn và ghi vào `APP_SPEC.md`;
    - viết `DESIGN_PROMPT.md`;
    - build, tự kiểm tra bằng ảnh chụp màn hình.
 5. Bạn nhận **link web app chạy được**, kèm bản tóm tắt và prompt thiết kế. Muốn giao diện đẹp hơn

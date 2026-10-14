@@ -1,20 +1,27 @@
 ---
 name: tao-app
-description: Tạo trọn một app mới từ 2 câu trả lời. Chỉ hỏi người viết app là gì và ai dùng / dùng để làm gì; Claude tự quyết mọi thứ còn lại theo mặc định tốt nhất, ghi APP_SPEC.md, viết DESIGN_PROMPT.md (prompt để người viết tự gửi Claude Design), build, tự kiểm tra, rồi gửi link web app chạy được cùng prompt thiết kế — không dừng giữa chừng chờ duyệt. Dùng khi người dùng gõ /tao-app, hoặc nói muốn tạo/làm/build một app mới.
+description: Tạo trọn một app mới từ vài câu trả lời. Chỉ hỏi người viết app là gì, ai dùng / dùng để làm gì, và chọn màu sắc + phong cách; Claude tự quyết mọi thứ còn lại theo mặc định tốt nhất, ghi APP_SPEC.md, viết DESIGN_PROMPT.md (prompt để người viết tự gửi Claude Design), build, tự kiểm tra, rồi gửi link web app chạy được cùng prompt thiết kế — không dừng giữa chừng chờ duyệt. Dùng khi người dùng gõ /tao-app, hoặc nói muốn tạo/làm/build một app mới.
 ---
 
-# /tao-app — Trả lời 2 câu, nhận link app
+# /tao-app — Trả lời vài câu, nhận link app
 
 Người viết app chỉ trả lời những điều **chỉ họ mới biết**. Mọi thứ khác Claude tự quyết và làm
 liền một mạch tới khi có **link web app chạy được**. Không dừng giữa chừng xin duyệt spec hay thiết
 kế — người viết xem link rồi yêu cầu sửa sau.
 
-## Bước 1 — Hỏi (một lượt; chỉ hỏi lượt 2 khi thiếu thứ không thể tự suy ra)
+## Bước 1 — Hỏi (lượt 1: câu 1–2; lượt 2: câu 3 kèm lựa chọn hợp với app vừa mô tả)
 
 1. **App là gì?** Mô tả một câu, kèm tên tạm nếu có.
 2. **Ai dùng app?** Có mấy loại người dùng; mỗi loại **dùng app để làm gì** (1–2 việc chính).
+3. **Màu sắc và phong cách?** Hỏi bằng `AskUserQuestion` sau khi đã biết app là gì, gồm 2 câu, mỗi câu
+   2–3 lựa chọn cụ thể hợp với app đó (đề xuất hợp nhất đặt đầu, ghi "(Recommended)"):
+   - **Màu chủ đạo:** mỗi lựa chọn ghi tên màu + mã hex + cảm giác nó tạo ra (vd "Xanh lá dịu
+     #4CAF7D — tươi mát, thư giãn"). Ưu tiên tông dịu, dễ chịu; tránh màu quá chói/gắt.
+   - **Phong cách:** biến thể trong khuôn khổ phong cách nền (xem "Hình ảnh" bên dưới), vd "Mềm mại,
+     nhiều khoảng trắng" / "Ấm áp, có hình minh họa" / "Gọn gàng, chuyên nghiệp".
+   Người viết có màu/thương hiệu sẵn thì họ ghi ở ô Other.
 
-Không hỏi về luồng, bố cục, màu, giọng, cách kiếm tiền, nền tảng.
+Không hỏi về luồng, bố cục, giọng, cách kiếm tiền, nền tảng.
 
 Sau khi có câu trả lời, nói ngắn gọn: loại app (nhẹ/đầy đủ — xem Bước 4), model + effort + thời
 gian ước tính, rồi làm luôn.
@@ -36,10 +43,18 @@ khác (vd: công cụ văn phòng dùng trên máy tính) thì làm khác và gh
 - Đăng xuất và hành động nguy hiểm (xóa, hủy) để xa nút chính, luôn hỏi xác nhận.
 - Thông tin quan trọng nhất (giá, thời gian, trạng thái) đặt nổi bật trên cùng mỗi thẻ.
 
-**Hình ảnh:**
-- Một màu chủ đạo hợp tính chất app (tránh trùng màu thương hiệu lớn như xanh Zalo), kèm màu nhạt đi
-  kèm và màu đỏ cho lỗi/gấp. Nền sáng, thẻ trắng bo góc, tối giản. Không dark mode ở bản đầu.
-- Icon nhỏ dùng emoji (không phụ thuộc font/CDN bên ngoài). Logo tạm: ô vuông bo góc chữ viết tắt.
+**Hình ảnh — phong cách nền của mọi app (người viết đã chọn, luôn áp dụng):**
+- **Nhẹ nhàng, dễ chịu, đơn giản mà đầy đủ.** Nhìn vào thấy thoải mái, không rối mắt, nhưng mọi thông
+  tin và nút cần cho việc chính đều có mặt — không giấu thứ quan trọng để trông "tối giản".
+- **Bo tròn góc rõ ràng:** thẻ ~16–20px, nút dạng viên thuốc (bo tròn hết), ô nhập ~12px, ảnh đại diện tròn.
+- Nhiều khoảng trắng, chữ dễ đọc (cỡ chữ thân ≥15px), phân cấp rõ bằng cỡ/đậm chữ thay vì nhiều màu.
+- Màu dịu: màu chủ đạo theo lựa chọn ở Bước 1, kèm một tông nhạt của nó làm nền nhấn; nền trang sáng
+  ấm/trung tính, thẻ trắng, bóng đổ rất nhẹ; đỏ dịu cho lỗi/gấp. Tránh tương phản gắt, viền đậm, màu
+  bão hòa mạnh. Vẫn đảm bảo chữ đủ tương phản để đọc dễ.
+- Chuyển động mềm, ngắn; không hiệu ứng lòe loẹt.
+- Không dark mode ở bản đầu. Icon nhỏ dùng emoji (không phụ thuộc font/CDN bên ngoài). Logo tạm: ô
+  vuông bo tròn chữ viết tắt.
+- Phong cách người viết chọn ở Bước 1 chỉ là biến thể trong khuôn khổ trên, không phá các điểm trên.
 
 **Cảm giác khi bấm:**
 - Nút chính đổi màu khi nhấn, rung nhẹ trên điện thoại hỗ trợ; nút thường không rung.
