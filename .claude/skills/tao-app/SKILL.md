@@ -1,30 +1,29 @@
 ---
 name: tao-app
-description: Bắt đầu một app mới. Chỉ hỏi người viết app là gì và ai dùng / dùng để làm gì; mọi thứ còn lại (luồng, bố cục, hình ảnh, cảm giác khi bấm, giọng văn) Claude tự quyết theo mặc định tốt nhất, ghi vào APP_SPEC.md, cho người viết xem lướt và đổi nếu muốn, rồi viết DESIGN_PROMPT.md (prompt gửi Claude Design) trước khi viết bất kỳ dòng code nào. Dùng khi người dùng gõ /tao-app, hoặc nói muốn tạo/làm/build một app mới mà repo chưa có APP_SPEC.md đã chốt.
+description: Tạo trọn một app mới từ 2 câu trả lời. Chỉ hỏi người viết app là gì và ai dùng / dùng để làm gì; Claude tự quyết mọi thứ còn lại theo mặc định tốt nhất, ghi APP_SPEC.md, viết DESIGN_PROMPT.md (prompt để người viết tự gửi Claude Design), build, tự kiểm tra, rồi gửi link web app chạy được cùng prompt thiết kế — không dừng giữa chừng chờ duyệt. Dùng khi người dùng gõ /tao-app, hoặc nói muốn tạo/làm/build một app mới.
 ---
 
-# /tao-app — Hỏi ít, quyết hộ phần còn lại
+# /tao-app — Trả lời 2 câu, nhận link app
 
-Người viết app chỉ cần trả lời những điều **chỉ họ mới biết**: app để làm gì, ai dùng, dùng để làm
-gì. Những thứ có sẵn đáp án tốt nhất (số chạm, vị trí nút, cách báo lỗi, màu, giọng văn...) thì
-Claude tự quyết, không hỏi. **Không viết code cho tới khi APP_SPEC.md đã chốt.**
+Người viết app chỉ trả lời những điều **chỉ họ mới biết**. Mọi thứ khác Claude tự quyết và làm
+liền một mạch tới khi có **link web app chạy được**. Không dừng giữa chừng xin duyệt spec hay thiết
+kế — người viết xem link rồi yêu cầu sửa sau.
 
-## Bước 1 — Hỏi (một lượt, tối đa 2 lượt nếu cần làm rõ)
-
-Hỏi bằng tiếng Việt, ngắn gọn, không thuật ngữ:
+## Bước 1 — Hỏi (một lượt; chỉ hỏi lượt 2 khi thiếu thứ không thể tự suy ra)
 
 1. **App là gì?** Mô tả một câu, kèm tên tạm nếu có.
 2. **Ai dùng app?** Có mấy loại người dùng; mỗi loại **dùng app để làm gì** (1–2 việc chính).
 
-Chỉ hỏi thêm khi câu trả lời thiếu thứ không thể tự suy ra (vd: không rõ có mấy loại người dùng).
-Không hỏi về luồng, bố cục, màu, giọng, cách kiếm tiền.
+Không hỏi về luồng, bố cục, màu, giọng, cách kiếm tiền, nền tảng.
 
-## Bước 2 — Tự quyết phần còn lại
+Sau khi có câu trả lời, nói ngắn gọn: loại app (nhẹ/đầy đủ — xem Bước 4), model + effort + thời
+gian ước tính, rồi làm luôn.
 
-Suy ra từ mục đích app và người dùng, áp các mặc định dưới đây. Có lý do rõ ràng để làm khác
-(vd: app nội bộ văn phòng dùng trên máy tính) thì làm khác và ghi lý do vào spec.
+## Bước 2 — Tự quyết và ghi APP_SPEC.md
 
-**Nền tảng:** web chạy tốt trên điện thoại (nhanh ra mắt nhất). Cần chạy trong Zalo → Zalo Mini App.
+Chép `APP_SPEC.template.md` thành `APP_SPEC.md` và điền đầy đủ. Mục 0–1 lấy từ câu trả lời; các mục
+còn lại suy ra từ mục đích app và người dùng theo các mặc định dưới đây. Có lý do rõ ràng để làm
+khác (vd: công cụ văn phòng dùng trên máy tính) thì làm khác và ghi lý do vào spec.
 
 **Luồng chính:**
 - Việc chính hoàn thành với **ít lần chạm nhất có thể**; màn hình đầu tiên là nơi làm việc chính.
@@ -35,11 +34,11 @@ Suy ra từ mục đích app và người dùng, áp các mặc định dưới 
 - Mặc định dùng một tay trên điện thoại: thanh điều hướng dưới đáy; nút chính ở nửa dưới, to (≥48px),
   rộng hết chiều ngang; mỗi màn hình một hành động chính.
 - Đăng xuất và hành động nguy hiểm (xóa, hủy) để xa nút chính, luôn hỏi xác nhận.
-- Thông tin quan trọng nhất với người dùng (giá, thời gian, trạng thái) đặt nổi bật trên cùng mỗi thẻ.
+- Thông tin quan trọng nhất (giá, thời gian, trạng thái) đặt nổi bật trên cùng mỗi thẻ.
 
 **Hình ảnh:**
-- Chọn một màu chủ đạo hợp tính chất app (tránh trùng màu thương hiệu lớn như xanh Zalo), kèm màu
-  nhạt đi kèm và màu đỏ cho lỗi/gấp. Nền sáng, thẻ trắng bo góc, tối giản. Không dark mode ở bản đầu.
+- Một màu chủ đạo hợp tính chất app (tránh trùng màu thương hiệu lớn như xanh Zalo), kèm màu nhạt đi
+  kèm và màu đỏ cho lỗi/gấp. Nền sáng, thẻ trắng bo góc, tối giản. Không dark mode ở bản đầu.
 - Icon nhỏ dùng emoji (không phụ thuộc font/CDN bên ngoài). Logo tạm: ô vuông bo góc chữ viết tắt.
 
 **Cảm giác khi bấm:**
@@ -50,39 +49,57 @@ Suy ra từ mục đích app và người dùng, áp các mặc định dưới 
 **Giọng giao tiếp:**
 - Xưng "bạn", thân thiện, ngắn gọn; emoji vừa phải.
 - Không màn giới thiệu; chỗ dễ bối rối hiện một dòng gợi ý lần đầu.
-- Báo lỗi luôn kèm cách sửa, không hiện mã lỗi kỹ thuật. Chế độ demo/thử nghiệm có thêm nút
+- Báo lỗi luôn kèm cách sửa, không hiện mã lỗi kỹ thuật. Bản demo có thêm nút
   "Sao chép báo lỗi cho Claude" (copy sẵn: lỗi gì, màn hình nào, lúc nào, chi tiết kỹ thuật).
 
 **Phạm vi bản đầu:** chỉ những gì phục vụ việc chính của từng loại người dùng; thứ khác ghi vào
-"Để sau" trong spec. Chưa thu tiền, chưa thanh toán trong app trừ khi đó chính là việc chính.
+"Để sau". Chưa thu tiền, chưa thanh toán trong app trừ khi đó chính là việc chính.
 
-## Bước 3 — Ghi spec và cho xem lướt
+## Bước 3 — Viết prompt thiết kế (chỉ viết, không tự vẽ)
 
-1. Chép `APP_SPEC.template.md` thành `APP_SPEC.md`, điền đầy đủ. Mục 0–1 lấy từ câu trả lời; các
-   mục còn lại là quyết định của Claude.
-2. Tóm tắt trong chat thật ngắn (5–7 dòng): người dùng, luồng chính và số chạm, màu, giọng, những gì
-   để sau. Nói rõ: "Muốn đổi gì cứ nói, không thì mình chốt."
-3. Người viết đổi gì → sửa spec rồi tóm tắt lại phần đổi. Đồng ý (hoặc không phản đối) → ghi ngày
-   chốt vào APP_SPEC.md.
+Viết `DESIGN_PROMPT.md` ở gốc repo: prompt hoàn chỉnh, tự đứng được, để người viết **tự** copy dán
+vào Claude Design nếu muốn thiết kế đẹp hơn. Claude không tự tạo thiết kế trên canvas. Gồm: mô tả app
+và người dùng; khung hình (vd điện thoại 390×844) và nguyên tắc bố cục; phong cách (mã màu, bo góc,
+icon); **danh sách từng màn hình** theo từng loại người dùng bám đúng luồng chính, mỗi màn ghi nội
+dung, nút chính và câu chữ mẫu đúng giọng; các trạng thái (đang tải, trống, lỗi, thành công, gợi ý lần
+đầu); ghi chú tương tác; phần cần bàn giao (màn hình + trang thành phần). Dữ liệu mẫu thực tế, đúng
+ngôn ngữ app. Không thêm gì spec không có. Không chờ người viết — sang Bước 4 ngay.
 
-## Bước 4 — Prompt thiết kế
+## Bước 4 — Build và đăng
 
-Viết `DESIGN_PROMPT.md` ở gốc repo: một prompt hoàn chỉnh, tự đứng được, để người viết copy dán vào
-Claude Design. Gồm: mô tả app và người dùng; khung hình (vd điện thoại 390×844) và nguyên tắc bố cục;
-phong cách (mã màu, bo góc, icon); **danh sách từng màn hình** theo từng loại người dùng bám đúng
-luồng chính, mỗi màn ghi nội dung, nút chính và câu chữ mẫu đúng giọng; các trạng thái (đang tải,
-trống, lỗi, thành công, gợi ý lần đầu); ghi chú tương tác; phần cần bàn giao (màn hình + trang thành
-phần). Dữ liệu mẫu thực tế, đúng ngôn ngữ app. Không thêm gì spec không có.
-Đưa nội dung prompt ngay trong chat để copy được luôn.
+Phân loại app:
 
-## Bước 5 — Trước khi build
+- **App nhẹ** (dùng cá nhân/nhóm nhỏ, không cần đăng nhập Zalo/thanh toán/logic server phức tạp):
+  build thành web app và đăng bằng tool **Artifact** (theo đúng hướng dẫn của tool: nạp skill thiết kế
+  artifact trước khi viết trang; cần lưu dữ liệu dùng chung giữa người xem → dùng capability `db` qua
+  skill `artifact-capabilities`, không dùng localStorage cho dữ liệu chính). Link có ngay, không cần
+  server. Mặc định private — nhắc người viết tự chia sẻ khi muốn người khác dùng.
+- **App đầy đủ** (nhiều người dùng thật cần đăng nhập, thanh toán, dữ liệu nhạy cảm, logic server):
+  build backend + frontend trong repo, deploy lên Railway, gửi domain. Railway không tạo được service
+  mới (vd hết hạn mức gói Free) → báo rõ lý do và việc người viết cần làm, đồng thời đăng bản demo
+  giao diện bằng Artifact để người viết vẫn có link xem ngay.
 
-Commit APP_SPEC.md + DESIGN_PROMPT.md. Nêu model nên dùng, mức effort, thời gian ước tính rồi mới
-build. Có thiết kế từ Claude Design gửi lại → build bám theo thiết kế đó và APP_SPEC.md.
-Spec đổi → cập nhật APP_SPEC.md trước, viết lại DESIGN_PROMPT.md, rồi mới sửa code.
+Không hỏi lại giữa chừng. Gặp quyết định không có trong mặc định → chọn phương án an toàn, đơn giản
+nhất, ghi vào "Quyết định còn mở" trong spec.
 
-## Trong lúc build
+## Bước 5 — Tự kiểm tra trước khi gửi link
 
-- Mọi màn hình, nút, màu, câu chữ phải khớp APP_SPEC.md. Muốn làm khác → sửa spec trước.
-- Mỗi màn hình làm xong: chụp màn hình (Playwright, kích thước điện thoại), đối chiếu spec: số chạm
-  của luồng chính, nút chính ở nửa dưới, câu chữ đúng giọng.
+- Chạy test/typecheck nếu có. Mở app thật, chụp màn hình kích thước điện thoại (Playwright) **mọi
+  màn hình**, đi hết luồng chính của từng loại người dùng, theo dõi lỗi console.
+- Đối chiếu spec: số chạm luồng chính, nút chính ở nửa dưới, màu, câu chữ đúng giọng.
+- Mọi class CSS dùng trong code phải thực sự được định nghĩa; không phụ thuộc font/icon tải từ CDN.
+- Sai thì sửa rồi kiểm tra lại. Chỉ gửi link khi đã đi hết luồng chính không lỗi.
+
+## Bước 6 — Gửi kết quả
+
+Commit APP_SPEC.md, DESIGN_PROMPT.md và code. Gửi người viết, ngắn gọn:
+1. **Link app** (và tài khoản/cách dùng thử nếu có).
+2. Tóm tắt 5–7 dòng: người dùng, luồng chính và số chạm, màu, giọng, những gì để sau, việc còn chờ
+   người viết (nếu có).
+3. **Nội dung DESIGN_PROMPT.md** ngay trong chat để copy, kèm một câu: muốn đẹp hơn thì gửi prompt
+   cho Claude Design rồi đưa lại kết quả để Claude chỉnh app theo.
+
+## Khi người viết yêu cầu sửa
+
+Sửa APP_SPEC.md trước (và DESIGN_PROMPT.md nếu phần giao diện đổi), rồi sửa code, kiểm tra lại như
+Bước 5, đăng lại cùng link. Có thiết kế từ Claude Design gửi lại → chỉnh app bám theo thiết kế đó.

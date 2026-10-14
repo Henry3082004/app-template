@@ -3,10 +3,10 @@
 Repo này được tạo từ `app-template` của Henry. Người viết app không phải lập trình viên — nói tiếng
 Việt, ngắn gọn, giải thích bằng ngôn ngữ thường.
 
-## Quy tắc số 1: chưa có spec thì không code
+## Quy tắc số 1: spec trước, code sau
 
-- Nếu chưa có `APP_SPEC.md` ở gốc repo, hoặc file đó chưa ghi "Đã chốt" → **chạy skill `/tao-app`
-  trước**. Không dựng khung dự án, không viết code, không chọn màu/thư viện thay người viết.
+- Chưa có `APP_SPEC.md` ở gốc repo → **chạy skill `/tao-app`**. Skill này chỉ hỏi người viết 2 câu,
+  tự ghi spec, viết prompt thiết kế, rồi build và gửi link luôn — không dừng chờ duyệt.
 - `APP_SPEC.md` là nguồn sự thật cho mọi quyết định về người dùng, luồng, bố cục, hình ảnh, cảm
   giác khi bấm và giọng văn. Code đi ngược spec là lỗi, kể cả khi "trông đẹp hơn".
 - Người viết đổi ý → sửa `APP_SPEC.md` trước, rồi mới sửa code.

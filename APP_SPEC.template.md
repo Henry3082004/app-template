@@ -4,7 +4,7 @@
 > do Claude quyết theo mặc định tốt nhất, người viết đổi được. Mọi màn hình, nút bấm, màu sắc, câu
 > chữ khi build phải khớp file này. Muốn làm khác → sửa file này trước.
 
-**Trạng thái:** Nháp / Đã chốt ngày ____
+**Ngày tạo:** ____ — **Link app:** ____
 **Người viết app:** ____
 
 ## 0. Thông tin chung
