@@ -67,17 +67,30 @@ ngôn ngữ app. Không thêm gì spec không có. Không chờ người viết 
 
 ## Bước 4 — Build và đăng
 
-Phân loại app:
+Phân loại app rồi chọn nơi chạy (connector đã kết nối: Railway, Render, Supabase, Netlify, Sentry):
 
-- **App nhẹ** (dùng cá nhân/nhóm nhỏ, không cần đăng nhập Zalo/thanh toán/logic server phức tạp):
-  build thành web app và đăng bằng tool **Artifact** (theo đúng hướng dẫn của tool: nạp skill thiết kế
-  artifact trước khi viết trang; cần lưu dữ liệu dùng chung giữa người xem → dùng capability `db` qua
-  skill `artifact-capabilities`, không dùng localStorage cho dữ liệu chính). Link có ngay, không cần
-  server. Mặc định private — nhắc người viết tự chia sẻ khi muốn người khác dùng.
-- **App đầy đủ** (nhiều người dùng thật cần đăng nhập, thanh toán, dữ liệu nhạy cảm, logic server):
-  build backend + frontend trong repo, deploy lên Railway, gửi domain. Railway không tạo được service
-  mới (vd hết hạn mức gói Free) → báo rõ lý do và việc người viết cần làm, đồng thời đăng bản demo
-  giao diện bằng Artifact để người viết vẫn có link xem ngay.
+| Loại | Khi nào | Chạy ở đâu |
+|---|---|---|
+| **A. Nhẹ** | Dùng cá nhân/nhóm nhỏ, không cần tài khoản riêng từng người, không thanh toán | Tool **Artifact** trên claude.ai |
+| **B. Có dữ liệu + đăng nhập** | Nhiều người dùng có tài khoản, dữ liệu lưu lâu dài, logic đơn giản (thêm/sửa/xem/lọc) | **Supabase** (database + đăng nhập + lưu file) + giao diện trên **Netlify** |
+| **C. Cần server thật** | Logic nghiệp vụ phức tạp, tích hợp bên thứ ba (Zalo, thanh toán), xử lý định kỳ | Server trên **Railway**, hết chỗ → **Render**; database **Supabase** Postgres; giao diện **Netlify** |
+
+Chọn loại **đơn giản nhất** đáp ứng được việc chính. Phân vân giữa B và C → chọn B.
+
+- **Loại A:** theo đúng hướng dẫn của tool Artifact (nạp skill thiết kế artifact trước khi viết trang;
+  dữ liệu dùng chung giữa người xem → capability `db` qua skill `artifact-capabilities`, không dùng
+  localStorage cho dữ liệu chính). Mặc định private — nhắc người viết tự chia sẻ.
+- **Loại B:** tạo project Supabase riêng cho app (gói miễn phí giới hạn số project → hết chỗ thì dùng
+  chung project với schema riêng cho app). Bật Row Level Security cho mọi bảng, kiểm tra
+  `get_advisors` trước khi gửi link. Frontend gọi Supabase bằng publishable key, deploy lên Netlify.
+- **Loại C:** server dựng theo khung NestJS + Prisma + Dockerfile như Gig Việc. Thử Railway trước;
+  không tạo được service (hết hạn mức) → Render (`create_web_service`). Bật Sentry cho cả server và
+  frontend để Claude đọc được lỗi thật của người dùng.
+- **Chi phí:** không bao giờ tạo tài nguyên tốn tiền khi chưa hỏi người viết. Tool báo có phí (vd
+  Supabase `get_cost` khác 0) → dừng, báo số tiền và hỏi trước khi `confirm_cost`.
+- Không tạo được ở mọi nơi → báo rõ lý do và việc người viết cần làm, đồng thời đăng bản demo giao
+  diện bằng Artifact để vẫn có link xem ngay.
+- Ghi nơi chạy, tên project/service và link vào APP_SPEC.md.
 
 Không hỏi lại giữa chừng. Gặp quyết định không có trong mặc định → chọn phương án an toàn, đơn giản
 nhất, ghi vào "Quyết định còn mở" trong spec.
@@ -102,4 +115,6 @@ Commit APP_SPEC.md, DESIGN_PROMPT.md và code. Gửi người viết, ngắn g�
 ## Khi người viết yêu cầu sửa
 
 Sửa APP_SPEC.md trước (và DESIGN_PROMPT.md nếu phần giao diện đổi), rồi sửa code, kiểm tra lại như
-Bước 5, đăng lại cùng link. Có thiết kế từ Claude Design gửi lại → chỉnh app bám theo thiết kế đó.
+Bước 5, đăng lại cùng link. Có thiết kế từ Claude Design gửi lại → chỉnh app bám theo thiết kế đó
+(là link Claude Design và app chạy trên Netlify → thử tool `import-claude-design-from-url` của Netlify
+trước). Người dùng gặp lỗi → đọc lỗi trên Sentry (loại C) hoặc log Supabase (loại B) trước khi sửa.
