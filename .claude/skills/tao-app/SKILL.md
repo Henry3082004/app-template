@@ -1,6 +1,6 @@
 ---
 name: tao-app
-description: Bắt đầu một app mới. Hỏi người viết app lần lượt 6 nhóm câu hỏi (người dùng, luồng chính, bố cục & nút bấm, hình ảnh, cảm giác khi bấm, giọng giao tiếp), ghi kết quả vào APP_SPEC.md và chốt với người viết trước khi viết bất kỳ dòng code nào. Dùng khi người dùng gõ /tao-app, hoặc nói muốn tạo/làm/build một app mới mà repo chưa có APP_SPEC.md đã chốt.
+description: Bắt đầu một app mới. Hỏi người viết app lần lượt 6 nhóm câu hỏi (người dùng, luồng chính, bố cục & nút bấm, hình ảnh, cảm giác khi bấm, giọng giao tiếp), ghi kết quả vào APP_SPEC.md, chốt với người viết, rồi viết DESIGN_PROMPT.md (prompt gửi Claude Design) trước khi viết bất kỳ dòng code nào. Dùng khi người dùng gõ /tao-app, hoặc nói muốn tạo/làm/build một app mới mà repo chưa có APP_SPEC.md đã chốt.
 ---
 
 # /tao-app — Hỏi đủ trước khi build
@@ -83,7 +83,8 @@ Nguyên tắc mặc định (nói cho người viết biết, cho phép đổi):
 - Người dùng mới: có cần màn hình hướng dẫn lần đầu không, hay để họ tự khám phá kèm gợi ý nhỏ?
 - Báo lỗi thế nào: chỉ nói lỗi, hay nói lỗi **kèm cách sửa**? (khuyên dùng: luôn kèm cách sửa,
   không bao giờ hiện thông báo kỹ thuật như "Error 500")
-- Có từ ngữ nào **phải dùng** hoặc **cấm dùng** không?
+- Có từ ngữ nào **phải dùng** hoặc **cấm dùng** không? (bắt buộc hỏi — nếu đã hỏi 4 câu trong
+  lượt đầu của nhóm này thì hỏi câu này ở một lượt riêng, không được bỏ qua)
 
 ## Sau khi hỏi xong
 
@@ -92,8 +93,22 @@ Nguyên tắc mặc định (nói cho người viết biết, cho phép đổi):
 2. Tóm tắt lại cho người viết trong chat: số loại người dùng, việc chính của từng loại, luồng
    chính (số lần chạm), màu, giọng — ngắn gọn, dễ đọc.
 3. Hỏi người viết chốt. Có chỉnh sửa → sửa APP_SPEC.md rồi tóm tắt lại.
-4. Chốt xong → ghi ngày chốt vào APP_SPEC.md, commit, rồi mới lập kế hoạch build.
+4. Chốt xong → ghi ngày chốt vào APP_SPEC.md.
+5. Viết `DESIGN_PROMPT.md` ở gốc repo: một prompt hoàn chỉnh, tự đứng được, để người viết copy
+   dán vào Claude Design. Gồm:
+   - mô tả app 2–3 câu và người dùng;
+   - khung hình (vd điện thoại 390×844) và nguyên tắc bố cục từ nhóm 3 (vị trí nút chính, điều hướng);
+   - phong cách từ nhóm 4 (mã màu, bo góc, ảnh/icon, dark mode);
+   - **danh sách từng màn hình** theo từng loại người dùng, bám đúng luồng nhóm 2, mỗi màn ghi rõ nội
+     dung, nút chính và câu chữ mẫu đúng giọng nhóm 6;
+   - các trạng thái chung: đang tải, trống, lỗi, thành công, gợi ý lần đầu (theo nhóm 5 và 6);
+   - ghi chú tương tác (rung, chuyển trang) và phần cần bàn giao (màn hình + trang thành phần).
+   Dữ liệu mẫu phải thực tế, đúng ngôn ngữ của app. Không thêm gì spec không có.
+   Đưa nội dung prompt cho người viết ngay trong chat để copy được luôn.
+6. Commit APP_SPEC.md + DESIGN_PROMPT.md, rồi mới lập kế hoạch build.
    Trước khi build, nêu model nên dùng, mức effort và thời gian ước tính.
+   Có thiết kế từ Claude Design gửi lại → build bám theo thiết kế đó và APP_SPEC.md.
+   Spec đổi → viết lại DESIGN_PROMPT.md.
 
 ## Trong lúc build
 

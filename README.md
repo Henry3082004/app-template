@@ -13,7 +13,8 @@ Khung chung để tạo app mới nhanh và đúng ý người viết.
    4. **Hình ảnh**: màu sắc, phong cách, ảnh và icon.
    5. **Cảm giác khi bấm**: rung, hiệu ứng, cách báo thành công.
    6. **Giọng giao tiếp**: xưng hô, cách hướng dẫn, cách báo lỗi.
-4. Câu trả lời được ghi vào `APP_SPEC.md`. Bạn chốt xong thì Claude mới bắt đầu build.
+4. Câu trả lời được ghi vào `APP_SPEC.md`. Bạn chốt xong, Claude viết `DESIGN_PROMPT.md`, một
+   prompt để bạn copy gửi Claude Design vẽ giao diện. Có spec và thiết kế rồi mới bắt đầu build.
 
 ## Nội dung repo
 
@@ -21,4 +22,5 @@ Khung chung để tạo app mới nhanh và đúng ý người viết.
 |---|---|
 | `.claude/skills/tao-app/SKILL.md` | Bộ câu hỏi và cách hỏi của `/tao-app` |
 | `APP_SPEC.template.md` | Mẫu đặc tả app, được điền sau khi hỏi xong |
+| `DESIGN_PROMPT.md` (tạo sau khi chốt) | Prompt gửi Claude Design, sinh ra từ `APP_SPEC.md` |
 | `CLAUDE.md` | Quy ước Claude phải theo trong mọi app tạo từ template này |
