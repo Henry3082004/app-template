@@ -24,8 +24,8 @@
                         5. Viết DESIGN_PROMPT.md
                         6. Chọn nơi chạy:
                            A. Nhẹ               → claude.ai
-                           B. Tài khoản+dữ liệu → Supabase + Netlify
-                           C. Cần server        → Railway/Render + Supabase + Netlify
+                           B. Tài khoản+dữ liệu → Supabase + Vercel
+                           C. Cần server        → Railway/Render + Supabase + Vercel
                            Z. Có Zalo           → thêm giao diện Zalo Mini App
                                                   (dữ liệu/server theo B hoặc C)
                         7. Build (B, C: gắn Sentry để bắt lỗi thật)

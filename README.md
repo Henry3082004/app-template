@@ -18,7 +18,7 @@ quy trình dùng chung. Sơ đồ quy trình đầy đủ: [`QUY_TRINH.md`](QUY_
 
 | App | Thư mục | Trạng thái |
 |---|---|---|
-| Việc Thời Vụ — tìm việc làm thời vụ | `apps/viec-thoi-vu/` | Bản đầu xong, đang deploy |
+| Việc Thời Vụ — tìm việc làm thời vụ | `apps/viec-thoi-vu/` | Đang chạy: https://viec-thoi-vu.vercel.app |
 
 ## Nội dung phần chung
 

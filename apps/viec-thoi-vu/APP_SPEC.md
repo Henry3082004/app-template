@@ -4,7 +4,7 @@
 > quyết theo mặc định tốt nhất, Henry đổi được. Mọi màn hình, nút bấm, màu sắc, câu chữ khi build
 > phải khớp file này. Muốn làm khác → sửa file này trước.
 
-**Ngày tạo:** 14/10/2026 — **Link app:** (điền sau khi deploy)
+**Ngày tạo:** 14/10/2026 — **Link app:** https://viec-thoi-vu.vercel.app
 **Người viết app:** Henry
 
 ## 0. Thông tin chung
@@ -12,7 +12,7 @@
 - **Mô tả một câu:** App tìm việc làm thời vụ — người cần việc tìm việc ngắn hạn gần mình; cơ sở cần
   người theo đợt/ca đăng tin và chọn người nhanh.
 - **Nền tảng:** Web (điện thoại là chính, máy tính vẫn dùng tốt) + Zalo Mini App (cùng code giao diện).
-- **Loại app:** B + Zalo — Supabase (database, đăng nhập, hàm xử lý) + Netlify (web).
+- **Loại app:** B + Zalo — Supabase (database, đăng nhập, hàm xử lý) + Vercel (web).
 - **Cách kiếm tiền:** Nhà tuyển dụng trả phí gói Pro; người tìm việc luôn miễn phí (xem mục 7).
 
 ## 1. Người dùng

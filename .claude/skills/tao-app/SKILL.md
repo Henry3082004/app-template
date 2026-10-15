@@ -120,13 +120,13 @@ ngôn ngữ app. Không thêm gì spec không có. Không chờ người viết 
 
 ## Bước 4 — Build và đăng
 
-Phân loại app rồi chọn nơi chạy (connector đã kết nối: Railway, Render, Supabase, Netlify, Sentry):
+Phân loại app rồi chọn nơi chạy (connector đã kết nối: Railway, Render, Supabase, Vercel, Netlify, Sentry):
 
 | Loại | Khi nào | Chạy ở đâu |
 |---|---|---|
 | **A. Nhẹ** | Dùng cá nhân/nhóm nhỏ, không cần tài khoản riêng từng người, không thanh toán | Tool **Artifact** trên claude.ai |
-| **B. Có dữ liệu + đăng nhập** | Nhiều người dùng có tài khoản, dữ liệu lưu lâu dài, logic đơn giản (thêm/sửa/xem/lọc) | **Supabase** (database + đăng nhập + lưu file) + giao diện trên **Netlify** |
-| **C. Cần server thật** | Logic nghiệp vụ phức tạp, tích hợp bên thứ ba (Zalo, thanh toán), xử lý định kỳ | Server trên **Railway**, hết chỗ → **Render**; database **Supabase** Postgres; giao diện **Netlify** |
+| **B. Có dữ liệu + đăng nhập** | Nhiều người dùng có tài khoản, dữ liệu lưu lâu dài, logic đơn giản (thêm/sửa/xem/lọc) | **Supabase** (database + đăng nhập + lưu file) + giao diện trên **Vercel** |
+| **C. Cần server thật** | Logic nghiệp vụ phức tạp, tích hợp bên thứ ba (Zalo, thanh toán), xử lý định kỳ | Server trên **Railway**, hết chỗ → **Render**; database **Supabase** Postgres; giao diện **Vercel** |
 
 Chọn loại **đơn giản nhất** đáp ứng được việc chính. Phân vân giữa B và C → chọn B.
 
@@ -135,7 +135,16 @@ Chọn loại **đơn giản nhất** đáp ứng được việc chính. Phân 
   localStorage cho dữ liệu chính). Mặc định private — nhắc người viết tự chia sẻ.
 - **Loại B:** tạo project Supabase riêng cho app (gói miễn phí giới hạn số project → hết chỗ thì dùng
   chung project với schema riêng cho app). Bật Row Level Security cho mọi bảng, kiểm tra
-  `get_advisors` trước khi gửi link. Frontend gọi Supabase bằng publishable key, deploy lên Netlify.
+  `get_advisors` trước khi gửi link. Frontend gọi Supabase bằng publishable key, deploy lên Vercel.
+
+**Deploy web lên Vercel (đã kiểm chứng với Việc Thời Vụ):** commit + push `apps/<slug>/` lên `main`, rồi
+`create_deployment` với `gitSource {type: github, org: Henry3082004, repo: app-template, ref: main, sha}`,
+`projectSettings {framework: vite, rootDirectory: apps/<slug>, buildCommand: npm run build, outputDirectory: dist}`,
+`target: production` → link `https://<slug>.vercel.app`. Kèm `vercel.json` (rewrite SPA). Biến `VITE_*` công khai để
+trong `.env.production` (commit được vì chỉ là khóa công khai). Netlify cần liên kết Git thủ công nên không dùng.
+Sandbox không mở được `*.vercel.app` / `*.supabase.co`: kiểm tra link thật bằng `net.http_get` (pg_net) qua
+Supabase `execute_sql`; kiểm tra giao diện bằng bản mock (`build:mock`) + Playwright.
+Sentry: tổ chức không cho tạo project mới → dùng chung project có sẵn, gắn tag `app:<slug>` (`initialScope`).
 - **Loại C:** server dựng theo khung NestJS + Prisma + Dockerfile như Gig Việc. Thử Railway trước;
   không tạo được service (hết hạn mức) → Render (`create_web_service`).
 - **Sentry (loại B và C, bắt buộc):** tạo project Sentry cho app (dùng connector Sentry), gắn SDK vào
@@ -161,7 +170,7 @@ thiểu là **B** (đăng nhập Zalo cần nơi lưu tài khoản; A trên clau
   - Không dùng class kiểu Tailwind nếu không cài Tailwind; tự định nghĩa class trong file CSS.
   - Gọi `getLocation`/`getAccessToken` của Zalo chỉ chạy được trong Zalo → luôn có phương án dự phòng
     cho bản web (geolocation của trình duyệt, nút "Đăng nhập demo").
-- **Gửi ngay** link bản web (Netlify) để xem trước, có nút "Đăng nhập demo" thay cho đăng nhập Zalo.
+- **Gửi ngay** link bản web (Vercel) để xem trước, có nút "Đăng nhập demo" thay cho đăng nhập Zalo.
 - **Việc người viết phải tự làm** (cần danh tính thật, Claude không làm thay được) — liệt kê rõ trong
   tóm tắt và trong APP_SPEC.md mục "Quyết định còn mở":
   1. Đăng ký Zalo Developer + tạo Mini App → gửi Claude **App ID** và **App Secret**.
@@ -213,7 +222,7 @@ làm. Ghi mọi quyết định vào APP_SPEC.md mục "7. Bán".
 4. **Trang giới thiệu (landing page)** — cùng phong cách nền của app: câu giá trị chính, ảnh chụp màn
    hình thật, 3–6 tính năng, bảng giá, câu hỏi thường gặp, nút "Dùng thử miễn phí". Song ngữ nếu có
    khách quốc tế. Thẻ SEO cơ bản + ảnh chia sẻ mạng xã hội. Có tên miền → landing ở tên miền chính,
-   app ở `app.`; chưa có → dùng domain Netlify.
+   app ở `app.`; chưa có → dùng domain `<slug>.vercel.app`.
 5. **Trang bắt buộc:** Điều khoản sử dụng, Chính sách bảo mật, Chính sách hoàn tiền — viết theo đúng
    cách app thu thập dữ liệu và thu tiền; ghi chú người viết nên nhờ người am hiểu pháp lý xem lại.
 6. **Bộ tài liệu đăng bán** trong thư mục `ban/` (vi + en khi có khách quốc tế):
