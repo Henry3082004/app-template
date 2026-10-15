@@ -1,0 +1,12 @@
+{
+  "app": {
+    "title": "Việc Thời Vụ",
+    "headerColor": "#5B8DEF",
+    "textColor": "white",
+    "statusBarColor": "#5B8DEF",
+    "leftButton": "back"
+  },
+  "listCSS": [],
+  "listSyncJS": [],
+  "listAsyncJS": []
+}
