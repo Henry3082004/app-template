@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "build": "vite build",
+    "build": "../node_modules/.bin/vite build && node fix-config.mjs",
     "deploy": "zmp deploy"
   },
   "devDependencies": {

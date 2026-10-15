@@ -7,7 +7,15 @@
     "leftButton": "back"
   },
   "backgroundColor": "#FFF9F1",
-  "listCSS": [],
-  "listSyncJS": [],
-  "listAsyncJS": []
+  "listCSS": [
+    "assets/index-vNiAMsbH.css"
+  ],
+  "listSyncJS": [
+    "assets/index.C5aMCHSw.module.js"
+  ],
+  "listAsyncJS": [
+    "assets/Landing.Dimb4zXw.module.js",
+    "assets/Legal.D0ibQHcx.module.js",
+    "assets/browser.B-DILub9.module.js"
+  ]
 }
