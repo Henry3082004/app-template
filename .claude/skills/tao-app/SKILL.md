@@ -118,6 +118,13 @@ dung, nút chính và câu chữ mẫu đúng giọng; các trạng thái (đang
 đầu); ghi chú tương tác; phần cần bàn giao (màn hình + trang thành phần). Dữ liệu mẫu thực tế, đúng
 ngôn ngữ app. Không thêm gì spec không có. Không chờ người viết — sang Bước 4 ngay.
 
+**Responsive bắt buộc** (bài học Việc Thời Vụ: bản chỉ-điện-thoại bị cột hẹp trống hai bên trên tablet/máy tính):
+prompt phải đòi mỗi màn ở 4 cỡ khung — điện thoại 390×844, tablet dọc 834×1112, tablet ngang 1194×834, máy
+tính 1440×900 — kèm điểm chuyển bố cục (<600 / 600–1023 / ≥1024px) và quy tắc riêng từng cỡ: điện thoại thanh
+đáy + nút chính rộng hết chiều ngang; tablet thanh bên trái + danh sách/chi tiết cạnh nhau + hộp thoại giữa
+màn hình; máy tính thanh trên + 3 vùng + trạng thái di chuột/focus bàn phím, nút chính gọn. Code cũng phải
+làm đúng như vậy (không để cột 480px căn giữa), và Bước 5 phải chụp thử cả 3 cỡ (điện thoại, tablet, máy tính).
+
 ## Bước 4 — Build và đăng
 
 Phân loại app rồi chọn nơi chạy (connector đã kết nối: Railway, Render, Supabase, Vercel, Netlify, Sentry):
