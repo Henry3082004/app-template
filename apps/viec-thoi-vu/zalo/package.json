@@ -1,0 +1,12 @@
+{
+  "name": "viec-thoi-vu-zalo",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "vite build",
+    "deploy": "zmp deploy"
+  },
+  "devDependencies": {
+    "zmp-cli": "^4.0.3"
+  }
+}

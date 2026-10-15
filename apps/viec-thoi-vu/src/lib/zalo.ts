@@ -1,4 +1,4 @@
-/** True when running inside the Zalo Mini App webview. */
-export const IN_ZALO = typeof window !== 'undefined' &&
-  (/Zalo/i.test(navigator.userAgent) || (window as unknown as { ZaloJavaScriptInterface?: unknown }).ZaloJavaScriptInterface !== undefined ||
-    new URLSearchParams(location.search).has('zalo'))
+/** True when running inside the Zalo Mini App (zalo/ build sets VITE_ZALO, or the Zalo webview user agent). */
+export const IN_ZALO = import.meta.env.VITE_ZALO === '1' ||
+  (typeof window !== 'undefined' &&
+    (/Zalo/i.test(navigator.userAgent) || new URLSearchParams(location.search).has('zalo')))

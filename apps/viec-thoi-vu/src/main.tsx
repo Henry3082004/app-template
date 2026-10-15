@@ -30,6 +30,6 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 )
 
-if ('serviceWorker' in navigator && import.meta.env.PROD && import.meta.env.VITE_MOCK !== '1') {
+if ('serviceWorker' in navigator && import.meta.env.PROD && import.meta.env.VITE_MOCK !== '1' && import.meta.env.VITE_ZALO !== '1') {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => undefined))
 }
