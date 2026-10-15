@@ -1,35 +1,16 @@
 import { useEffect, useState } from 'react'
-import { Navigate, useParams } from 'react-router-dom'
-import { ErrorBox } from '../components/ErrorBox'
-import { CardSkeleton } from '../components/Skeleton'
-import { SuccessScreen } from '../components/SuccessScreen'
-import { Topbar } from '../components/Topbar'
+import { Avatar, Btn, Dialog, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { api } from '../lib/api'
-import { dateRange, initials } from '../lib/format'
+import { capy } from '../lib/capy'
+import { dateRange } from '../lib/format'
 import { tap } from '../lib/haptics'
 import { useI18n, type TKey } from '../lib/i18n'
 import { displayPhone, telHref, zaloHref } from '../lib/phone'
-import { useSession } from '../lib/session'
-import type { Applicant, Job } from '../lib/types'
+import type { Applicant, MyJob } from '../lib/types'
 
-function Contact({ phone }: { phone: string }) {
+/** Applicants of one post: a page on phones, the right-hand column on tablet/desktop. */
+export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: () => void; onChanged(): void }) {
   const { t } = useI18n()
-  return (
-    <div className="notice info mt-12">
-      <div className="phone-big">{displayPhone(phone)}</div>
-      <div className="two mt-8">
-        <a className="btn primary small" href={telHref(phone)}>📞 {t('call')}</a>
-        <a className="btn secondary small" href={zaloHref(phone)} target="_blank" rel="noreferrer">💬 {t('zalo')}</a>
-      </div>
-    </div>
-  )
-}
-
-export default function Applicants() {
-  const { id = '' } = useParams()
-  const { t } = useI18n()
-  const { profile, ready } = useSession()
-  const [job, setJob] = useState<Job | null>(null)
   const [list, setList] = useState<Applicant[] | null>(null)
   const [error, setError] = useState<unknown>(null)
   const [actErr, setActErr] = useState<unknown>(null)
@@ -38,14 +19,9 @@ export default function Applicants() {
 
   const load = () => {
     setError(null)
-    Promise.all([api.getJob(id), api.applicantsFor(id)])
-      .then(([j, a]) => { setJob(j); setList(a) })
-      .catch(setError)
+    api.applicantsFor(job.id).then((a) => { setList(a); onChanged() }).catch(setError)
   }
-  useEffect(() => { if (profile?.role === 'employer') load() }, [profile, id])
-
-  if (!ready) return <CardSkeleton />
-  if (profile?.role !== 'employer') return <Navigate to="/app" replace />
+  useEffect(() => { setList(null); load() }, [job.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const decide = async (a: Applicant, d: 'accepted' | 'rejected') => {
     tap()
@@ -63,68 +39,76 @@ export default function Applicants() {
   }
 
   const toggle = async () => {
-    if (!job) return
     if (job.status === 'open' && !confirm(t('closeConfirm'))) return
     setActErr(null)
-    try { await api.setJobStatus(job.id, job.status === 'open' ? 'closed' : 'open'); load() } catch (e) { setActErr(e) }
-  }
-
-  if (accepted) {
-    return (
-      <SuccessScreen title={t('acceptedTitle', { name: accepted.name.split(' ').slice(-1)[0] })} text={t('acceptedText')}>
-        {accepted.phone && (
-          <>
-            <div className="phone-big">{displayPhone(accepted.phone)}</div>
-            <a className="btn primary block" href={telHref(accepted.phone)}>📞 {t('call')}</a>
-            <a className="btn secondary block" href={zaloHref(accepted.phone)} target="_blank" rel="noreferrer">💬 {t('zalo')}</a>
-          </>
-        )}
-        <button className="btn ghost block" onClick={() => setAccepted(null)}>{t('done')}</button>
-      </SuccessScreen>
-    )
+    try { await api.setJobStatus(job.id, job.status === 'open' ? 'closed' : 'open'); onChanged() } catch (e) { setActErr(e) }
   }
 
   return (
-    <div className="page-enter">
-      <Topbar title={job?.title ?? t('applicantsTitle')} back="/app/tin-cua-toi" />
-      {job && (
-        <div className="row between" style={{ marginTop: -8, marginBottom: 12 }}>
-          <span className="muted small">📅 {dateRange(job.start_date, job.end_date)} · 👥 {t('filledOf', { filled: job.filled, slots: job.slots })}</span>
-          {job.status === 'closed' && <span className="badge gray">{t('closed')}</span>}
-        </div>
-      )}
-      {error != null && <ErrorBox error={error} where="Applicants.load" onRetry={load} />}
-      {actErr != null && <div style={{ marginBottom: 12 }}><ErrorBox error={actErr} where="Applicants.action" /></div>}
-      {!list && !error && <CardSkeleton count={2} />}
-      {list && list.length === 0 && <div className="empty"><div className="big">⏳</div>{t('noApplicants')}</div>}
-      {list?.map((a) => (
-        <article className="card" key={a.id}>
-          <div className="row" style={{ alignItems: 'flex-start', gap: 12 }}>
-            <div className="avatar">{initials(a.full_name)}</div>
-            <div className="grow">
-              <div className="row between">
-                <h3 className="job-title">{a.full_name}</h3>
-                {a.status !== 'pending' && <span className={a.status === 'accepted' ? 'badge ok' : 'badge gray'}>{t(`st${a.status}` as TKey)}</span>}
-              </div>
-              {a.bio && <p className="muted small">{a.bio}</p>}
-              {a.message && <p className="mt-8">“{a.message}”</p>}
-            </div>
+    <div className="pcol">
+      <div className="pg fade-in" key={job.id} style={{ flex: 1 }}>
+        {onBack && <button type="button" className="back" onClick={onBack}>{t('backMine')}</button>}
+        <div className="hrow" style={{ alignItems: 'center', marginBottom: 16 }}>
+          <div>
+            <h2 className="ptitle" style={{ fontSize: 20 }}>{job.title}</h2>
+            <div className="sub">📅 {dateRange(job.start_date, job.end_date)} · 👥 {t('filledOf', { filled: job.filled, slots: job.slots })}</div>
           </div>
-          {a.status === 'accepted' && a.phone && <Contact phone={a.phone} />}
-          {a.status === 'pending' && job?.status === 'open' && (
-            <div className="two mt-12">
-              <button className="btn secondary" disabled={busyId === a.id} onClick={() => decide(a, 'rejected')}>{t('reject')}</button>
-              <button className="btn primary" disabled={busyId === a.id} onClick={() => decide(a, 'accepted')}>{t('accept')}</button>
-            </div>
-          )}
-        </article>
-      ))}
-      {job && (
-        <div className="center mt-24">
-          <button className={job.status === 'open' ? 'btn danger-text' : 'btn ghost'} onClick={toggle}>
-            {job.status === 'open' ? t('closeJob') : t('reopenJob')}
-          </button>
+          {job.status === 'closed' && <Tag>{t('closed')}</Tag>}
         </div>
+        {error != null && <ErrorBox error={error} where="Applicants.load" onRetry={load} />}
+        {actErr != null && <div style={{ marginBottom: 12 }}><ErrorBox error={actErr} where="Applicants.action" /></div>}
+        {!list && !error && <Skel n={2} />}
+        {list && list.length === 0 && <Empty pose="empty" title={t('noApplicants')} />}
+        <div className="g2">
+          {list?.map((a) => (
+            <div key={a.id} className="card cand">
+              <div className="row">
+                <Avatar name={a.full_name} />
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div className="hrow" style={{ alignItems: 'center' }}>
+                    <b>{a.full_name}</b>
+                    {a.status !== 'pending' && <Tag tone={a.status === 'accepted' ? 'ok' : ''}>{t(`st${a.status}` as TKey)}</Tag>}
+                  </div>
+                  {a.bio && <div className="sub" style={{ fontSize: 14 }}>{a.bio}</div>}
+                </div>
+              </div>
+              {a.message && <div className="tag" style={{ borderRadius: 12, whiteSpace: 'normal' }}>💬 “{a.message}”</div>}
+              {a.status === 'accepted' && a.phone && (
+                <>
+                  <div className="phone">📞 {displayPhone(a.phone)}</div>
+                  <div className="acts">
+                    <a className="btn btn-primary sm" href={telHref(a.phone)}>{t('call')}</a>
+                    <a className="btn btn-ghost sm" href={zaloHref(a.phone)} target="_blank" rel="noreferrer">{t('zalo')}</a>
+                  </div>
+                </>
+              )}
+              {a.status === 'pending' && job.status === 'open' && (
+                <div className="acts">
+                  <Btn v="ghost" disabled={busyId === a.id} onClick={() => decide(a, 'rejected')}>{t('reject')}</Btn>
+                  <Btn disabled={busyId === a.id} onClick={() => decide(a, 'accepted')}>{t('accept')}</Btn>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="center mt24"><Btn v="text" onClick={toggle}>{job.status === 'open' ? t('closeJob') : t('reopenJob')}</Btn></div>
+      </div>
+      {accepted && (
+        <Dialog full label={t('acceptedTitle', { name: accepted.name })} onClose={() => setAccepted(null)}>
+          <img className="capy sm hop" src={capy('cheer')} alt="" />
+          <h2>{t('acceptedTitle', { name: accepted.name.replace(/\(.*?\)/g, '').trim().split(' ').slice(-1)[0] })}</h2>
+          <div className="sub">{t('acceptedText')}</div>
+          {accepted.phone && (
+            <>
+              <div className="phone">{displayPhone(accepted.phone)}</div>
+              <div className="row" style={{ gap: 10, width: '100%' }}>
+                <a className="btn btn-primary block" href={telHref(accepted.phone)}>{t('call')}</a>
+                <a className="btn btn-ghost block" href={zaloHref(accepted.phone)} target="_blank" rel="noreferrer">{t('zalo')}</a>
+              </div>
+            </>
+          )}
+          <Btn v="text" onClick={() => setAccepted(null)}>{t('done')}</Btn>
+        </Dialog>
       )}
     </div>
   )

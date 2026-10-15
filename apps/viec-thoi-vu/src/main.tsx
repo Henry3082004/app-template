@@ -2,8 +2,12 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import { ErrorBoundary, initSentry } from './lib/sentry'
-import './ds/tokens.css'
-import './ds/bundle.css'
+import './ds/tokens/colors.css'
+import './ds/tokens/typography.css'
+import './ds/tokens/spacing.css'
+import './ds/tokens/effects.css'
+import './ds/tokens/base.css'
+import './ds/app.css'
 
 initSentry()
 

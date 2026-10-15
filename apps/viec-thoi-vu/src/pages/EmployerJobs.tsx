@@ -1,65 +1,97 @@
-import { useEffect, useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
-import { Dock } from '../components/Dock'
-import { ErrorBox } from '../components/ErrorBox'
-import { CardSkeleton } from '../components/Skeleton'
-import { Topbar } from '../components/Topbar'
+import { useCallback, useEffect, useState } from 'react'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Applicants } from './Applicants'
+import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { api } from '../lib/api'
 import { dateRange } from '../lib/format'
 import { tap } from '../lib/haptics'
 import { useI18n } from '../lib/i18n'
 import { useSession } from '../lib/session'
 import type { MyJob } from '../lib/types'
+import { useBp } from '../lib/useBp'
 
 export default function EmployerJobs() {
   const { t } = useI18n()
   const nav = useNavigate()
+  const { id } = useParams()
+  const bp = useBp()
+  const wide = bp !== 'm'
   const { profile, ready } = useSession()
   const [list, setList] = useState<MyJob[] | null>(null)
   const [error, setError] = useState<unknown>(null)
 
-  const load = () => {
+  const load = useCallback(() => {
     if (profile?.role !== 'employer') return
     setError(null)
     api.myJobs().then(setList).catch(setError)
-  }
-  useEffect(load, [profile])
+  }, [profile])
+  useEffect(load, [load])
 
-  if (!ready) return <CardSkeleton />
+  if (!ready) return <div className="pg"><Skel n={2} /></div>
   if (profile?.role !== 'employer') return <Navigate to="/app" replace />
 
   const open = list?.filter((j) => j.status === 'open').length ?? 0
   const isPro = profile.plan === 'pro'
+  const post = id ? list?.find((j) => j.id === id) : undefined
+  const post_ = () => { tap(); nav('/app/dang-tin') }
 
-  return (
-    <div className="page-enter">
-      <Topbar title={t('myJobsTitle')} />
-      <div className="plan-bar">
+  if (!wide && id) {
+    return post
+      ? <Applicants job={post} onBack={() => nav('/app/tin-cua-toi')} onChanged={load} />
+      : <div className="pg">{list ? <Empty pose="empty" title={t('notFound')} /> : <Skel n={2} />}</div>
+  }
+
+  const listing = (
+    <>
+      <div className="hrow" style={{ alignItems: 'center', marginBottom: 12 }}>
+        <h1 className="ptitle">{t('myJobsTitle')}</h1>
+        {wide && <Btn sm onClick={post_}>{t('postJob')}</Btn>}
+      </div>
+      <div className="plan" style={{ marginBottom: 12 }}>
         <span>{isPro ? t('proBar') : t('planBar', { open })}</span>
-        {!isPro && <button className="btn ghost small" style={{ height: 28 }} onClick={() => nav('/app/bang-gia')}>{t('upgrade')}</button>}
+        {!isPro && <Link to="/app/bang-gia">{t('upgrade')}</Link>}
       </div>
       {error != null && <ErrorBox error={error} where="EmployerJobs.load" onRetry={load} />}
-      {!list && !error && <CardSkeleton />}
-      {list && list.length === 0 && <div className="empty"><div className="big">📋</div>{t('emptyMyJobs')}</div>}
-      {list?.map((j) => (
-        <article className="card tappable" key={j.id} onClick={() => nav(`/app/tin/${j.id}`)} role="button" tabIndex={0}>
-          <div className="row between" style={{ alignItems: 'flex-start' }}>
-            <h3 className="job-title grow">{j.title}</h3>
-            {j.status === 'closed' ? <span className="badge gray">{t('closed')}</span> : j.is_urgent ? <span className="badge urgent">{t('urgent')}</span> : null}
+      {!list && !error && <Skel n={2} />}
+      {list && list.length === 0 && <Empty pose="empty" title={t('emptyMyJobs')} />}
+      <div className="cards">
+        {list?.map((j) => (
+          <button key={j.id} type="button" className={'card job' + (wide && j.id === id ? ' sel' : '')} onClick={() => nav(`/app/tin/${j.id}`)}>
+            <div className="hrow"><h3>{j.title}</h3>{j.status === 'closed' ? <Tag>{t('closed')}</Tag> : j.is_urgent ? <Tag tone="urgent">{t('urgent')}</Tag> : null}</div>
+            <div className="tags">
+              <Tag>📅 {dateRange(j.start_date, j.end_date)}</Tag>
+              <Tag>👥 {t('filledOf', { filled: j.filled, slots: j.slots })}</Tag>
+              {j.newApplicants > 0 ? <Tag tone="p">{t('newApplicants', { n: j.newApplicants })}</Tag> : <Tag>{t('applicantsN', { n: j.applicants })}</Tag>}
+            </div>
+          </button>
+        ))}
+      </div>
+    </>
+  )
+
+  if (!wide) {
+    return (
+      <div className="pcol">
+        <div className="pg" style={{ flex: 1 }}>{listing}</div>
+        <div className="cta">
+          <div style={{ position: 'relative' }}>
+            {list && list.length === 0 && <div className="coach" style={{ bottom: 60, left: 0 }}>{t('firstTip')}</div>}
+            <Btn block onClick={post_}>{t('postJob')}</Btn>
           </div>
-          <div className="chips">
-            <span className="chip">📅 {dateRange(j.start_date, j.end_date)}</span>
-            <span className="chip">👥 {t('filledOf', { filled: j.filled, slots: j.slots })}</span>
-            {j.newApplicants > 0
-              ? <span className="badge info">{t('newApplicants', { n: j.newApplicants })}</span>
-              : <span className="chip">{t('applicantsN', { n: j.applicants })}</span>}
-          </div>
-        </article>
-      ))}
-      <Dock>
-        {list && list.length === 0 && <div className="tip">{t('firstTip')}</div>}
-        <button className="btn primary block" onClick={() => { tap(); nav('/app/dang-tin') }}>{t('postJob')}</button>
-      </Dock>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="split two">
+      <section className="listcol" style={{ position: 'relative' }}>
+        {list && list.length === 0 && <div className="coach" style={{ top: 62, left: 150 }}>{t('firstTip')}</div>}
+        {listing}
+      </section>
+      <section className="detailcol">
+        {post ? <Applicants job={post} onChanged={load} /> : <Empty pose="wave" title={t('pickPost')} sub={t('pickPostSub')} />}
+      </section>
     </div>
   )
 }

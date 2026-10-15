@@ -1,0 +1,5 @@
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--font-sans);font-size:var(--fs-body);line-height:var(--lh-body);color:var(--text-body);background:var(--surface-page);-webkit-font-smoothing:antialiased}
+a{color:var(--text-link);text-decoration:none}a:hover{color:var(--brand-700);text-decoration:underline}
+::selection{background:var(--brand-100)}

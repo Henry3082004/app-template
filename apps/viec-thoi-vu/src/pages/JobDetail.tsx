@@ -1,52 +1,41 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { Dock } from '../components/Dock'
-import { ErrorBox } from '../components/ErrorBox'
-import { PayLine } from '../components/JobCard'
-import { CardSkeleton } from '../components/Skeleton'
-import { SuccessScreen } from '../components/SuccessScreen'
-import { Topbar } from '../components/Topbar'
+import { useState } from 'react'
+import { Pay } from '../components/JobCard'
+import { Btn, ErrorBox, Fld, Tag } from '../components/ui'
 import { api } from '../lib/api'
 import { errorCode } from '../lib/errors'
 import { dateRange } from '../lib/format'
+import { fmtKm } from '../lib/geo'
 import { tap } from '../lib/haptics'
 import { useI18n } from '../lib/i18n'
 import { report } from '../lib/sentry'
 import { useSession } from '../lib/session'
 import type { AppStatus, Job } from '../lib/types'
 
-export default function JobDetail() {
-  const { id = '' } = useParams()
-  const nav = useNavigate()
-  const { t } = useI18n()
+/** Job detail: a page on phones, the right-hand column on tablet/desktop. */
+export function JobDetail({ job, distance, mine, onApplied, onBack }: {
+  job: Job
+  distance?: number | null
+  mine: AppStatus | null
+  onApplied(): void
+  onBack?: () => void
+}) {
+  const { t, locale } = useI18n()
   const { profile, askAuth } = useSession()
-  const [job, setJob] = useState<Job | null | undefined>(undefined)
-  const [loadErr, setLoadErr] = useState<unknown>(null)
-  const [mine, setMine] = useState<AppStatus | null>(null)
-  const [showMsg, setShowMsg] = useState(false)
   const [msg, setMsg] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<unknown>(null)
-  const [done, setDone] = useState(false)
-
-  const load = () => {
-    setLoadErr(null)
-    api.getJob(id).then(setJob).catch(setLoadErr)
-  }
-  useEffect(load, [id])
-  useEffect(() => {
-    if (profile?.role === 'seeker') api.myApplicationStatus().then((m) => setMine(m[id] ?? null)).catch(() => undefined)
-  }, [profile, id])
+  const left = job.slots - job.filled
+  const full = left <= 0 || job.status !== 'open'
+  const isEmployer = profile?.role === 'employer'
 
   const send = async () => {
     setBusy(true)
     setError(null)
     try {
-      await api.apply(id, msg)
-      setDone(true)
+      await api.apply(job.id, msg)
+      onApplied()
     } catch (e) {
-      if (errorCode(e) === 'ALREADY_APPLIED') setMine('pending')
-      if (errorCode(e) === 'UNKNOWN') report(e, { where: 'apply', job: id })
+      if (errorCode(e) === 'UNKNOWN') report(e, { where: 'apply', job: job.id })
       setError(e)
     } finally {
       setBusy(false)
@@ -55,85 +44,38 @@ export default function JobDetail() {
 
   const onApply = () => {
     tap()
-    if (!profile) return askAuth({ role: 'seeker', onDone: (p) => (p.role === 'seeker' ? send() : undefined) })
-    send()
+    if (!profile) return askAuth({ role: 'seeker', onDone: (p) => { if (p.role === 'seeker') void send() } })
+    void send()
   }
-
-  if (done) {
-    return (
-      <SuccessScreen title={t('appliedTitle')} text={t('appliedText')}>
-        <button className="btn primary block" onClick={() => nav('/app')}>{t('moreJobs')}</button>
-        <button className="btn ghost block" onClick={() => nav('/app/da-ung-tuyen')}>{t('seeApplied')}</button>
-      </SuccessScreen>
-    )
-  }
-
-  if (loadErr) return <div className="page-enter"><Topbar title="" back /><ErrorBox error={loadErr} where="JobDetail.load" onRetry={load} /></div>
-  if (job === undefined) return <div><Topbar title="" back /><CardSkeleton count={2} /></div>
-  if (job === null) {
-    return (
-      <div className="page-enter">
-        <Topbar title="" back />
-        <div className="empty"><div className="big">🔍</div>{t('notFound')}</div>
-      </div>
-    )
-  }
-
-  const left = job.slots - job.filled
-  const full = left <= 0 || job.status !== 'open'
-  const isEmployer = profile?.role === 'employer'
 
   return (
-    <div className="page-enter">
-      <Topbar title="" back />
-      <section className="card">
-        <div className="row between" style={{ alignItems: 'flex-start' }}>
-          <h2 className="grow" style={{ fontSize: 21 }}>{job.title}</h2>
-          {job.is_urgent && <span className="badge urgent">{t('urgent')}</span>}
+    <>
+      <div className="dscroll fade-in" key={job.id}>
+        {onBack && <button type="button" className="back" onClick={onBack}>{t('backJobs')}</button>}
+        <div className="card">
+          <div className="hrow"><h2 style={{ fontSize: 20 }}>{job.title}</h2>{job.is_urgent && <Tag tone="urgent">{t('urgent')}</Tag>}</div>
+          <div style={{ marginTop: 8 }}><Pay job={job} xl /></div>
         </div>
-        <PayLine job={job} big />
-      </section>
-
-      <section className="card">
-        <div className="info-row"><span className="ico">📅</span><div><div className="muted small">{t('time')}</div>{dateRange(job.start_date, job.end_date)}{job.shift_note ? ` · ${job.shift_note}` : ''}</div></div>
-        <div className="info-row"><span className="ico">📍</span><div><div className="muted small">{t('place')}</div>{job.address}, {job.city}</div></div>
-        <div className="info-row"><span className="ico">👥</span><div><div className="muted small">{t('slots')}</div>{left > 0 ? t('slotsOf', { left, total: job.slots }) : t('full')}</div></div>
-        {job.business_name && <div className="info-row"><span className="ico">🏪</span><div><div className="muted small">{t('business')}</div>{job.business_name}</div></div>}
-      </section>
-
-      {job.description && (
-        <section className="card">
-          <h3 className="bold" style={{ fontSize: 15 }}>{t('about')}</h3>
-          <p className="mt-8" style={{ whiteSpace: 'pre-line', color: '#374151' }}>{job.description}</p>
-        </section>
-      )}
-
-      {!full && !mine && !isEmployer && (
-        <div className="mt-12">
-          {!showMsg ? (
-            <button className="btn ghost small" style={{ paddingLeft: 0 }} onClick={() => setShowMsg(true)}>+ {t('messageOpt')}</button>
-          ) : (
-            <div className="field">
-              <label htmlFor="msg">{t('messageOpt')}</label>
-              <textarea id="msg" className="textarea" maxLength={300} value={msg} onChange={(e) => setMsg(e.target.value)} placeholder={t('messagePh')} />
-            </div>
-          )}
+        <div className="card info">
+          <div>📅 <span><b>{dateRange(job.start_date, job.end_date)}</b>{job.shift_note && <><br />{job.shift_note}</>}</span></div>
+          <div>📍 <span><b>{job.address}, {job.city}</b>{distance != null && <><br />{fmtKm(distance, locale)}</>}</span></div>
+          <div>👥 <span>{left > 0 ? t('slotsOf', { left, total: job.slots }) : t('full')}</span></div>
+          {job.business_name && <div>🏪 <span>{job.business_name}</span></div>}
         </div>
-      )}
-      {isEmployer && <div className="notice info mt-12">{t('employerCantApply')}</div>}
-      {error != null && <div className="mt-12"><ErrorBox error={error} where="JobDetail.apply" /></div>}
-
+        {job.description && <div className="card"><b>{t('about')}</b><p style={{ marginTop: 6, whiteSpace: 'pre-line' }}>{job.description}</p></div>}
+        {!full && !mine && !isEmployer && (
+          <Fld label={t('messageOpt')} htmlFor="msg"><textarea id="msg" className="inp" maxLength={300} value={msg} onChange={(e) => setMsg(e.target.value)} placeholder={t('messagePh')} /></Fld>
+        )}
+        {isEmployer && <div className="notice info">{t('employerCantApply')}</div>}
+        {error != null && <ErrorBox error={error} where="JobDetail.apply" />}
+      </div>
       {!isEmployer && (
-        <Dock>
-          {mine ? (
-            <button className="btn block" disabled>{mine === 'withdrawn' ? t('stwithdrawn') : t('applied')}</button>
-          ) : full ? (
-            <button className="btn block" disabled>{t('full')}</button>
-          ) : (
-            <button className="btn primary block" onClick={onApply} disabled={busy}>{busy ? '…' : t('applyNow')}</button>
-          )}
-        </Dock>
+        <div className="cta">
+          {mine ? <Btn block disabled>{mine === 'withdrawn' ? t('stwithdrawn') : t('applied')}</Btn>
+            : full ? <Btn block disabled>{t('full')}</Btn>
+            : <Btn block onClick={onApply} disabled={busy}>{busy ? '…' : t('applyNow')}</Btn>}
+        </div>
       )}
-    </div>
+    </>
   )
 }

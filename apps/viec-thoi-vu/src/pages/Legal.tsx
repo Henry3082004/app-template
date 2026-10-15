@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../lib/i18n'
-import { LandingHeader, LegalFooter } from './Landing'
+import { LandingBar, LandingFooter } from './Landing'
 
 type Doc = { title: string; updated: string; sections: [string, string[]][] }
 type Kind = 'terms' | 'privacy' | 'refund'
@@ -80,7 +80,7 @@ export default function Legal({ kind }: { kind: Kind }) {
   useEffect(() => { document.title = `${d.title} — Việc Thời Vụ`; window.scrollTo(0, 0) }, [d.title])
   return (
     <div className="landing">
-      <div className="l-wrap"><LandingHeader /></div>
+      <LandingBar />
       <article className="legal">
         <Link to="/app">← Việc Thời Vụ</Link>
         <h1>{d.title}</h1>
@@ -92,7 +92,7 @@ export default function Legal({ kind }: { kind: Kind }) {
           </section>
         ))}
       </article>
-      <div className="l-wrap"><LegalFooter /></div>
+      <LandingFooter />
     </div>
   )
 }

@@ -1,6 +1,13 @@
 # PROGRESS — Việc Thời Vụ
 
-## Trạng thái: Bản đầu đã build (15/10/2026)
+## Trạng thái: Bản Capy + responsive (15/10/2026)
+
+- Giao diện theo design system Claude Design "Việc Thời Vụ" (nâu Capy): `src/ds/tokens/*` + `src/ds/app.css`; linh vật `public/capy/`.
+- Responsive: điện thoại / tablet / tablet ngang / máy tính (Shell: thanh đáy · thanh bên · thanh trên; danh sách–chi tiết cạnh nhau).
+- Kiểm tra: Playwright 17 bước × 4 cỡ khung trên bản mock — không lỗi, không cuộn ngang.
+- **Lưu ý bản quyền:** 6 hình Capy do Claude Design tạo từ ảnh tham khảo; trước khi bán thật nên thay bằng hình vẽ gốc của riêng bạn.
+
+### Lịch sử: Bản đầu (xanh dương)
 
 **Link:** https://viec-thoi-vu.vercel.app (Vercel project `viec-thoi-vu`, tự build từ `main` khi Claude gọi deploy) · **Database:** Supabase `niscqjczfvipxxgdslqs` · **Lỗi:** Sentry `sago-k5/javascript-react`, lọc tag `app:viec-thoi-vu`
 

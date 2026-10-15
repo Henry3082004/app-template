@@ -22,11 +22,11 @@ const vi = {
   sendApplication: 'Gửi đơn', employerCantApply: 'Bạn đang dùng tài khoản nhà tuyển dụng nên không ứng tuyển được.',
   notFound: 'Không tìm thấy tin này. Có thể tin đã bị xóa.', back: 'Quay lại',
   // success
-  appliedTitle: 'Đã gửi đơn!', appliedText: 'Nhà tuyển dụng sẽ liên hệ bạn sớm 🙌', moreJobs: 'Xem thêm việc', seeApplied: 'Xem đơn đã gửi',
+  appliedTitle: 'Đã gửi đơn!', appliedText: 'Capy cổ vũ bạn hết mình 🙌 Nhà tuyển dụng sẽ liên hệ bạn sớm.', moreJobs: 'Xem thêm việc', seeApplied: 'Xem đơn đã gửi',
   // auth
   signupTitle: 'Tạo tài khoản', loginTitle: 'Đăng nhập', phone: 'Số điện thoại', password: 'Mật khẩu',
   passwordHint: 'Ít nhất 8 ký tự', yourName: 'Tên của bạn', haveAccount: 'Đã có tài khoản? Đăng nhập',
-  noAccount: 'Chưa có tài khoản? Tạo mới', authSeekerSub: 'Để nhà tuyển dụng liên hệ được với bạn.',
+  noAccount: 'Chưa có tài khoản? Tạo mới', authSeekerSub: 'Tạo tài khoản trong 10 giây để nhà tuyển dụng liên hệ bạn.',
   authEmployerSub: 'Tạo hồ sơ cơ sở một lần, lần sau đăng tin chỉ mất 1 phút.',
   businessName: 'Tên cơ sở', address: 'Địa chỉ', city: 'Tỉnh / thành phố', continue: 'Tiếp tục',
   saveAndPost: 'Lưu và đăng tin', demoOr: 'hoặc dùng thử ngay', demoSeeker: 'Dùng thử: Người tìm việc',
@@ -40,7 +40,7 @@ const vi = {
   // employer
   myJobsTitle: 'Tin của tôi', postJob: '+ Đăng tin', newApplicants: '{n} ứng viên mới', applicantsN: '{n} ứng viên',
   filledOf: '{filled}/{slots} chỗ', planBar: 'Gói Miễn phí: {open}/2 tin đang mở', upgrade: 'Nâng cấp',
-  proBar: 'Gói Pro: đăng tin không giới hạn', firstTip: 'Đăng tin đầu tiên chỉ mất 1 phút',
+  proBar: 'Gói Pro: đăng tin không giới hạn', firstTip: '🍊 Đăng tin đầu tiên chỉ mất 1 phút thôi!',
   emptyMyJobs: 'Bạn chưa có tin nào. Đăng tin đầu tiên để tìm người ngay hôm nay.',
   employerOnly: 'Trang này dành cho nhà tuyển dụng.',
   // post
@@ -53,7 +53,7 @@ const vi = {
   // applicants
   applicantsTitle: 'Ứng viên', accept: 'Nhận', reject: 'Từ chối', closeJob: 'Đóng tin', reopenJob: 'Mở lại tin',
   closeConfirm: 'Đóng tin này? Người tìm việc sẽ không thấy nữa.', noApplicants: 'Chưa có ai ứng tuyển. Tin mới thường có ứng viên trong vài giờ ⏳',
-  acceptedTitle: 'Đã nhận {name}!', acceptedText: 'Gọi ngay để hẹn lịch nhé', done: 'Xong',
+  acceptedTitle: 'Chốt {name} rồi!', acceptedText: 'Gọi ngay để hẹn lịch nhé 🎉', done: 'Xong',
   // account
   accountTitle: 'Tài khoản', language: 'Ngôn ngữ', pricing: 'Bảng giá', signOut: 'Đăng xuất', signOutConfirm: 'Đăng xuất khỏi tài khoản?',
   bio: 'Giới thiệu ngắn', bioPh: 'VD: Sinh viên, rảnh tối và cuối tuần', save: 'Lưu', saved: 'Đã lưu ✓',
@@ -68,7 +68,7 @@ const vi = {
   paySoon: 'Thanh toán đang được mở. Bạn sẽ nâng cấp được trong vài ngày tới — cảm ơn bạn đã chờ 💙',
   // errors
   retry: 'Thử lại', copyForClaude: 'Sao chép báo lỗi cho Claude', copied: 'Đã sao chép ✓',
-  eNETWORK: 'Mất kết nối. Kiểm tra mạng rồi thử lại nhé.', eINVALID_PHONE: 'Số điện thoại chưa đúng. Nhập dạng 0901234567 nhé.',
+  eNETWORK: 'Mất kết nối. Kiểm tra mạng rồi thử lại giúp Capy nhé.', eINVALID_PHONE: 'Số điện thoại chưa đúng. Nhập dạng 0901234567 nhé.',
   eWEAK_PASSWORD: 'Mật khẩu cần ít nhất 8 ký tự.', eNAME_REQUIRED: 'Cho mình xin tên của bạn nhé.',
   ePHONE_TAKEN: 'Số này đã có tài khoản. Bấm "Đăng nhập" bên dưới nhé.', eINVALID_LOGIN: 'Sai số điện thoại hoặc mật khẩu. Kiểm tra lại nhé.',
   eFREE_PLAN_LIMIT: 'Gói Miễn phí chỉ mở được 2 tin cùng lúc. Đóng bớt một tin hoặc nâng cấp Pro nhé.',
@@ -78,6 +78,14 @@ const vi = {
   eCANNOT_WITHDRAW: 'Đơn đã được xử lý nên không rút được nữa.', eFORBIDDEN: 'Tài khoản này không làm được việc đó.',
   eNOT_SIGNED_IN: 'Bạn cần đăng nhập trước nhé.', eSLOTS_BELOW_FILLED: 'Số người cần không được ít hơn số đã nhận.',
   eUNKNOWN: 'Có lỗi xảy ra. Thử lại sau ít phút nhé.',
+  capyFound: 'Capy tìm được {n} việc gần bạn nè 🍊', capyLoading: 'Capy đang tìm việc cho bạn…', capyErrTitle: 'Ối, có trục trặc nhỏ',
+  emptyTitle: 'Chưa có việc hợp ý', emptySub: 'Thử bỏ bớt bộ lọc nha.', clearFilters: 'Bỏ bộ lọc',
+  pickJob: 'Chọn một việc để xem chi tiết', pickJobSub: 'Thông tin ca làm và nút ứng tuyển sẽ hiện ở đây.',
+  pickPost: 'Chọn một tin', pickPostSub: 'Danh sách ứng viên sẽ hiện ở đây.',
+  catLabel: 'Ngành nghề', area: 'Khu vực', allAreas: 'Tất cả khu vực', minPay: 'Lương tối thiểu', noLimit: 'Không giới hạn',
+  backJobs: '← Quay lại', backMine: '← Tin của tôi', byeSub: 'Tạm biệt nhé, Capy chờ bạn quay lại!',
+  whoSees: '👀 Người tìm việc sẽ thấy', signIn: 'Đăng nhập', loginHello: 'Ứng tuyển ngay 👋', hireHello: 'Tạo hồ sơ cơ sở 🏪',
+  clearable: 'Bỏ chọn', openApp: 'Mở app', tagline: 'tìm nhanh, nhận việc trong ngày', popular: 'Phổ biến',
 }
 
 type Dict = typeof vi
@@ -97,7 +105,7 @@ const en: Dict = {
   messageOpt: 'Note to the employer (optional)', messagePh: "e.g. I'm free evenings and have serving experience",
   sendApplication: 'Send application', employerCantApply: "You're signed in as an employer, so you can't apply.",
   notFound: "We couldn't find this post. It may have been removed.", back: 'Back',
-  appliedTitle: 'Application sent!', appliedText: "The employer will contact you soon 🙌", moreJobs: 'See more jobs', seeApplied: 'See my applications',
+  appliedTitle: 'Application sent!', appliedText: "Capy is cheering you on 🙌 The employer will contact you soon.", moreJobs: 'See more jobs', seeApplied: 'See my applications',
   signupTitle: 'Create account', loginTitle: 'Sign in', phone: 'Phone number', password: 'Password',
   passwordHint: 'At least 8 characters', yourName: 'Your name', haveAccount: 'Have an account? Sign in',
   noAccount: 'New here? Create an account', authSeekerSub: 'So employers can reach you.',
@@ -112,7 +120,7 @@ const en: Dict = {
   findJobs: 'Find jobs', loginToSee: 'Sign in to see your applications.', login: 'Sign in',
   myJobsTitle: 'My posts', postJob: '+ Post a job', newApplicants: '{n} new applicants', applicantsN: '{n} applicants',
   filledOf: '{filled}/{slots} filled', planBar: 'Free plan: {open}/2 open posts', upgrade: 'Upgrade',
-  proBar: 'Pro plan: unlimited posts', firstTip: 'Your first post takes just a minute',
+  proBar: 'Pro plan: unlimited posts', firstTip: '🍊 Your first post takes just 1 minute!',
   emptyMyJobs: 'No posts yet. Post your first job and find people today.',
   employerOnly: 'This page is for employers.',
   postTitle: 'Post a job', prefilled: 'Filled from your last post — edit as needed', jobTitle: 'Job title', jobTitlePh: 'e.g. Evening kitchen helper',
@@ -145,6 +153,14 @@ const en: Dict = {
   eCANNOT_WITHDRAW: "This application was already handled, so it can't be withdrawn.", eFORBIDDEN: "This account can't do that.",
   eNOT_SIGNED_IN: 'Please sign in first.', eSLOTS_BELOW_FILLED: "People needed can't be fewer than already accepted.",
   eUNKNOWN: 'Something went wrong. Please try again in a few minutes.',
+  capyFound: 'Capy found {n} jobs near you 🍊', capyLoading: 'Capy is finding jobs for you…', capyErrTitle: 'Oops, a small hiccup',
+  emptyTitle: 'No jobs match yet', emptySub: 'Try removing a filter.', clearFilters: 'Clear filters',
+  pickJob: 'Pick a job to see details', pickJobSub: 'Shift info and the apply button will show here.',
+  pickPost: 'Pick a post', pickPostSub: 'Its applicants will show here.',
+  catLabel: 'Category', area: 'Area', allAreas: 'All areas', minPay: 'Minimum pay', noLimit: 'No limit',
+  backJobs: '← Back', backMine: '← My posts', byeSub: 'Bye for now — Capy will be waiting for you!',
+  whoSees: '👀 What job seekers will see', signIn: 'Sign in', loginHello: 'Apply now 👋', hireHello: 'Set up your business 🏪',
+  clearable: 'Clear', openApp: 'Open app', tagline: 'find fast, start today', popular: 'Popular',
 }
 
 export type TKey = keyof Dict

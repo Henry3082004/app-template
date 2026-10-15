@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { JobCard } from '../components/JobCard'
+import { capy, LOGO } from '../lib/capy'
 import { useI18n } from '../lib/i18n'
 import { seedJobs } from '../lib/seed'
 import type { Job } from '../lib/types'
@@ -11,50 +12,60 @@ const preview: Job[] = seedJobs.slice(0, 3).map((j) => ({ ...j, filled: 0, statu
 const copy = {
   vi: {
     h1a: 'Việc thời vụ gần bạn —', h1b: 'tìm nhanh, nhận việc trong ngày',
-    lead: 'Người tìm việc lướt xem việc ngắn hạn gần nhà và ứng tuyển bằng 2 lần chạm. Cửa hàng, kho, nông trại, sự kiện đăng tin trong 1 phút và chọn người ngay.',
-    cta1: 'Tìm việc ngay', cta2: 'Đăng tin tuyển',
-    whyTitle: 'Gọn cho cả hai bên', whySub: 'Không cần CV, không chờ tin nhắn trôi trong nhóm.',
-    seekers: 'Người tìm việc', employers: 'Nhà tuyển dụng',
-    s: [['📍', 'Việc gần bạn trước', 'Bật vị trí là thấy việc gần nhất, kèm khoảng cách.'], ['⚡', 'Ứng tuyển 2 lần chạm', 'Chạm vào việc, bấm Ứng tuyển — xong.'], ['📞', 'Biết ngay khi được nhận', 'Được nhận là thấy số điện thoại để gọi hoặc nhắn Zalo.']],
-    e: [['📝', 'Đăng tin 1 phút', 'Form tự điền theo tin trước, chỉ sửa ngày và số người.'], ['👥', 'Chọn người 1 chạm', 'Xem ứng viên, bấm Nhận, có số điện thoại ngay.'], ['✅', 'Tự đóng khi đủ người', 'Không còn bị gọi hỏi khi đã tuyển xong.']],
-    priceTitle: 'Bảng giá', priceSub: 'Người tìm việc luôn miễn phí.',
+    lead: 'Xem việc quanh bạn, ứng tuyển một chạm. Cần người? Đăng tin chỉ mất 1 phút. 🙌',
+    cta1: 'Tìm việc ngay', cta2: 'Đăng tin tuyển', open: 'Mở app', nav: ['Lợi ích', 'Bảng giá', 'Hỏi đáp'],
+    seekers: '👋 Cho người tìm việc', employers: '🏪 Cho nhà tuyển dụng',
+    s: [['📍', 'Việc gần bạn', 'Sắp xếp theo khoảng cách, thấy ngay lương và ca.'], ['⚡', 'Ứng tuyển một chạm', 'Không cần CV, chỉ tên và số điện thoại.'], ['📞', 'Liên hệ trực tiếp', 'Được nhận là có số chủ việc, gọi hoặc nhắn Zalo luôn.']],
+    e: [['✨', 'Đăng tin 1 phút', 'Tin sau điền sẵn theo tin trước.'], ['👥', 'Chọn người dễ dàng', 'Xem lời nhắn, nhận hoặc từ chối bằng một nút.'], ['🎯', 'Đúng đợt, đúng ca', 'Đặt số chỗ theo từng đợt cần người; đủ người tin tự đóng.']],
+    priceTitle: 'Bảng giá đơn giản', priceSub: 'Người tìm việc luôn miễn phí.',
     faqTitle: 'Câu hỏi thường gặp',
-    faq: [['Người tìm việc có phải trả phí không?', 'Không. Người tìm việc dùng miễn phí hoàn toàn.'], ['Khi nào tôi thấy số điện thoại của bên kia?', 'Chỉ khi nhà tuyển dụng bấm Nhận. Trước đó số của hai bên được giữ kín.'], ['Gói Miễn phí có giới hạn gì?', 'Mỗi nhà tuyển dụng mở tối đa 2 tin cùng lúc. Gói Pro không giới hạn và có nhãn Gấp lên đầu danh sách.'], ['Có dùng trong Zalo được không?', 'Có — app chạy trên web và sắp có trên Zalo Mini App.']],
+    faq: [['Tôi có cần đăng nhập để xem việc không?', 'Không. Bạn chỉ đăng ký khi bấm Ứng tuyển.'], ['Ứng tuyển có mất phí không?', 'Người tìm việc luôn miễn phí.'], ['Bao lâu thì nhà tuyển dụng liên hệ?', 'Thường trong ngày. Khi được nhận, bạn thấy số điện thoại để gọi hoặc nhắn Zalo.'], ['Gói Miễn phí có giới hạn gì?', 'Mỗi nhà tuyển dụng mở tối đa 2 tin cùng lúc. Gói Pro không giới hạn và có nhãn Gấp.'], ['Tôi có dùng được trong Zalo không?', 'Có, Việc Thời Vụ chạy cả trên web và trong Zalo Mini App.']],
+    bandT: 'Sẵn sàng tìm việc đầu tiên?', bandS: 'Mở app và xem việc quanh bạn ngay hôm nay.',
     terms: 'Điều khoản', privacy: 'Bảo mật', refund: 'Hoàn tiền',
   },
   en: {
     h1a: 'Short-term jobs near you —', h1b: 'find fast, start today',
-    lead: 'Job seekers browse nearby short-term work and apply in 2 taps. Shops, warehouses, farms and events post in a minute and pick people right away.',
-    cta1: 'Find a job', cta2: 'Post a job',
-    whyTitle: 'Simple for both sides', whySub: 'No CVs, no messages lost in group chats.',
-    seekers: 'Job seekers', employers: 'Employers',
-    s: [['📍', 'Nearby jobs first', 'Share your location to see the closest jobs with distance.'], ['⚡', 'Apply in 2 taps', 'Tap a job, tap Apply — done.'], ['📞', 'Know when you are hired', "Once accepted you'll see the phone number to call or message."]],
-    e: [['📝', 'Post in a minute', 'The form fills from your last post; just change dates and headcount.'], ['👥', 'Pick people in one tap', 'Review applicants, tap Accept, get their number instantly.'], ['✅', 'Auto-closes when full', 'No more calls after the spots are filled.']],
-    priceTitle: 'Pricing', priceSub: 'Always free for job seekers.',
+    lead: 'See jobs around you and apply in one tap. Need people? Post in 1 minute. 🙌',
+    cta1: 'Find a job', cta2: 'Post a job', open: 'Open app', nav: ['Benefits', 'Pricing', 'FAQ'],
+    seekers: '👋 For job seekers', employers: '🏪 For employers',
+    s: [['📍', 'Jobs near you', 'Sorted by distance, with pay and shift at a glance.'], ['⚡', 'Apply in one tap', 'No CV — just your name and phone number.'], ['📞', 'Direct contact', "Once you're accepted you get the employer's number to call or message."]],
+    e: [['✨', 'Post in 1 minute', 'New posts are pre-filled from the last one.'], ['👥', 'Choose people easily', 'Read messages, accept or decline with one button.'], ['🎯', 'Right shift, right time', 'Set spots per round; posts close automatically when full.']],
+    priceTitle: 'Simple pricing', priceSub: 'Always free for job seekers.',
     faqTitle: 'FAQ',
-    faq: [['Do job seekers pay?', 'No. It is completely free for job seekers.'], ['When do I see the other side’s phone number?', 'Only after the employer accepts. Until then both numbers stay private.'], ['What are the Free plan limits?', 'Employers can have up to 2 open posts at once. Pro is unlimited and adds the Urgent badge.'], ['Does it work in Zalo?', 'Yes — it runs on the web and is coming to Zalo Mini App.']],
+    faq: [['Do I need to sign in to browse jobs?', 'No. You only sign up when you tap Apply.'], ['Does applying cost anything?', 'Job seekers always use it for free.'], ['How soon will employers get in touch?', "Usually the same day. Once you're accepted you'll see their phone number."], ['What are the Free plan limits?', 'Employers can have up to 2 open posts at once. Pro is unlimited and adds the Urgent badge.'], ['Does it work in Zalo?', 'Yes — on the web and as a Zalo Mini App.']],
+    bandT: 'Ready for your first job?', bandS: 'Open the app and see jobs around you today.',
     terms: 'Terms', privacy: 'Privacy', refund: 'Refunds',
   },
 }
 
-export function LegalFooter() {
-  const { locale } = useI18n()
+export function LandingBar() {
+  const { locale, setLocale, t } = useI18n()
   const c = copy[locale]
   return (
-    <footer className="l-foot">
-      <span>© 2026 Việc Thời Vụ</span>
-      <nav><Link to="/dieu-khoan">{c.terms}</Link><Link to="/bao-mat">{c.privacy}</Link><Link to="/hoan-tien">{c.refund}</Link></nav>
-    </footer>
+    <header className="bar">
+      <Link to="/" className="logo"><img src={LOGO} alt="" />{t('appName')}</Link>
+      <nav><a href="/#loi-ich">{c.nav[0]}</a><a href="/#bang-gia">{c.nav[1]}</a><a href="/#hoi-dap">{c.nav[2]}</a></nav>
+      <span className="sp" />
+      <div className="lang">
+        <button type="button" className={locale === 'vi' ? 'on' : ''} onClick={() => setLocale('vi')}>VI</button>
+        <button type="button" className={locale === 'en' ? 'on' : ''} onClick={() => setLocale('en')}>EN</button>
+      </div>
+      <Link className="btn btn-primary sm" to="/app">{c.open}</Link>
+    </header>
   )
 }
 
-export function LandingHeader() {
-  const { locale, setLocale } = useI18n()
+export function LandingFooter() {
+  const { locale, t } = useI18n()
+  const c = copy[locale]
   return (
-    <header className="l-head">
-      <Link to="/" className="l-brand"><div className="logo">VT</div>Việc Thời Vụ</Link>
-      <button className="l-lang" onClick={() => setLocale(locale === 'vi' ? 'en' : 'vi')}>{locale === 'vi' ? 'English' : 'Tiếng Việt'}</button>
-    </header>
+    <footer>
+      <div className="wrap">
+        <div className="logo"><img src={LOGO} alt="" />{t('appName')}</div>
+        <div className="links"><Link to="/dieu-khoan">{c.terms}</Link><Link to="/bao-mat">{c.privacy}</Link><Link to="/hoan-tien">{c.refund}</Link></div>
+        <div>© 2026 Việc Thời Vụ</div>
+      </div>
+    </footer>
   )
 }
 
@@ -65,56 +76,45 @@ export default function Landing() {
   useEffect(() => { document.title = locale === 'vi' ? 'Việc Thời Vụ — tìm việc thời vụ gần bạn' : 'Việc Thời Vụ — short-term jobs near you' }, [locale])
   return (
     <div className="landing">
-      <div className="l-wrap">
-        <LandingHeader />
-        <section className="hero">
-          <div>
-            <h1>{c.h1a} <span>{c.h1b}</span></h1>
-            <p className="lead">{c.lead}</p>
-            <div className="ctas">
-              <Link className="btn primary" to="/app">{c.cta1}</Link>
-              <Link className="btn secondary" to="/app?tuyen=1">{c.cta2}</Link>
-            </div>
+      <LandingBar />
+      <div className="hero-bg"><div className="wrap hero">
+        <div>
+          <h1>{c.h1a} <span style={{ color: 'var(--p)' }}>{c.h1b}</span></h1>
+          <p>{c.lead}</p>
+          <div className="cta2"><Link className="btn btn-primary" to="/app">{c.cta1}</Link><Link className="btn btn-ghost" to="/app?tuyen=1">{c.cta2}</Link></div>
+        </div>
+        <div className="pwrap">
+          <img className="mascot" src={capy('wave')} alt="" />
+          <div className="phoneframe" aria-hidden="true">
+            <div className="logo" style={{ fontSize: 13 }}><img src={LOGO} alt="" style={{ width: 24, height: 24, borderRadius: 8 }} />Việc Thời Vụ</div>
+            <div className="sk">🔍 …</div>
+            {preview.map((j) => <JobCard key={j.id} job={j} onOpen={() => nav('/app')} />)}
           </div>
-          <div className="phone-frame" aria-hidden="true">
-            <div className="phone-screen">
-              {preview.map((j) => <JobCard key={j.id} job={j} onOpen={() => nav('/app')} />)}
-            </div>
-          </div>
-        </section>
+        </div>
+      </div></div>
 
-        <section className="l-section">
-          <h2>{c.whyTitle}</h2>
-          <p className="sub">{c.whySub}</p>
-          <div className="benefits">
-            {[{ title: c.seekers, items: c.s }, { title: c.employers, items: c.e }].map((col) => (
-              <div className="card benefit-col" key={col.title}>
-                <h3>{col.title}</h3>
-                {col.items.map(([ico, h, p]) => (
-                  <div className="benefit" key={h}>
-                    <div className="ico">{ico}</div>
-                    <div><div className="bold">{h}</div><div className="muted small">{p}</div></div>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </section>
+      <section id="loi-ich"><div className="wrap"><div className="two3">
+        {[{ h: c.seekers, items: c.s }, { h: c.employers, items: c.e }].map((col) => (
+          <div key={col.h}><h3>{col.h}</h3><div className="ben">{col.items.map(([e, b, s]) => <div className="card" key={b}><span className="e">{e}</span><div><b>{b}</b><span className="t">{s}</span></div></div>)}</div></div>
+        ))}
+      </div></div></section>
 
-        <section className="l-section">
-          <h2>{c.priceTitle}</h2>
-          <p className="sub">{c.priceSub}</p>
-          <div className="pricing"><PricingCards onPro={() => nav('/app/bang-gia')} /></div>
-        </section>
+      <section id="bang-gia" style={{ background: '#fff' }}><div className="wrap">
+        <h2 style={{ textAlign: 'center', marginBottom: 6 }}>{c.priceTitle}</h2><p className="sub" style={{ textAlign: 'center', marginBottom: 20 }}>{c.priceSub}</p>
+        <div className="pr"><PricingCards onPro={() => nav('/app/bang-gia')} /></div>
+      </div></section>
 
-        <section className="l-section">
-          <h2>{c.faqTitle}</h2>
-          <div className="faq">
-            {c.faq.map(([q, a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}
-          </div>
-        </section>
-        <LegalFooter />
-      </div>
+      <section id="hoi-dap"><div className="wrap">
+        <h2 style={{ textAlign: 'center' }}>{c.faqTitle}</h2>
+        <div className="faq">{c.faq.map(([q, a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}</div>
+      </div></section>
+
+      <section style={{ paddingTop: 0 }}><div className="wrap"><div className="cband">
+        <img src={capy('cheer')} alt="" />
+        <h2 style={{ marginBottom: 8 }}>{c.bandT}</h2><div>{c.bandS}</div>
+        <Link className="btn" to="/app">{c.cta1}</Link>
+      </div></div></section>
+      <LandingFooter />
     </div>
   )
 }

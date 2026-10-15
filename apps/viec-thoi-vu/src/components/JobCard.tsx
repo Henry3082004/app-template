@@ -2,28 +2,27 @@ import { dateRange, money, payUnitKey } from '../lib/format'
 import { fmtKm } from '../lib/geo'
 import { useI18n } from '../lib/i18n'
 import type { Job } from '../lib/types'
+import { Tag } from './ui'
 
-export function PayLine({ job, big }: { job: Job; big?: boolean }) {
+export function Pay({ job, xl }: { job: Job; xl?: boolean }) {
   const { t, locale } = useI18n()
-  return <div className={big ? 'pay big' : 'pay'}>{money(job.pay_amount, locale)} / {t(payUnitKey(job.pay_unit))}</div>
+  return <div className={xl ? 'pay xl' : 'pay'}>{money(job.pay_amount, locale)} <small>/ {t(payUnitKey(job.pay_unit))}</small></div>
 }
 
-export function JobCard({ job, distance, onOpen }: { job: Job; distance?: number | null; onOpen(): void }) {
+export function JobCard({ job, distance, sel, onOpen }: { job: Job; distance?: number | null; sel?: boolean; onOpen(): void }) {
   const { t, locale } = useI18n()
   const left = job.slots - job.filled
+  const full = left <= 0 || job.status !== 'open'
   return (
-    <article className="card tappable" onClick={onOpen} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onOpen()}>
-      <div className="row between" style={{ alignItems: 'flex-start' }}>
-        <h3 className="job-title grow">{job.title}</h3>
-        {job.is_urgent && <span className="badge urgent">{t('urgent')}</span>}
+    <button type="button" className={'card job' + (sel ? ' sel' : '') + (full ? ' full' : '')} onClick={onOpen}>
+      <div className="hrow"><h3>{job.title}</h3>{job.is_urgent && <Tag tone="urgent">{t('urgent')}</Tag>}</div>
+      <Pay job={job} />
+      <div className="tags">
+        <Tag>📅 {dateRange(job.start_date, job.end_date)}</Tag>
+        <Tag>📍 {job.city}{distance != null ? ` · ${fmtKm(distance, locale)}` : ''}</Tag>
+        <Tag>{full ? '👥 ' + t('full') : '👥 ' + t('slotsLeft', { n: left })}</Tag>
       </div>
-      <PayLine job={job} />
-      <div className="chips">
-        <span className="chip">📅 {dateRange(job.start_date, job.end_date)}</span>
-        <span className="chip">📍 {job.city}{distance != null ? ` · ${fmtKm(distance, locale)}` : ''}</span>
-        <span className="chip">👥 {left > 0 ? t('slotsLeft', { n: left }) : t('full')}</span>
-      </div>
-      {job.business_name && <div className="employer-name">🏪 {job.business_name}</div>}
-    </article>
+      {job.business_name && <div className="biz">🏪 {job.business_name}</div>}
+    </button>
   )
 }

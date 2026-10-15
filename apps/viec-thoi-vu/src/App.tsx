@@ -1,15 +1,13 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
-import { AuthSheet } from './components/AuthSheet'
-import { BottomNav } from './components/BottomNav'
-import { CardSkeleton } from './components/Skeleton'
+import { AuthDialog } from './components/AuthDialog'
+import { Shell } from './components/Shell'
+import { Skel } from './components/ui'
 import { I18nProvider } from './lib/i18n'
 import { SessionProvider } from './lib/session'
 import { IN_ZALO } from './lib/zalo'
 import Account from './pages/Account'
-import Applicants from './pages/Applicants'
 import EmployerJobs from './pages/EmployerJobs'
-import JobDetail from './pages/JobDetail'
 import Jobs from './pages/Jobs'
 import MyApplications from './pages/MyApplications'
 import PostJob from './pages/PostJob'
@@ -18,42 +16,40 @@ import Pricing from './pages/Pricing'
 const Landing = lazy(() => import('./pages/Landing'))
 const Legal = lazy(() => import('./pages/Legal'))
 
-/** Pages inside /app share the phone-width shell; nav hides on focused flows. */
-function AppShell() {
+/** Everything under /app lives in the responsive shell (bottom bar · side rail · top bar). */
+function AppPages() {
   const { pathname } = useLocation()
-  const hideNav = pathname.startsWith('/app/dang-tin') || pathname.startsWith('/app/viec/')
-  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
   useEffect(() => { document.title = 'Việc Thời Vụ' }, [])
+  useEffect(() => { document.querySelector('.main')?.scrollTo(0, 0) }, [pathname])
   return (
-    <div className={hideNav ? 'app no-nav' : 'app'}>
+    <Shell>
       <Routes>
         <Route index element={<Jobs />} />
-        <Route path="viec/:id" element={<JobDetail />} />
+        <Route path="viec/:id" element={<Jobs />} />
         <Route path="da-ung-tuyen" element={<MyApplications />} />
         <Route path="tai-khoan" element={<Account />} />
         <Route path="tin-cua-toi" element={<EmployerJobs />} />
+        <Route path="tin/:id" element={<EmployerJobs />} />
         <Route path="dang-tin" element={<PostJob />} />
-        <Route path="tin/:id" element={<Applicants />} />
         <Route path="bang-gia" element={<Pricing />} />
         <Route path="*" element={<Jobs />} />
       </Routes>
-      {!hideNav && <BottomNav />}
-    </div>
+    </Shell>
   )
 }
 
 function AppRoutes() {
   return (
-    <Suspense fallback={<div className="app"><CardSkeleton /></div>}>
+    <Suspense fallback={<div className="pg"><Skel n={2} /></div>}>
       <Routes>
-        <Route path="/" element={IN_ZALO ? <AppShell /> : <Landing />} />
-        <Route path="/app/*" element={<AppShell />} />
+        <Route path="/" element={IN_ZALO ? <AppPages /> : <Landing />} />
+        <Route path="/app/*" element={<AppPages />} />
         <Route path="/dieu-khoan" element={<Legal kind="terms" />} />
         <Route path="/bao-mat" element={<Legal kind="privacy" />} />
         <Route path="/hoan-tien" element={<Legal kind="refund" />} />
         <Route path="*" element={<Landing />} />
       </Routes>
-      <AuthSheet />
+      <AuthDialog />
     </Suspense>
   )
 }

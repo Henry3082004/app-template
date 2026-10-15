@@ -80,7 +80,7 @@ nhà tuyển dụng.
 
 ## 3. Bố cục và nút bấm
 
-- **Thiết bị chính:** điện thoại, một tay. Máy tính: nội dung căn giữa, rộng tối đa ~480px.
+- **Thiết bị:** responsive 4 cỡ: điện thoại <600px (thanh đáy), tablet 600–1023px (thanh bên trái, danh sách + chi tiết cạnh nhau), tablet ngang 1024–1279px (thêm cột bộ lọc), máy tính ≥1280px (thanh trên, 3 vùng, form đăng tin có xem trước).
 - **Điều hướng:** thanh dưới đáy.
   - Khách / người tìm việc: "Việc làm" · "Đã ứng tuyển" · "Tài khoản".
   - Nhà tuyển dụng: "Tin của tôi" · "Tài khoản".
@@ -94,11 +94,9 @@ nhà tuyển dụng.
 
 - **Phong cách nền:** nhẹ nhàng, dễ chịu, đơn giản mà đầy đủ, bo tròn rõ (thẻ 18px, nút viên thuốc,
   ô nhập 12px).
-- **Biến thể đã chọn:** mềm mại, nhiều khoảng trắng.
-- **Màu:** chủ đạo xanh dương nhạt `#5B8DEF` (đậm khi nhấn `#4A7AD9`) — nền nhấn `#EAF1FE` — nền trang
-  `#F6F8FC` — chữ `#1F2937`, chữ phụ `#6B7280` — gấp/lỗi đỏ dịu `#E5675E` trên nền `#FDECEA` —
-  thành công `#3FA672`.
-- **Ảnh & icon:** emoji; logo tạm ô vuông bo tròn chữ "VT" màu chủ đạo.
+- **Biến thể đã chọn:** mềm mại, nhiều khoảng trắng; linh vật **Capy** (capybara) — xem `src/ds/` và `public/capy/`.
+- **Màu (bản Capy, 15/10/2026):** chủ đạo nâu caramel `#A65F2A` (nhấn `#8A4C1F`) — nền nhấn kem `#FBEFDF` — nền trang `#FFF9F1` — chữ `#3B2A1E`, chữ phụ `#7A6657` — vàng nắng `#F2B63D` (Pro) — xanh nước `#7CC4D8` (thông tin) — gấp/lỗi `#D9534F` trên `#FDE9E4` — thành công `#4F9D5D`. Bảng đầy đủ: `src/ds/tokens/colors.css`. (Bản đầu dùng xanh dương `#5B8DEF`.)
+- **Ảnh & icon:** emoji + 6 dáng Capy (chào, mừng, trống, lỗi, tắm/đang tải, gấp) trong `public/capy/`; logo = đầu Capy.
 - **Dark mode:** không ở bản đầu.
 
 ## 5. Cảm giác khi bấm
