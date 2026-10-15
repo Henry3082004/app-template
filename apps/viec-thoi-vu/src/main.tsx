@@ -22,7 +22,7 @@ function Crash() {
   )
 }
 
-createRoot(document.getElementById('root')!).render(
+createRoot((document.getElementById('root') ?? document.getElementById('app'))!).render(
   <StrictMode>
     <ErrorBoundary fallback={<Crash />}>
       <App />
