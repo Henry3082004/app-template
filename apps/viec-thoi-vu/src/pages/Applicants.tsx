@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Ic } from '../components/Ic'
+import { EmployerPay, Rep } from '../components/Escrow'
 import { Avatar, Btn, Dialog, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { api } from '../lib/api'
 import { capy } from '../lib/capy'
@@ -7,12 +8,13 @@ import { dateRange } from '../lib/format'
 import { tap } from '../lib/haptics'
 import { useI18n, type TKey } from '../lib/i18n'
 import { displayPhone, telHref, zaloHref } from '../lib/phone'
-import type { Applicant, MyJob } from '../lib/types'
+import type { Applicant, MyJob, Reputation } from '../lib/types'
 
 /** Applicants of one post: a page on phones, the right-hand column on tablet/desktop. */
 export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: () => void; onChanged(): void }) {
   const { t } = useI18n()
   const [list, setList] = useState<Applicant[] | null>(null)
+  const [reps, setReps] = useState<Record<string, Reputation>>({})
   const [error, setError] = useState<unknown>(null)
   const [actErr, setActErr] = useState<unknown>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
@@ -20,7 +22,10 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
 
   const load = () => {
     setError(null)
-    api.applicantsFor(job.id).then((a) => { setList(a); onChanged() }).catch(setError)
+    api.sweep().catch(() => undefined)
+      .then(() => api.applicantsFor(job.id))
+      .then((a) => { setList(a); onChanged(); api.reputations(a.map((x) => x.seeker_id)).then(setReps).catch(() => undefined) })
+      .catch(setError)
   }
   useEffect(() => { setList(null); load() }, [job.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -73,6 +78,7 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
                   {a.bio && <div className="sub" style={{ fontSize: 14 }}>{a.bio}</div>}
                 </div>
               </div>
+              <Rep rep={reps[a.seeker_id]} />
               {a.message && <div className="tag" style={{ borderRadius: 12, whiteSpace: 'normal' }}><Ic n="message" size={14} /> “{a.message}”</div>}
               {a.status === 'accepted' && a.phone && (
                 <>
@@ -83,6 +89,7 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
                   </div>
                 </>
               )}
+              {a.status === 'accepted' && <EmployerPay app={a} job={job} onChanged={load} />}
               {a.status === 'pending' && job.status === 'open' && (
                 <div className="acts">
                   <Btn v="ghost" disabled={busyId === a.id} onClick={() => decide(a, 'rejected')}>{t('reject')}</Btn>

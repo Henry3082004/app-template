@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { OwnReputation } from '../components/Escrow'
 import { Ic } from '../components/Ic'
 import { Avatar, Btn, Empty, ErrorBox, Fld } from '../components/ui'
 import { api } from '../lib/api'
@@ -94,6 +95,7 @@ export default function Account() {
           {error != null && <ErrorBox error={error} where="Account.save" />}
           <Btn v="ghost" block onClick={save} disabled={saving || !f.full_name.trim()}>{saving ? '…' : saved ? t('saved') : t('save')}</Btn>
         </div>
+        <OwnReputation userId={profile.id} employer={emp} />
         {lang}
       </div>
       <p className="small mt24"><Link to="/dieu-khoan">{t('legal')}</Link></p>

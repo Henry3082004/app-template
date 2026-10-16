@@ -1,12 +1,21 @@
 import { normalizePhone } from './phone'
 import { seedEmployers, seedJobs } from './seed'
+import { addDays, today } from './format'
 import {
-  AppError, type Api, type AppStatus, type Job, type Profile, type Role,
+  AppError, type Api, type AppStatus, type Attendance, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
 } from './types'
 
 // In-memory backend for local UI testing (VITE_MOCK=1). Enforces the same rules as the database.
 interface User { profile: Profile; password: string }
-interface App { id: string; job_id: string; seeker_id: string; status: AppStatus; message: string | null; created_at: string; seen: boolean }
+interface App extends Omit<Escrow, 'reviewed'> {
+  id: string; job_id: string; seeker_id: string; status: AppStatus; message: string | null; created_at: string; seen: boolean
+  completed_at: number | null; released_at: number | null
+}
+interface Rev { id: string; application_id: string; reviewer_id: string; reviewee_id: string; reviewer_role: Role; stars: number; tags: string[]; comment: string | null; created_at: string }
+const FEE_PCT = 8 // the real value lives in the database (app_settings.fee_percent)
+const NEW_PAY = { pay_status: 'none' as PayStatus, escrow_amount: null, platform_fee: null, attendance: null as Attendance | null, funding_mode: null, completed_at: null, released_at: null }
+const SEEKER_TAGS = ['accurate_description', 'friendly', 'clean_safe', 'clear_instructions']
+const EMPLOYER_TAGS = ['hardworking', 'punctual', 'polite', 'fast_learner']
 
 const now = () => new Date().toISOString()
 let seq = 100
@@ -26,7 +35,8 @@ Object.entries(seedEmployers).forEach(([id, e], i) => {
 })
 
 const jobs: Job[] = seedJobs.map((j) => ({ ...j, filled: 0, status: 'open', created_at: now() }))
-const apps: App[] = [{ id: 'a1', job_id: 'j3', seeker_id: '11111111-1111-4111-8111-000000000001', status: 'pending', message: 'Em rảnh buổi sáng ạ', created_at: now(), seen: false }]
+const apps: App[] = [{ id: 'a1', job_id: 'j3', seeker_id: '11111111-1111-4111-8111-000000000001', status: 'pending', message: 'Em rảnh buổi sáng ạ', created_at: now(), seen: false, ...NEW_PAY }]
+const reviews: Rev[] = []
 
 let current: string | null = null
 try { current = sessionStorage.getItem('mock-uid') } catch { /* storage unavailable */ }
@@ -41,6 +51,44 @@ const me = () => {
   return users[current].profile
 }
 const byDigits = (d: string) => Object.values(users).find((u) => u.profile.phone === '+' + d)
+
+const jobOf = (a: App) => jobs.find((j) => j.id === a.job_id)!
+const revealed = (appId: string) => {
+  const a = apps.find((x) => x.id === appId)
+  return !!a && (reviews.filter((r) => r.application_id === appId).length >= 2 || (!!a.released_at && Date.now() - a.released_at > 7 * 864e5))
+}
+const escrowOf = (a: App, viewer: string): Escrow => ({
+  pay_status: a.pay_status, escrow_amount: a.escrow_amount, platform_fee: a.platform_fee, attendance: a.attendance, funding_mode: a.funding_mode,
+  reviewed: reviews.some((r) => r.application_id === a.id && r.reviewer_id === viewer),
+})
+function quoteOf(a: App, hours?: number) {
+  const j = jobOf(a)
+  const days = Math.max((Date.parse(j.end_date) - Date.parse(j.start_date)) / 864e5 + 1, 1)
+  if (j.pay_unit === 'hour' && hours != null && (hours < 1 || hours > 16 * days)) throw new AppError('BAD_HOURS')
+  const amt = j.pay_unit === 'hour' ? j.pay_amount * (hours ?? 8 * days) : j.pay_unit === 'day' ? j.pay_amount * days : j.pay_amount
+  const fee = Math.round((amt * FEE_PCT) / 100)
+  return { amount: Math.round(amt), fee, net: Math.round(amt) - fee }
+}
+const freeSlot = (a: App) => {
+  const j = jobOf(a)
+  j.filled = Math.max(j.filled - 1, 0)
+  if (j.status === 'closed' && j.end_date >= today()) j.status = 'open'
+}
+const sweepFor = (uid: string | null) => {
+  apps.forEach((a) => {
+    if (uid && a.seeker_id !== uid && jobOf(a).employer_id !== uid) return
+    if (a.pay_status === 'noshow_reported' && a.completed_at && Date.now() - a.completed_at > 48 * 36e5) { a.pay_status = 'refunded'; freeSlot(a) }
+    if (a.pay_status === 'held' && addDays(jobOf(a).end_date, 2) < today()) { a.pay_status = 'released'; a.released_at = Date.now(); a.completed_at ??= Date.now() }
+  })
+}
+const myApp = (id: string, who: 'employer' | 'seeker') => {
+  const p = me()
+  const a = apps.find((x) => x.id === id)
+  if (!a) throw new AppError('NOT_FOUND')
+  const ok = who === 'employer' ? jobOf(a).employer_id === p.id : a.seeker_id === p.id
+  if (!ok) throw new AppError('FORBIDDEN')
+  return a
+}
 
 export const mockApi: Api = {
   async me() { return wait(current && users[current] ? users[current].profile : null) },
@@ -84,7 +132,7 @@ export const mockApi: Api = {
     const job = jobs.find((j) => j.id === jobId)
     if (!job || job.status !== 'open') throw new AppError('JOB_NOT_OPEN')
     if (apps.some((a) => a.job_id === jobId && a.seeker_id === p.id)) throw new AppError('ALREADY_APPLIED')
-    apps.push({ id: nid(), job_id: jobId, seeker_id: p.id, status: 'pending', message: message.trim() || null, created_at: now(), seen: false })
+    apps.push({ id: nid(), job_id: jobId, seeker_id: p.id, status: 'pending', message: message.trim() || null, created_at: now(), seen: false, ...NEW_PAY })
     return wait(undefined)
   },
 
@@ -92,7 +140,8 @@ export const mockApi: Api = {
     const p = me()
     return wait(apps.filter((a) => a.seeker_id === p.id).reverse().map((a) => {
       const job = jobs.find((j) => j.id === a.job_id)!
-      return { id: a.id, status: a.status, message: a.message, created_at: a.created_at, job, employer_phone: a.status === 'accepted' ? users[job.employer_id]?.profile.phone ?? null : null }
+      const funded = ['held', 'released', 'noshow_reported', 'disputed'].includes(a.pay_status)
+      return { id: a.id, status: a.status, message: a.message, created_at: a.created_at, job, ...escrowOf(a, p.id), employer_phone: a.status === 'accepted' && funded ? users[job.employer_id]?.profile.phone ?? null : null }
     }))
   },
 
@@ -135,7 +184,7 @@ export const mockApi: Api = {
     const list = apps.filter((a) => a.job_id === jobId && a.status !== 'withdrawn' && jobs.find((j) => j.id === jobId)?.employer_id === p.id)
     const out = list.map((a) => {
       const s = users[a.seeker_id]?.profile
-      return { id: a.id, status: a.status, message: a.message, created_at: a.created_at, seeker_id: a.seeker_id, full_name: s?.full_name ?? '—', bio: s?.bio ?? null, phone: a.status === 'accepted' ? s?.phone ?? null : null }
+      return { id: a.id, status: a.status, message: a.message, created_at: a.created_at, seeker_id: a.seeker_id, ...escrowOf(a, p.id), full_name: s?.full_name ?? '—', bio: s?.bio ?? null, phone: a.status === 'accepted' ? s?.phone ?? null : null }
     })
     list.forEach((a) => { a.seen = true })
     return wait(out)
@@ -162,4 +211,87 @@ export const mockApi: Api = {
     Object.assign(p, patch)
     return wait(p)
   },
+
+  async paymentMode() { return wait('test' as const) },
+  async quote(id, hours) {
+    const p = me()
+    const a = apps.find((x) => x.id === id)
+    if (!a) throw new AppError('NOT_FOUND')
+    if (p.id !== a.seeker_id && p.id !== jobOf(a).employer_id) throw new AppError('FORBIDDEN')
+    return wait(quoteOf(a, hours))
+  },
+  async fund(id, hours) {
+    const a = myApp(id, 'employer')
+    if (a.status !== 'accepted') throw new AppError('NOT_ACCEPTED')
+    if (a.pay_status !== 'none') throw new AppError('ALREADY_FUNDED')
+    if (jobOf(a).end_date < today()) throw new AppError('JOB_ENDED')
+    const q = quoteOf(a, hours)
+    Object.assign(a, { pay_status: 'held', escrow_amount: q.amount, platform_fee: q.fee, funding_mode: 'test' })
+    return wait(undefined)
+  },
+  async completeShift(id, attendance) {
+    const a = myApp(id, 'employer')
+    if (!['ok', 'late', 'noshow'].includes(attendance)) throw new AppError('BAD_ATTENDANCE')
+    if (a.pay_status === 'none') throw new AppError('NOT_FUNDED')
+    if (a.pay_status !== 'held') throw new AppError('ALREADY_SETTLED')
+    if (today() < jobOf(a).start_date) throw new AppError('TOO_EARLY')
+    a.attendance = attendance
+    a.completed_at = Date.now()
+    if (attendance === 'noshow') a.pay_status = 'noshow_reported'
+    else { a.pay_status = 'released'; a.released_at = Date.now() }
+    return wait(undefined)
+  },
+  async respondNoshow(id, accept) {
+    const a = myApp(id, 'seeker')
+    if (a.pay_status !== 'noshow_reported') throw new AppError('ALREADY_SETTLED')
+    if (accept) { a.pay_status = 'refunded'; freeSlot(a) } else a.pay_status = 'disputed'
+    return wait(undefined)
+  },
+  async openDispute(id) {
+    const p = me()
+    const a = apps.find((x) => x.id === id)
+    if (!a) throw new AppError('NOT_FOUND')
+    if (p.id !== a.seeker_id && p.id !== jobOf(a).employer_id) throw new AppError('FORBIDDEN')
+    if (a.pay_status !== 'held') throw new AppError('CANNOT_DISPUTE')
+    a.pay_status = 'disputed'
+    return wait(undefined)
+  },
+  async submitReview(id, stars, tags, comment) {
+    const p = me()
+    const a = apps.find((x) => x.id === id)
+    if (!a) throw new AppError('NOT_FOUND')
+    const j = jobOf(a)
+    if (p.id !== a.seeker_id && p.id !== j.employer_id) throw new AppError('FORBIDDEN')
+    if (a.pay_status !== 'released') throw new AppError('NOT_COMPLETED')
+    if (!(stars >= 1 && stars <= 5)) throw new AppError('BAD_STARS')
+    const allowed = p.role === 'employer' ? EMPLOYER_TAGS : SEEKER_TAGS
+    if (!tags.every((t) => allowed.includes(t))) throw new AppError('BAD_TAGS')
+    if (reviews.some((r) => r.application_id === id && r.reviewer_id === p.id)) throw new AppError('ALREADY_REVIEWED')
+    reviews.push({ id: nid(), application_id: id, reviewer_id: p.id, reviewee_id: p.role === 'employer' ? a.seeker_id : j.employer_id, reviewer_role: p.role, stars, tags, comment: comment.trim().slice(0, 300) || null, created_at: now() })
+    return wait(undefined)
+  },
+  async reputations(ids) {
+    const out: Record<string, Reputation> = {}
+    ids.forEach((u) => {
+      const mine = apps.filter((a) => a.seeker_id === u || jobOf(a).employer_id === u)
+      const rs = reviews.filter((r) => r.reviewee_id === u && revealed(r.application_id))
+      const counts: Record<string, number> = {}
+      rs.forEach((r) => r.tags.forEach((t) => { counts[t] = (counts[t] ?? 0) + 1 }))
+      out[u] = {
+        user_id: u,
+        shifts_done: mine.filter((a) => a.pay_status === 'released').length,
+        noshow: apps.filter((a) => a.seeker_id === u && a.pay_status === 'refunded' && a.attendance === 'noshow').length,
+        late: apps.filter((a) => a.seeker_id === u && a.pay_status === 'released' && a.attendance === 'late').length,
+        ratings: rs.length,
+        avg_stars: rs.length ? Math.round((rs.reduce((n, r) => n + r.stars, 0) / rs.length) * 10) / 10 : null,
+        top_tags: Object.entries(counts).sort((x, y) => y[1] - x[1]).slice(0, 3).map(([t]) => t),
+      }
+    })
+    return wait(out)
+  },
+  async receivedReviews() {
+    const p = me()
+    return wait(reviews.filter((r) => r.reviewee_id === p.id && revealed(r.application_id)).map(({ id, stars, tags, comment, created_at, reviewer_role }) => ({ id, stars, tags, comment, created_at, reviewer_role })))
+  },
+  async sweep() { sweepFor(current); return wait(undefined) },
 }

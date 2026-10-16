@@ -1,8 +1,8 @@
 import { createClient, type PostgrestError } from '@supabase/supabase-js'
 import { normalizePhone, phoneEmail } from './phone'
 import {
-  AppError, type Api, type Applicant, type Job, type JobInput, type MyApplication, type MyJob,
-  type Profile, type ProfileUpdate, type SignUpInput,
+  AppError, type Api, type Applicant, type Escrow, type Job, type JobInput, type MyApplication, type MyJob,
+  type Profile, type ProfileUpdate, type Reputation, type SignUpInput,
 } from './types'
 
 const URL = import.meta.env.VITE_SUPABASE_URL as string
@@ -12,7 +12,9 @@ const sb = createClient(URL, KEY, { auth: { persistSession: true, autoRefreshTok
 
 const JOB_COLS = '*, employer:profiles!jobs_employer_id_fkey(business_name, full_name)'
 const KNOWN = ['FREE_PLAN_LIMIT', 'URGENT_REQUIRES_PRO', 'JOB_NOT_OPEN', 'SLOTS_BELOW_FILLED', 'FORBIDDEN',
-  'ALREADY_DECIDED', 'JOB_FULL', 'NOT_FOUND', 'CANNOT_WITHDRAW']
+  'ALREADY_DECIDED', 'JOB_FULL', 'NOT_FOUND', 'CANNOT_WITHDRAW', 'NOT_FUNDED', 'TOO_EARLY', 'ALREADY_FUNDED', 'ALREADY_SETTLED',
+  'NOT_ACCEPTED', 'JOB_ENDED', 'PAYMENT_NOT_AVAILABLE', 'CANNOT_DISPUTE', 'NOT_COMPLETED', 'ALREADY_REVIEWED', 'REVIEW_WINDOW_CLOSED',
+  'BAD_HOURS', 'BAD_STARS', 'BAD_TAGS', 'BAD_ATTENDANCE']
 
 function fail(e: PostgrestError | Error | null | undefined): never {
   const msg = e?.message ?? ''
@@ -51,6 +53,22 @@ async function phonesOf(userIds: string[]): Promise<Record<string, string>> {
   const { data } = await sb.from('contacts').select('user_id, phone').in('user_id', userIds)
   return Object.fromEntries((data ?? []).map((r) => [r.user_id, r.phone]))
 }
+
+const ESCROW_COLS = 'pay_status, escrow_amount, platform_fee, attendance, funding_mode'
+
+/** Which of these applications did the signed-in user already review? */
+async function reviewedSet(appIds: string[], me: string): Promise<Set<string>> {
+  if (!appIds.length) return new Set()
+  const { data } = await sb.from('reviews').select('application_id').eq('reviewer_id', me).in('application_id', appIds)
+  return new Set((data ?? []).map((r) => r.application_id))
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const toEscrow = (r: any, reviewed: boolean): Escrow => ({
+  pay_status: r.pay_status, attendance: r.attendance, funding_mode: r.funding_mode, reviewed,
+  escrow_amount: r.escrow_amount == null ? null : Number(r.escrow_amount),
+  platform_fee: r.platform_fee == null ? null : Number(r.platform_fee),
+})
 
 export const supabaseApi: Api = {
   async me() {
@@ -126,15 +144,16 @@ export const supabaseApi: Api = {
   async myApplications() {
     const id = await uid()
     const { data, error } = await sb.from('applications')
-      .select(`id, status, message, created_at, job:jobs(${JOB_COLS})`)
+      .select(`id, status, message, created_at, ${ESCROW_COLS}, job:jobs(${JOB_COLS})`)
       .eq('seeker_id', id).order('created_at', { ascending: false })
     if (error) fail(error)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rows = (data ?? []).filter((r: any) => r.job) as any[]
     const accepted = rows.filter((r) => r.status === 'accepted').map((r) => r.job.employer_id)
-    const phones = await phonesOf(accepted)
+    // The database only returns an employer's phone once the money for that shift is held.
+    const [phones, done] = await Promise.all([phonesOf(accepted), reviewedSet(rows.map((r) => r.id), id)])
     return rows.map((r): MyApplication => ({
-      id: r.id, status: r.status, message: r.message, created_at: r.created_at,
+      id: r.id, status: r.status, message: r.message, created_at: r.created_at, ...toEscrow(r, done.has(r.id)),
       job: toJob(r.job), employer_phone: r.status === 'accepted' ? phones[r.job.employer_id] ?? null : null,
     }))
   },
@@ -175,15 +194,16 @@ export const supabaseApi: Api = {
 
   async applicantsFor(jobId) {
     const { data, error } = await sb.from('applications')
-      .select('id, status, message, created_at, seeker_id, seeker:profiles!applications_seeker_id_fkey(full_name, bio)')
+      .select(`id, status, message, created_at, seeker_id, ${ESCROW_COLS}, seeker:profiles!applications_seeker_id_fkey(full_name, bio)`)
       .eq('job_id', jobId).neq('status', 'withdrawn').order('created_at', { ascending: true })
     if (error) fail(error)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rows = (data ?? []) as any[]
-    const phones = await phonesOf(rows.filter((r) => r.status === 'accepted').map((r) => r.seeker_id))
+    const me = await uid()
+    const [phones, done] = await Promise.all([phonesOf(rows.filter((r) => r.status === 'accepted').map((r) => r.seeker_id)), reviewedSet(rows.map((r) => r.id), me)])
     sb.rpc('mark_applications_seen', { p_job: jobId }).then(() => undefined)
     return rows.map((r): Applicant => ({
-      id: r.id, status: r.status, message: r.message, created_at: r.created_at, seeker_id: r.seeker_id,
+      id: r.id, status: r.status, message: r.message, created_at: r.created_at, seeker_id: r.seeker_id, ...toEscrow(r, done.has(r.id)),
       full_name: r.seeker?.full_name ?? '—', bio: r.seeker?.bio ?? null, phone: phones[r.seeker_id] ?? null,
     }))
   },
@@ -204,5 +224,61 @@ export const supabaseApi: Api = {
     const p = await loadProfile(id)
     if (!p) throw new AppError('NO_PROFILE')
     return p
+  },
+
+  async paymentMode() {
+    const { data } = await sb.rpc('payment_mode')
+    return data === 'live' ? 'live' : 'test'
+  },
+
+  async quote(applicationId, hours) {
+    const { data, error } = await sb.rpc('quote_application', { p_application: applicationId, p_hours: hours ?? null })
+    if (error) fail(error)
+    return data as { amount: number; fee: number; net: number }
+  },
+
+  async fund(applicationId, hours) {
+    const { error } = await sb.rpc('fund_application', { p_application: applicationId, p_hours: hours ?? null })
+    if (error) fail(error)
+  },
+
+  async completeShift(applicationId, attendance) {
+    const { error } = await sb.rpc('complete_shift', { p_application: applicationId, p_attendance: attendance })
+    if (error) fail(error)
+  },
+
+  async respondNoshow(applicationId, accept) {
+    const { error } = await sb.rpc('respond_noshow', { p_application: applicationId, p_accept: accept })
+    if (error) fail(error)
+  },
+
+  async openDispute(applicationId, reason) {
+    const { error } = await sb.rpc('open_dispute', { p_application: applicationId, p_reason: reason })
+    if (error) fail(error)
+  },
+
+  async submitReview(applicationId, stars, tags, comment) {
+    const { error } = await sb.rpc('submit_review', { p_application: applicationId, p_stars: stars, p_tags: tags, p_comment: comment })
+    if (error) fail(error)
+  },
+
+  async reputations(userIds) {
+    const ids = [...new Set(userIds)].filter(Boolean)
+    if (!ids.length) return {}
+    const { data, error } = await sb.rpc('reputations', { p_users: ids })
+    if (error) fail(error)
+    return Object.fromEntries(((data ?? []) as Reputation[]).map((r) => [r.user_id, { ...r, avg_stars: r.avg_stars == null ? null : Number(r.avg_stars) }]))
+  },
+
+  async receivedReviews() {
+    const id = await uid()
+    const { data, error } = await sb.from('reviews').select('id, stars, tags, comment, created_at, reviewer_role')
+      .eq('reviewee_id', id).order('created_at', { ascending: false }).limit(20)
+    if (error) fail(error)
+    return data ?? []
+  },
+
+  async sweep() {
+    await sb.rpc('sweep_overdue')
   },
 }

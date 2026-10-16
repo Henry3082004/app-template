@@ -222,3 +222,23 @@ textarea.inp{min-height:84px;resize:vertical}
 .job .meta span+span::before{content:"·";margin-right:6px}
 .job .meta .low{color:var(--errfg);font-weight:600}
 .sortline{flex-direction:column;align-items:flex-start;gap:2px}.sortline .back{white-space:nowrap}
+
+/* Escrow + reputation */
+.rep{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:13px}
+.rep .muted{font-size:13px}.stars-n{display:inline-flex;align-items:center;gap:3px;color:var(--tx);font-size:13px}.stars-n svg{color:var(--sun)}
+.warnt{color:var(--errfg);font-weight:600}
+.tag.warn{background:var(--warning-bg);color:var(--warning-fg);font-weight:600}
+.escrow{display:flex;flex-direction:column;gap:10px;border-top:1px dashed var(--line);padding-top:12px}
+.escrow .acts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sumrows{display:flex;flex-direction:column;gap:6px;background:var(--bg);border-radius:14px;padding:12px 14px}
+.sumrows>div{display:flex;justify-content:space-between;gap:12px;font-size:15px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;flex-direction:column;gap:2px;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:12px 14px;font:inherit;cursor:pointer;min-height:56px}
+.opt span{font-size:13px;color:var(--tx2)}.opt:hover{border-color:var(--p)}.opt.noshow b{color:var(--errfg)}
+.starpick{display:flex;gap:6px;justify-content:center}
+.starpick button{border:0;background:none;padding:4px;color:var(--gray-300,#d9cbbd);cursor:pointer;min-width:44px;min-height:44px}
+.starpick button.on{color:var(--sun)}.starpick button.on svg{fill:currentColor}
+.chiprow.wrap{flex-wrap:wrap;overflow:visible}
+.revitem{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.stars-n svg{fill:currentColor}
+.escrow .acts .btn-primary,.escrow .acts .btn-ghost{flex:1 1 150px}

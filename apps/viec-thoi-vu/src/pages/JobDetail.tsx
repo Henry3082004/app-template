@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Ic } from '../components/Ic'
+import { Rep } from '../components/Escrow'
 import { Pay } from '../components/JobCard'
 import { Btn, ErrorBox, Fld, Tag } from '../components/ui'
 import { api } from '../lib/api'
@@ -10,7 +11,7 @@ import { tap } from '../lib/haptics'
 import { useI18n } from '../lib/i18n'
 import { report } from '../lib/sentry'
 import { useSession } from '../lib/session'
-import type { AppStatus, Job } from '../lib/types'
+import type { AppStatus, Job, Reputation } from '../lib/types'
 
 /** Job detail: a page on phones, the right-hand column on tablet/desktop. */
 export function JobDetail({ job, distance, mine, onApplied, onBack }: {
@@ -25,9 +26,15 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
   const [msg, setMsg] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<unknown>(null)
+  const [rep, setRep] = useState<Reputation>()
   const left = job.slots - job.filled
   const full = left <= 0 || job.status !== 'open'
   const isEmployer = profile?.role === 'employer'
+
+  useEffect(() => {
+    setRep(undefined)
+    api.reputations([job.employer_id]).then((m) => setRep(m[job.employer_id])).catch(() => undefined)
+  }, [job.employer_id])
 
   const send = async () => {
     setBusy(true)
@@ -56,6 +63,7 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
         <div className="card">
           <div className="hrow"><h2 style={{ fontSize: 20 }}>{job.title}</h2>{job.is_urgent && <Tag tone="urgent">{t('urgent')}</Tag>}</div>
           <div style={{ marginTop: 8 }}><Pay job={job} xl /></div>
+          <div style={{ marginTop: 12 }}><Rep rep={rep} employer /></div>
         </div>
         <div className="card info">
           <div><Ic n="calendar" size={18} /><span><b>{dateRange(job.start_date, job.end_date)}</b>{job.shift_note && <><br />{job.shift_note}</>}</span></div>

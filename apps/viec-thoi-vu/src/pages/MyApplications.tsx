@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { SeekerPay } from '../components/Escrow'
 import { Ic } from '../components/Ic'
 import { Pay } from '../components/JobCard'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
@@ -23,7 +24,7 @@ export default function MyApplications() {
   const load = () => {
     if (profile?.role !== 'seeker') return
     setError(null)
-    api.myApplications().then(setList).catch(setError)
+    api.sweep().catch(() => undefined).then(() => api.myApplications()).then(setList).catch(setError)
   }
   useEffect(load, [profile]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -59,6 +60,7 @@ export default function MyApplications() {
             </div>
             <Pay job={a.job} />
             <div className="biz"><Ic n="store" size={15} /> {a.job.business_name} · <Ic n="calendar" size={15} /> {dateRange(a.job.start_date, a.job.end_date)}</div>
+            {a.status === 'accepted' && <SeekerPay app={a} onChanged={load} />}
             {a.status === 'accepted' && a.employer_phone && (
               <>
                 <div className="phone"><Ic n="phone" size={20} /> {displayPhone(a.employer_phone)}</div>
