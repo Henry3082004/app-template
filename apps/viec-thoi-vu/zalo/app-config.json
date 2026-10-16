@@ -8,14 +8,14 @@
   },
   "backgroundColor": "#FFF9F1",
   "listCSS": [
-    "assets/index-vNiAMsbH.css"
+    "assets/index-CLwgxFyz.css"
   ],
   "listSyncJS": [
-    "assets/index.kylN6d6E.module.js"
+    "assets/index.BzinewQg.module.js"
   ],
   "listAsyncJS": [
-    "assets/Landing.BcqI2sBc.module.js",
-    "assets/Legal.DMKsCaYO.module.js",
-    "assets/browser.D4R5dTfe.module.js"
+    "assets/Landing.DzGcuLVG.module.js",
+    "assets/Legal.CGRer_DL.module.js",
+    "assets/browser.Dj69r_an.module.js"
   ]
 }

@@ -211,3 +211,7 @@ textarea.inp{min-height:84px;resize:vertical}
 .filter .ic-svg,.chip .ic-svg{margin-right:4px}
 .sortline .back{display:inline-flex;align-items:center;gap:4px}
 .searchbox .si{display:flex;color:var(--tx2)}
+/* Rail / bottom-bar labels: always centred under the icon, wrap cleanly */
+.rail a,.bnav a{text-align:center;line-height:1.2;justify-content:center}
+.rail a{width:84px;padding:10px 4px;gap:4px;word-break:keep-all;overflow-wrap:normal;text-wrap:balance}
+.rail a span.ic{margin:0 auto}
