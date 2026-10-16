@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Ic } from '../components/Ic'
 import { Pay } from '../components/JobCard'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { api } from '../lib/api'
@@ -57,13 +58,13 @@ export default function MyApplications() {
               <Tag tone={TONE[a.status]}>{t(`st${a.status}`)}</Tag>
             </div>
             <Pay job={a.job} />
-            <div className="biz">🏪 {a.job.business_name} · 📅 {dateRange(a.job.start_date, a.job.end_date)}</div>
+            <div className="biz"><Ic n="store" size={15} /> {a.job.business_name} · <Ic n="calendar" size={15} /> {dateRange(a.job.start_date, a.job.end_date)}</div>
             {a.status === 'accepted' && a.employer_phone && (
               <>
-                <div className="phone">📞 {displayPhone(a.employer_phone)}</div>
+                <div className="phone"><Ic n="phone" size={20} /> {displayPhone(a.employer_phone)}</div>
                 <div className="row" style={{ gap: 10 }}>
-                  <a className="btn btn-primary sm" href={telHref(a.employer_phone)}>{t('call')}</a>
-                  <a className="btn btn-ghost sm" href={zaloHref(a.employer_phone)} target="_blank" rel="noreferrer">{t('zalo')}</a>
+                  <a className="btn btn-primary sm" href={telHref(a.employer_phone)}>{<Ic n="phone" size={16} />} {t('call')}</a>
+                  <a className="btn btn-ghost sm" href={zaloHref(a.employer_phone)} target="_blank" rel="noreferrer">{<Ic n="message" size={16} />} {t('zalo')}</a>
                 </div>
               </>
             )}

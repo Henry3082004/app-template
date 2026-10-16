@@ -7,11 +7,11 @@ const vi = {
   navJobs: 'Việc làm', navApplied: 'Đã ứng tuyển', navAccount: 'Tài khoản', navMyJobs: 'Tin của tôi',
   // jobs list
   jobsTitle: 'Việc thời vụ', iNeedStaff: 'Tôi cần tuyển người', searchPh: 'Tìm việc, cơ sở, khu vực…',
-  fAll: 'Tất cả', fUrgent: '⚡ Gấp', catservice: 'Phục vụ', catwarehouse: 'Kho hàng', catevent: 'Sự kiện',
+  fAll: 'Tất cả', fUrgent: 'Gấp', catservice: 'Phục vụ', catwarehouse: 'Kho hàng', catevent: 'Sự kiện',
   catfarm: 'Nông nghiệp', catretail: 'Bán hàng', catother: 'Khác',
   emptyJobs: 'Chưa có việc phù hợp. Thử bỏ bớt bộ lọc nhé 👀', nearYou: 'Gần bạn nhất trước',
-  useLocation: '📍 Sắp xếp theo khoảng cách', locating: 'Đang tìm vị trí…', locDenied: 'Chưa lấy được vị trí — đang xếp theo tin mới.',
-  urgent: '⚡ Gấp', slotsLeft: 'còn {n} chỗ', full: 'Đã đủ người', closed: 'Đã đóng',
+  useLocation: 'Sắp xếp theo khoảng cách', locating: 'Đang tìm vị trí…', locDenied: 'Chưa lấy được vị trí — đang xếp theo tin mới.',
+  urgent: 'Gấp', slotsLeft: 'còn {n} chỗ', full: 'Đã đủ người', closed: 'Đã đóng',
   // units
   perhour: 'giờ', perday: 'ngày', pershift: 'ca', perjob: 'việc',
   uhour: 'Giờ', uday: 'Ngày', ushift: 'Ca', ujob: 'Việc',
@@ -63,7 +63,7 @@ const vi = {
   pricingTitle: 'Bảng giá', pricingSub: 'Người tìm việc luôn miễn phí. Nhà tuyển dụng chọn gói phù hợp.',
   free: 'Miễn phí', pro: 'Pro', freePrice: '0đ', perMonth: '/tháng', perYear: '/năm',
   freeF1: 'Tối đa 2 tin đang mở', freeF2: 'Nhận / từ chối ứng viên', freeF3: 'Xem SĐT người đã nhận',
-  proF1: 'Không giới hạn tin', proF2: 'Nhãn ⚡ Gấp — lên đầu danh sách', proF3: 'Mọi tính năng gói Miễn phí',
+  proF1: 'Không giới hạn tin', proF2: 'Nhãn Gấp — lên đầu danh sách', proF3: 'Mọi tính năng gói Miễn phí',
   yearSave: 'Trả năm tiết kiệm ~2 tháng', currentPlan: 'Gói hiện tại', choosePro: 'Nâng cấp Pro',
   paySoon: 'Thanh toán đang được mở. Bạn sẽ nâng cấp được trong vài ngày tới — cảm ơn bạn đã chờ 💙',
   // errors
@@ -84,7 +84,7 @@ const vi = {
   pickPost: 'Chọn một tin', pickPostSub: 'Danh sách ứng viên sẽ hiện ở đây.',
   catLabel: 'Ngành nghề', area: 'Khu vực', allAreas: 'Tất cả khu vực', minPay: 'Lương tối thiểu', noLimit: 'Không giới hạn',
   backJobs: '← Quay lại', backMine: '← Tin của tôi', byeSub: 'Tạm biệt nhé, Capy chờ bạn quay lại!',
-  whoSees: '👀 Người tìm việc sẽ thấy', signIn: 'Đăng nhập', loginHello: 'Ứng tuyển ngay 👋', hireHello: 'Tạo hồ sơ cơ sở 🏪',
+  whoSees: 'Người tìm việc sẽ thấy', signIn: 'Đăng nhập', loginHello: 'Ứng tuyển ngay 👋', hireHello: 'Tạo hồ sơ cơ sở',
   clearable: 'Bỏ chọn', openApp: 'Mở app', tagline: 'tìm nhanh, nhận việc trong ngày', popular: 'Phổ biến',
 }
 
@@ -93,11 +93,11 @@ const en: Dict = {
   appName: 'Việc Thời Vụ',
   navJobs: 'Jobs', navApplied: 'Applied', navAccount: 'Account', navMyJobs: 'My posts',
   jobsTitle: 'Short-term jobs', iNeedStaff: 'I need staff', searchPh: 'Search jobs, places, areas…',
-  fAll: 'All', fUrgent: '⚡ Urgent', catservice: 'Hospitality', catwarehouse: 'Warehouse', catevent: 'Events',
+  fAll: 'All', fUrgent: 'Urgent', catservice: 'Hospitality', catwarehouse: 'Warehouse', catevent: 'Events',
   catfarm: 'Farm', catretail: 'Retail', catother: 'Other',
   emptyJobs: 'No matching jobs. Try removing a filter 👀', nearYou: 'Closest first',
-  useLocation: '📍 Sort by distance', locating: 'Finding your location…', locDenied: "Couldn't get your location — showing newest first.",
-  urgent: '⚡ Urgent', slotsLeft: '{n} spots left', full: 'Fully staffed', closed: 'Closed',
+  useLocation: 'Sort by distance', locating: 'Finding your location…', locDenied: "Couldn't get your location — showing newest first.",
+  urgent: 'Urgent', slotsLeft: '{n} spots left', full: 'Fully staffed', closed: 'Closed',
   perhour: 'hour', perday: 'day', pershift: 'shift', perjob: 'job',
   uhour: 'Hour', uday: 'Day', ushift: 'Shift', ujob: 'Job',
   time: 'When', place: 'Where', slots: 'Spots', business: 'Business', about: 'About the job',
@@ -139,7 +139,7 @@ const en: Dict = {
   pricingTitle: 'Pricing', pricingSub: 'Always free for job seekers. Employers pick a plan.',
   free: 'Free', pro: 'Pro', freePrice: '$0', perMonth: '/month', perYear: '/year',
   freeF1: 'Up to 2 open posts', freeF2: 'Accept / decline applicants', freeF3: "See accepted applicants' phones",
-  proF1: 'Unlimited posts', proF2: '⚡ Urgent badge — pinned to top', proF3: 'Everything in Free',
+  proF1: 'Unlimited posts', proF2: 'Urgent badge — pinned to top', proF3: 'Everything in Free',
   yearSave: 'Pay yearly, save ~2 months', currentPlan: 'Current plan', choosePro: 'Upgrade to Pro',
   paySoon: "Payments are opening soon. You'll be able to upgrade in a few days — thanks for waiting 💙",
   retry: 'Try again', copyForClaude: 'Copy error report for Claude', copied: 'Copied ✓',
@@ -159,7 +159,7 @@ const en: Dict = {
   pickPost: 'Pick a post', pickPostSub: 'Its applicants will show here.',
   catLabel: 'Category', area: 'Area', allAreas: 'All areas', minPay: 'Minimum pay', noLimit: 'No limit',
   backJobs: '← Back', backMine: '← My posts', byeSub: 'Bye for now — Capy will be waiting for you!',
-  whoSees: '👀 What job seekers will see', signIn: 'Sign in', loginHello: 'Apply now 👋', hireHello: 'Set up your business 🏪',
+  whoSees: 'What job seekers will see', signIn: 'Sign in', loginHello: 'Apply now 👋', hireHello: 'Set up your business',
   clearable: 'Clear', openApp: 'Open app', tagline: 'find fast, start today', popular: 'Popular',
 }
 

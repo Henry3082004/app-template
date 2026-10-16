@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Ic } from '../components/Ic'
 import { Pay } from '../components/JobCard'
 import { Btn, ErrorBox, Fld, Tag } from '../components/ui'
 import { api } from '../lib/api'
@@ -57,10 +58,10 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
           <div style={{ marginTop: 8 }}><Pay job={job} xl /></div>
         </div>
         <div className="card info">
-          <div>📅 <span><b>{dateRange(job.start_date, job.end_date)}</b>{job.shift_note && <><br />{job.shift_note}</>}</span></div>
-          <div>📍 <span><b>{job.address}, {job.city}</b>{distance != null && <><br />{fmtKm(distance, locale)}</>}</span></div>
-          <div>👥 <span>{left > 0 ? t('slotsOf', { left, total: job.slots }) : t('full')}</span></div>
-          {job.business_name && <div>🏪 <span>{job.business_name}</span></div>}
+          <div><Ic n="calendar" size={18} /><span><b>{dateRange(job.start_date, job.end_date)}</b>{job.shift_note && <><br />{job.shift_note}</>}</span></div>
+          <div><Ic n="pin" size={18} /><span><b>{job.address}, {job.city}</b>{distance != null && <><br />{fmtKm(distance, locale)}</>}</span></div>
+          <div><Ic n="users" size={18} /><span>{left > 0 ? t('slotsOf', { left, total: job.slots }) : t('full')}</span></div>
+          {job.business_name && <div><Ic n="store" size={18} /><span>{job.business_name}</span></div>}
         </div>
         {job.description && <div className="card"><b>{t('about')}</b><p style={{ marginTop: 6, whiteSpace: 'pre-line' }}>{job.description}</p></div>}
         {!full && !mine && !isEmployer && (

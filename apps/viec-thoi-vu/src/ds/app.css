@@ -199,3 +199,15 @@ textarea.inp{min-height:84px;resize:vertical}
 .landing .bar .logo{white-space:nowrap;font-size:15px}.landing .bar .logo img{width:32px;height:32px}
 .wavecorner{top:14px;right:18px;width:64px}.dlg h2{padding-right:70px}.dlg.full h2{padding-right:0}
 @media(min-width:600px){.wavecorner{top:20px;right:24px;width:72px}}
+/* Lucide icons (components/Ic.tsx) */
+.ic-svg{flex:none;vertical-align:-0.18em}
+.bnav a .ic,.rail a .ic{display:grid;place-items:center;height:24px}
+.bnav a .ic svg,.rail a .ic svg{vertical-align:0}
+.info>div>svg{color:var(--p2);margin-top:2px}
+.biz{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.phone{display:flex;align-items:center;gap:8px}
+.tag .ic-svg{vertical-align:-0.2em}
+.landing .ben .e{color:var(--p2)}
+.filter .ic-svg,.chip .ic-svg{margin-right:4px}
+.sortline .back{display:inline-flex;align-items:center;gap:4px}
+.searchbox .si{display:flex;color:var(--tx2)}

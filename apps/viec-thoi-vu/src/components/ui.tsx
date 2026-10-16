@@ -4,6 +4,7 @@ import { capy, type CapyPose } from '../lib/capy'
 import { errorKey, errorReport } from '../lib/errors'
 import { initials } from '../lib/format'
 import { useI18n } from '../lib/i18n'
+import { Ic } from './Ic'
 
 type BtnProps = ButtonHTMLAttributes<HTMLButtonElement> & { v?: 'primary' | 'ghost' | 'text' | 'danger'; block?: boolean; sm?: boolean }
 export function Btn({ v = 'primary', block, sm, className = '', ...p }: BtnProps) {
@@ -15,7 +16,7 @@ export function Chip({ on, children, ...p }: ButtonHTMLAttributes<HTMLButtonElem
 }
 
 export function Tag({ tone = '', children }: { tone?: '' | 'urgent' | 'ok' | 'p' | 'sun'; children: ReactNode }) {
-  return <span className={'tag ' + tone}>{children}</span>
+  return <span className={'tag ' + tone}>{tone === 'urgent' && <Ic n="zap" size={13} />}{children}</span>
 }
 
 export function Avatar({ name }: { name: string }) {

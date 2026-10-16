@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Applicants } from './Applicants'
+import { Ic } from '../components/Ic'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { api } from '../lib/api'
 import { dateRange } from '../lib/format'
@@ -59,8 +60,8 @@ export default function EmployerJobs() {
           <button key={j.id} type="button" className={'card job' + (wide && j.id === id ? ' sel' : '')} onClick={() => nav(`/app/tin/${j.id}`)}>
             <div className="hrow"><h3>{j.title}</h3>{j.status === 'closed' ? <Tag>{t('closed')}</Tag> : j.is_urgent ? <Tag tone="urgent">{t('urgent')}</Tag> : null}</div>
             <div className="tags">
-              <Tag>📅 {dateRange(j.start_date, j.end_date)}</Tag>
-              <Tag>👥 {t('filledOf', { filled: j.filled, slots: j.slots })}</Tag>
+              <Tag><Ic n="calendar" size={14} /> {dateRange(j.start_date, j.end_date)}</Tag>
+              <Tag><Ic n="users" size={14} /> {t('filledOf', { filled: j.filled, slots: j.slots })}</Tag>
               {j.newApplicants > 0 ? <Tag tone="p">{t('newApplicants', { n: j.newApplicants })}</Tag> : <Tag>{t('applicantsN', { n: j.applicants })}</Tag>}
             </div>
           </button>

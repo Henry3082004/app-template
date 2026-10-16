@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Ic } from '../components/Ic'
 import { JobCard } from '../components/JobCard'
 import { Btn, Chip, Dialog, Empty, ErrorBox, Fld, Skel } from '../components/ui'
 import { api } from '../lib/api'
@@ -148,7 +149,7 @@ export default function Jobs() {
     )
   }
 
-  const chips = FILTERS.map((f) => <Chip key={f.id} on={filter === f.id} onClick={() => setFilter(f.id)}>{t(f.key)}</Chip>)
+  const chips = FILTERS.map((f) => <Chip key={f.id} on={filter === f.id} onClick={() => setFilter(f.id)}>{f.id === 'urgent' && <Ic n="zap" size={14} />}{t(f.key)}</Chip>)
 
   const body = error != null
     ? <ErrorBox error={error} where="Jobs.list" onRetry={load} />
@@ -182,7 +183,7 @@ export default function Jobs() {
               {bp !== 'd' && !profile && <Btn v="ghost" sm onClick={() => askAuth({ role: 'employer', onDone: (p) => nav(p.role === 'employer' ? '/app/dang-tin' : '/app') })}>{t('iNeedStaff')}</Btn>}
             </div>
             <div className="searchbox">
-              <span className="si" aria-hidden="true">🔍</span>
+              <span className="si"><Ic n="search" size={18} /></span>
               <input ref={searchRef} className="inp" type="search" placeholder={t('searchPh')} aria-label={t('searchPh')} value={q} onChange={(e) => setQ(e.target.value)} />
               <span className="kbd" aria-hidden="true">/</span>
             </div>
@@ -191,7 +192,7 @@ export default function Jobs() {
               {jobs && <span>{t('capyFound', { n: shown.length })}</span>}
               {coords
                 ? <span>{t('nearYou')}</span>
-                : <button type="button" className="back" style={{ minHeight: 0, padding: 0, fontSize: 14 }} onClick={findMe} disabled={loc === 'busy'}>{loc === 'busy' ? t('locating') : t('useLocation')}</button>}
+                : <button type="button" className="back" style={{ minHeight: 0, padding: 0, fontSize: 14 }} onClick={findMe} disabled={loc === 'busy'}>{loc === 'busy' ? t('locating') : <><Ic n="pin" size={14} /> {t('useLocation')}</>}</button>}
             </div>
             {loc === 'denied' && <div className="notice warn">{t('locDenied')}</div>}
           </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Ic } from '../components/Ic'
 import { Avatar, Btn, Empty, ErrorBox, Fld } from '../components/ui'
 import { api } from '../lib/api'
 import { CITIES } from '../lib/geo'
@@ -45,13 +46,13 @@ export default function Account() {
 
   const lang = (
     <div className="card stack">
-      <Fld label={'🌐 ' + t('language')}>
+      <Fld label={t('language')}>
         <div className="seg">
           <button type="button" className={locale === 'vi' ? 'on' : ''} onClick={() => changeLang('vi')}>Tiếng Việt</button>
           <button type="button" className={locale === 'en' ? 'on' : ''} onClick={() => changeLang('en')}>English</button>
         </div>
       </Fld>
-      {profile?.role === 'employer' && <Btn v="ghost" onClick={() => nav('/app/bang-gia')}>💎 {t('pricing')}</Btn>}
+      {profile?.role === 'employer' && <Btn v="ghost" onClick={() => nav('/app/bang-gia')}><Ic n="gem" size={18} /> {t('pricing')}</Btn>}
     </div>
   )
 

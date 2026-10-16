@@ -3,9 +3,10 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { LOGO } from '../lib/capy'
 import { useI18n } from '../lib/i18n'
 import { useSession } from '../lib/session'
+import { Ic, type IconName } from './Ic'
 import { Avatar, Btn } from './ui'
 
-interface Item { to: string; ico: string; label: string; end?: boolean; match?: string[] }
+interface Item { to: string; ico: IconName; label: string; end?: boolean; match?: string[] }
 
 /** Phone: bottom bar · tablet: left rail · desktop (≥1280px): top bar. Visibility is pure CSS. */
 export function Shell({ children }: { children: ReactNode }) {
@@ -16,13 +17,13 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const items: Item[] = profile?.role === 'employer'
     ? [
-        { to: '/app/tin-cua-toi', ico: '🏪', label: t('navMyJobs'), match: ['/app/tin', '/app/dang-tin'] },
-        { to: '/app/tai-khoan', ico: '👤', label: t('navAccount'), match: ['/app/bang-gia'] },
+        { to: '/app/tin-cua-toi', ico: 'store', label: t('navMyJobs'), match: ['/app/tin', '/app/dang-tin'] },
+        { to: '/app/tai-khoan', ico: 'user', label: t('navAccount'), match: ['/app/bang-gia'] },
       ]
     : [
-        { to: '/app', ico: '💼', label: t('navJobs'), end: true, match: ['/app/viec'] },
-        { to: '/app/da-ung-tuyen', ico: '📋', label: t('navApplied') },
-        { to: '/app/tai-khoan', ico: '👤', label: t('navAccount'), match: ['/app/bang-gia'] },
+        { to: '/app', ico: 'briefcase', label: t('navJobs'), end: true, match: ['/app/viec'] },
+        { to: '/app/da-ung-tuyen', ico: 'clipboard', label: t('navApplied') },
+        { to: '/app/tai-khoan', ico: 'user', label: t('navAccount'), match: ['/app/bang-gia'] },
       ]
   const isOn = (i: Item) => (i.end ? pathname === i.to : pathname.startsWith(i.to)) || !!i.match?.some((m) => pathname.startsWith(m))
 
@@ -30,7 +31,7 @@ export function Shell({ children }: { children: ReactNode }) {
     <>
       {items.map((i) => (
         <NavLink key={i.to} to={i.to} end={i.end} className={isOn(i) ? 'on' : ''} aria-current={isOn(i) ? 'page' : undefined}>
-          <span className="ic" aria-hidden="true">{i.ico}</span>{i.label}
+          <span className="ic"><Ic n={i.ico} size={22} /></span>{i.label}
         </NavLink>
       ))}
     </>

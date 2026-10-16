@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
+import { Ic } from '../components/Ic'
 import { JobCard } from '../components/JobCard'
 import { Btn, Chip, Dialog, ErrorBox, Fld, Tag } from '../components/ui'
 import { api } from '../lib/api'
@@ -88,7 +89,7 @@ export default function PostJob() {
 
   const form = (
     <div className="stack">
-      {prefilled && <div className="plan ok">✨ {t('prefilled')}</div>}
+      {prefilled && <div className="plan ok"><span><Ic n="sparkles" size={16} /> {t('prefilled')}</span></div>}
       <div className="formgrid">
         <div className="span"><Fld label={t('jobTitle')} htmlFor="p-title"><input id="p-title" className="inp" value={f.title} onChange={(e) => set('title', e.target.value)} placeholder={t('jobTitlePh')} maxLength={120} required /></Fld></div>
         <div className="span"><Fld label={t('category')}><div className="chiprow" style={{ flexWrap: 'wrap' }}>{CATS.map((c) => <Chip key={c} on={f.category === c} onClick={() => set('category', c)}>{t(`cat${c}` as TKey)}</Chip>)}</div></Fld></div>
@@ -125,7 +126,7 @@ export default function PostJob() {
           <h1 className="ptitle">{t('postTitle')}</h1>
         </div>
         {bp === 'd'
-          ? <div className="formwrap"><div>{form}<div style={{ marginTop: 20 }}>{submitBtn}</div></div><div className="preview"><div className="sub" style={{ marginBottom: 8 }}>{t('whoSees')}</div><JobCard job={preview} onOpen={() => undefined} /></div></div>
+          ? <div className="formwrap"><div>{form}<div style={{ marginTop: 20 }}>{submitBtn}</div></div><div className="preview"><div className="sub" style={{ marginBottom: 8 }}><Ic n="eye" size={16} /> {t('whoSees')}</div><JobCard job={preview} onOpen={() => undefined} /></div></div>
           : <div>{form}{bp !== 'm' && <div style={{ marginTop: 20 }}>{submitBtn}</div>}</div>}
       </div>
       {bp === 'm' && <div className="cta">{submitBtn}</div>}

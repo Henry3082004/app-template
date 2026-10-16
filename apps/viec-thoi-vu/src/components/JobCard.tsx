@@ -2,6 +2,7 @@ import { dateRange, money, payUnitKey } from '../lib/format'
 import { fmtKm } from '../lib/geo'
 import { useI18n } from '../lib/i18n'
 import type { Job } from '../lib/types'
+import { Ic } from './Ic'
 import { Tag } from './ui'
 
 export function Pay({ job, xl }: { job: Job; xl?: boolean }) {
@@ -18,11 +19,11 @@ export function JobCard({ job, distance, sel, onOpen }: { job: Job; distance?: n
       <div className="hrow"><h3>{job.title}</h3>{job.is_urgent && <Tag tone="urgent">{t('urgent')}</Tag>}</div>
       <Pay job={job} />
       <div className="tags">
-        <Tag>📅 {dateRange(job.start_date, job.end_date)}</Tag>
-        <Tag>📍 {job.city}{distance != null ? ` · ${fmtKm(distance, locale)}` : ''}</Tag>
-        <Tag>{full ? '👥 ' + t('full') : '👥 ' + t('slotsLeft', { n: left })}</Tag>
+        <Tag><Ic n="calendar" size={14} /> {dateRange(job.start_date, job.end_date)}</Tag>
+        <Tag><Ic n="pin" size={14} /> {job.city}{distance != null ? ` · ${fmtKm(distance, locale)}` : ''}</Tag>
+        <Tag><Ic n="users" size={14} /> {full ? t('full') : t('slotsLeft', { n: left })}</Tag>
       </div>
-      {job.business_name && <div className="biz">🏪 {job.business_name}</div>}
+      {job.business_name && <div className="biz"><Ic n="store" size={15} /> {job.business_name}</div>}
     </button>
   )
 }

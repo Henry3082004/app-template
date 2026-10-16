@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Ic } from '../components/Ic'
 import { Btn, Tag } from '../components/ui'
 import { useI18n } from '../lib/i18n'
 import { useSession } from '../lib/session'
@@ -18,7 +19,7 @@ export function PricingCards({ onPro }: { onPro?: () => void }) {
         {profile?.role === 'employer' && !pro && <Btn v="ghost" block disabled>{t('currentPlan')}</Btn>}
       </div>
       <div className="card plancard pro">
-        <div className="hrow"><b>{t('pro')}</b><Tag tone="sun">⭐ {t('popular')}</Tag></div>
+        <div className="hrow"><b>{t('pro')}</b><Tag tone="sun"><Ic n="star" size={13} /> {t('popular')}</Tag></div>
         <div className="pay">{vi ? '149.000đ' : '$7'} <small>{t('perMonth')}</small></div>
         <div className="sub" style={{ fontSize: 14 }}>{vi ? '1.490.000đ' : '$70'}{t('perYear')} · {t('yearSave')}</div>
         <ul><li>{t('proF1')}</li><li>{t('proF2')}</li><li>{t('proF3')}</li></ul>

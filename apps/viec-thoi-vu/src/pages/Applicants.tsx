@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Ic } from '../components/Ic'
 import { Avatar, Btn, Dialog, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { api } from '../lib/api'
 import { capy } from '../lib/capy'
@@ -51,7 +52,7 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
         <div className="hrow" style={{ alignItems: 'center', marginBottom: 16 }}>
           <div>
             <h2 className="ptitle" style={{ fontSize: 20 }}>{job.title}</h2>
-            <div className="sub">📅 {dateRange(job.start_date, job.end_date)} · 👥 {t('filledOf', { filled: job.filled, slots: job.slots })}</div>
+            <div className="sub"><Ic n="calendar" size={14} /> {dateRange(job.start_date, job.end_date)} · <Ic n="users" size={14} /> {t('filledOf', { filled: job.filled, slots: job.slots })}</div>
           </div>
           {job.status === 'closed' && <Tag>{t('closed')}</Tag>}
         </div>
@@ -72,13 +73,13 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
                   {a.bio && <div className="sub" style={{ fontSize: 14 }}>{a.bio}</div>}
                 </div>
               </div>
-              {a.message && <div className="tag" style={{ borderRadius: 12, whiteSpace: 'normal' }}>💬 “{a.message}”</div>}
+              {a.message && <div className="tag" style={{ borderRadius: 12, whiteSpace: 'normal' }}><Ic n="message" size={14} /> “{a.message}”</div>}
               {a.status === 'accepted' && a.phone && (
                 <>
-                  <div className="phone">📞 {displayPhone(a.phone)}</div>
+                  <div className="phone"><Ic n="phone" size={20} /> {displayPhone(a.phone)}</div>
                   <div className="acts">
-                    <a className="btn btn-primary sm" href={telHref(a.phone)}>{t('call')}</a>
-                    <a className="btn btn-ghost sm" href={zaloHref(a.phone)} target="_blank" rel="noreferrer">{t('zalo')}</a>
+                    <a className="btn btn-primary sm" href={telHref(a.phone)}>{<Ic n="phone" size={16} />} {t('call')}</a>
+                    <a className="btn btn-ghost sm" href={zaloHref(a.phone)} target="_blank" rel="noreferrer">{<Ic n="message" size={16} />} {t('zalo')}</a>
                   </div>
                 </>
               )}
@@ -102,8 +103,8 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
             <>
               <div className="phone">{displayPhone(accepted.phone)}</div>
               <div className="row" style={{ gap: 10, width: '100%' }}>
-                <a className="btn btn-primary block" href={telHref(accepted.phone)}>{t('call')}</a>
-                <a className="btn btn-ghost block" href={zaloHref(accepted.phone)} target="_blank" rel="noreferrer">{t('zalo')}</a>
+                <a className="btn btn-primary block" href={telHref(accepted.phone)}>{<Ic n="phone" size={16} />} {t('call')}</a>
+                <a className="btn btn-ghost block" href={zaloHref(accepted.phone)} target="_blank" rel="noreferrer">{<Ic n="message" size={16} />} {t('zalo')}</a>
               </div>
             </>
           )}

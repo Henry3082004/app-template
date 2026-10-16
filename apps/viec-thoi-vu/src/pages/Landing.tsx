@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Ic, type IconName } from '../components/Ic'
 import { JobCard } from '../components/JobCard'
 import { capy, LOGO } from '../lib/capy'
 import { useI18n } from '../lib/i18n'
@@ -14,9 +15,9 @@ const copy = {
     h1a: 'Việc thời vụ gần bạn —', h1b: 'tìm nhanh, nhận việc trong ngày',
     lead: 'Xem việc quanh bạn, ứng tuyển một chạm. Cần người? Đăng tin chỉ mất 1 phút. 🙌',
     cta1: 'Tìm việc ngay', cta2: 'Đăng tin tuyển', open: 'Mở app', nav: ['Lợi ích', 'Bảng giá', 'Hỏi đáp'],
-    seekers: '👋 Cho người tìm việc', employers: '🏪 Cho nhà tuyển dụng',
-    s: [['📍', 'Việc gần bạn', 'Sắp xếp theo khoảng cách, thấy ngay lương và ca.'], ['⚡', 'Ứng tuyển một chạm', 'Không cần CV, chỉ tên và số điện thoại.'], ['📞', 'Liên hệ trực tiếp', 'Được nhận là có số chủ việc, gọi hoặc nhắn Zalo luôn.']],
-    e: [['✨', 'Đăng tin 1 phút', 'Tin sau điền sẵn theo tin trước.'], ['👥', 'Chọn người dễ dàng', 'Xem lời nhắn, nhận hoặc từ chối bằng một nút.'], ['🎯', 'Đúng đợt, đúng ca', 'Đặt số chỗ theo từng đợt cần người; đủ người tin tự đóng.']],
+    seekers: 'Cho người tìm việc', employers: 'Cho nhà tuyển dụng',
+    s: [['pin', 'Việc gần bạn', 'Sắp xếp theo khoảng cách, thấy ngay lương và ca.'], ['zap', 'Ứng tuyển một chạm', 'Không cần CV, chỉ tên và số điện thoại.'], ['phone', 'Liên hệ trực tiếp', 'Được nhận là có số chủ việc, gọi hoặc nhắn Zalo luôn.']],
+    e: [['sparkles', 'Đăng tin 1 phút', 'Tin sau điền sẵn theo tin trước.'], ['users', 'Chọn người dễ dàng', 'Xem lời nhắn, nhận hoặc từ chối bằng một nút.'], ['target', 'Đúng đợt, đúng ca', 'Đặt số chỗ theo từng đợt cần người; đủ người tin tự đóng.']],
     priceTitle: 'Bảng giá đơn giản', priceSub: 'Người tìm việc luôn miễn phí.',
     faqTitle: 'Câu hỏi thường gặp',
     faq: [['Tôi có cần đăng nhập để xem việc không?', 'Không. Bạn chỉ đăng ký khi bấm Ứng tuyển.'], ['Ứng tuyển có mất phí không?', 'Người tìm việc luôn miễn phí.'], ['Bao lâu thì nhà tuyển dụng liên hệ?', 'Thường trong ngày. Khi được nhận, bạn thấy số điện thoại để gọi hoặc nhắn Zalo.'], ['Gói Miễn phí có giới hạn gì?', 'Mỗi nhà tuyển dụng mở tối đa 2 tin cùng lúc. Gói Pro không giới hạn và có nhãn Gấp.'], ['Tôi có dùng được trong Zalo không?', 'Có, Việc Thời Vụ chạy cả trên web và trong Zalo Mini App.']],
@@ -27,9 +28,9 @@ const copy = {
     h1a: 'Short-term jobs near you —', h1b: 'find fast, start today',
     lead: 'See jobs around you and apply in one tap. Need people? Post in 1 minute. 🙌',
     cta1: 'Find a job', cta2: 'Post a job', open: 'Open app', nav: ['Benefits', 'Pricing', 'FAQ'],
-    seekers: '👋 For job seekers', employers: '🏪 For employers',
-    s: [['📍', 'Jobs near you', 'Sorted by distance, with pay and shift at a glance.'], ['⚡', 'Apply in one tap', 'No CV — just your name and phone number.'], ['📞', 'Direct contact', "Once you're accepted you get the employer's number to call or message."]],
-    e: [['✨', 'Post in 1 minute', 'New posts are pre-filled from the last one.'], ['👥', 'Choose people easily', 'Read messages, accept or decline with one button.'], ['🎯', 'Right shift, right time', 'Set spots per round; posts close automatically when full.']],
+    seekers: 'For job seekers', employers: 'For employers',
+    s: [['pin', 'Jobs near you', 'Sorted by distance, with pay and shift at a glance.'], ['zap', 'Apply in one tap', 'No CV — just your name and phone number.'], ['phone', 'Direct contact', "Once you're accepted you get the employer's number to call or message."]],
+    e: [['sparkles', 'Post in 1 minute', 'New posts are pre-filled from the last one.'], ['users', 'Choose people easily', 'Read messages, accept or decline with one button.'], ['target', 'Right shift, right time', 'Set spots per round; posts close automatically when full.']],
     priceTitle: 'Simple pricing', priceSub: 'Always free for job seekers.',
     faqTitle: 'FAQ',
     faq: [['Do I need to sign in to browse jobs?', 'No. You only sign up when you tap Apply.'], ['Does applying cost anything?', 'Job seekers always use it for free.'], ['How soon will employers get in touch?', "Usually the same day. Once you're accepted you'll see their phone number."], ['What are the Free plan limits?', 'Employers can have up to 2 open posts at once. Pro is unlimited and adds the Urgent badge.'], ['Does it work in Zalo?', 'Yes — on the web and as a Zalo Mini App.']],
@@ -87,7 +88,7 @@ export default function Landing() {
           <img className="mascot" src={capy('wave')} alt="" />
           <div className="phoneframe" aria-hidden="true">
             <div className="logo" style={{ fontSize: 13 }}><img src={LOGO} alt="" style={{ width: 24, height: 24, borderRadius: 8 }} />Việc Thời Vụ</div>
-            <div className="sk">🔍 …</div>
+            <div className="sk"><Ic n="search" size={13} /> …</div>
             {preview.map((j) => <JobCard key={j.id} job={j} onOpen={() => nav('/app')} />)}
           </div>
         </div>
@@ -95,7 +96,7 @@ export default function Landing() {
 
       <section id="loi-ich"><div className="wrap"><div className="two3">
         {[{ h: c.seekers, items: c.s }, { h: c.employers, items: c.e }].map((col) => (
-          <div key={col.h}><h3>{col.h}</h3><div className="ben">{col.items.map(([e, b, s]) => <div className="card" key={b}><span className="e">{e}</span><div><b>{b}</b><span className="t">{s}</span></div></div>)}</div></div>
+          <div key={col.h}><h3>{col.h}</h3><div className="ben">{col.items.map(([e, b, s]) => <div className="card" key={b}><span className="e"><Ic n={e as IconName} size={22} /></span><div><b>{b}</b><span className="t">{s}</span></div></div>)}</div></div>
         ))}
       </div></div></section>
 
