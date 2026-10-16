@@ -1,7 +1,7 @@
 import { createClient, type PostgrestError } from '@supabase/supabase-js'
 import { normalizePhone, phoneEmail } from './phone'
 import {
-  AppError, type Api, type Applicant, type Escrow, type Job, type JobInput, type MyApplication, type MyJob,
+  AppError, type AdminDispute, type AdminPayout, type Api, type Applicant, type BankAccount, type Escrow, type Job, type JobInput, type MyApplication, type MyJob,
   type Profile, type ProfileUpdate, type Reputation, type SignUpInput,
 } from './types'
 
@@ -14,7 +14,7 @@ const JOB_COLS = '*, employer:profiles!jobs_employer_id_fkey(business_name, full
 const KNOWN = ['FREE_PLAN_LIMIT', 'URGENT_REQUIRES_PRO', 'JOB_NOT_OPEN', 'SLOTS_BELOW_FILLED', 'FORBIDDEN',
   'ALREADY_DECIDED', 'JOB_FULL', 'NOT_FOUND', 'CANNOT_WITHDRAW', 'NOT_FUNDED', 'TOO_EARLY', 'ALREADY_FUNDED', 'ALREADY_SETTLED',
   'NOT_ACCEPTED', 'JOB_ENDED', 'PAYMENT_NOT_AVAILABLE', 'CANNOT_DISPUTE', 'NOT_COMPLETED', 'ALREADY_REVIEWED', 'REVIEW_WINDOW_CLOSED',
-  'BAD_HOURS', 'BAD_STARS', 'BAD_TAGS', 'BAD_ATTENDANCE']
+  'BAD_HOURS', 'BAD_STARS', 'BAD_TAGS', 'BAD_ATTENDANCE', 'BAD_BANK', 'BAD_OUTCOME', 'NOT_DISPUTED', 'PAYOUT_DONE', 'REFERENCE_REQUIRED']
 
 function fail(e: PostgrestError | Error | null | undefined): never {
   const msg = e?.message ?? ''
@@ -61,6 +61,13 @@ async function reviewedSet(appIds: string[], me: string): Promise<Set<string>> {
   if (!appIds.length) return new Set()
   const { data } = await sb.from('reviews').select('application_id').eq('reviewer_id', me).in('application_id', appIds)
   return new Set((data ?? []).map((r) => r.application_id))
+}
+
+/** My payout rows (RLS: workers only ever see their own). Never blocks the list if it fails. */
+async function payoutsOf(appIds: string[]): Promise<Record<string, { status: 'pending' | 'paid'; reference: string | null }>> {
+  if (!appIds.length) return {}
+  const { data } = await sb.from('payouts').select('application_id, status, reference').in('application_id', appIds)
+  return Object.fromEntries((data ?? []).map((r) => [r.application_id, { status: r.status, reference: r.reference }]))
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -151,9 +158,9 @@ export const supabaseApi: Api = {
     const rows = (data ?? []).filter((r: any) => r.job) as any[]
     const accepted = rows.filter((r) => r.status === 'accepted').map((r) => r.job.employer_id)
     // The database only returns an employer's phone once the money for that shift is held.
-    const [phones, done] = await Promise.all([phonesOf(accepted), reviewedSet(rows.map((r) => r.id), id)])
+    const [phones, done, payouts] = await Promise.all([phonesOf(accepted), reviewedSet(rows.map((r) => r.id), id), payoutsOf(rows.map((r) => r.id))])
     return rows.map((r): MyApplication => ({
-      id: r.id, status: r.status, message: r.message, created_at: r.created_at, ...toEscrow(r, done.has(r.id)),
+      id: r.id, status: r.status, message: r.message, created_at: r.created_at, ...toEscrow(r, done.has(r.id)), payout: payouts[r.id] ?? null,
       job: toJob(r.job), employer_phone: r.status === 'accepted' ? phones[r.job.employer_id] ?? null : null,
     }))
   },
@@ -276,6 +283,40 @@ export const supabaseApi: Api = {
       .eq('reviewee_id', id).order('created_at', { ascending: false }).limit(20)
     if (error) fail(error)
     return data ?? []
+  },
+
+  async myBank() {
+    const id = await uid()
+    const { data, error } = await sb.from('bank_accounts').select('bank_name, account_no, holder_name').eq('user_id', id).maybeSingle()
+    if (error) fail(error)
+    return data as BankAccount | null
+  },
+
+  async saveBank(b) {
+    const { error } = await sb.rpc('save_bank_account', { p_bank: b.bank_name, p_account: b.account_no, p_holder: b.holder_name })
+    if (error) fail(error)
+  },
+
+  async adminDisputes() {
+    const { data, error } = await sb.rpc('admin_disputes')
+    if (error) fail(error)
+    return ((data ?? []) as AdminDispute[]).map((d) => ({ ...d, amount: d.amount == null ? null : Number(d.amount), fee: d.fee == null ? null : Number(d.fee) }))
+  },
+
+  async resolveDispute(applicationId, outcome, note) {
+    const { error } = await sb.rpc('resolve_dispute', { p_application: applicationId, p_outcome: outcome, p_note: note })
+    if (error) fail(error)
+  },
+
+  async adminPayouts() {
+    const { data, error } = await sb.rpc('admin_payouts')
+    if (error) fail(error)
+    return ((data ?? []) as AdminPayout[]).map((p) => ({ ...p, amount: Number(p.amount) }))
+  },
+
+  async markPayoutPaid(payoutId, reference) {
+    const { error } = await sb.rpc('mark_payout_paid', { p_payout: payoutId, p_reference: reference })
+    if (error) fail(error)
   },
 
   async sweep() {

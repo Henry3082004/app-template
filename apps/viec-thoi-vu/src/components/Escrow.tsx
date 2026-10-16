@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { api } from '../lib/api'
 import { today } from '../lib/format'
 import { money } from '../lib/format'
 import { useI18n, type TKey } from '../lib/i18n'
 import { repLevel } from '../lib/reputation'
-import type { Applicant, Attendance, Escrow, Job, MyApplication, Quote, ReceivedReview, Reputation, Role } from '../lib/types'
+import type { Applicant, Attendance, BankAccount, Escrow, Job, MyApplication, Quote, ReceivedReview, Reputation, Role } from '../lib/types'
 import { Ic } from './Ic'
 import { Btn, Dialog, ErrorBox, Fld } from './ui'
 
@@ -227,6 +228,10 @@ export function SeekerPay({ app, onChanged }: { app: MyApplication; onChanged():
   const done = () => { close(); onChanged() }
   const s = app.pay_status
   const testy = app.funding_mode === 'test'
+  const [bank, setBank] = useState<BankAccount | null | undefined>(undefined)
+  useEffect(() => {
+    if (s === 'released' && app.payout?.status !== 'paid') api.myBank().then(setBank).catch(() => undefined)
+  }, [s, app.payout?.status])
   const answer = async (accept: boolean) => {
     setBusy(true); setError(null)
     try { await api.respondNoshow(app.id, accept); onChanged() } catch (e) { setError(e) } finally { setBusy(false) }
@@ -252,6 +257,10 @@ export function SeekerPay({ app, onChanged }: { app: MyApplication; onChanged():
       {s === 'released' && (
         <>
           <div className="notice ok">{t('releasedSeeker', { amount: money(net(app), locale) })}</div>
+          {app.payout?.status === 'paid'
+            ? <div className="notice ok">{t('payoutDone')}{app.payout.reference ? ` (${app.payout.reference})` : ''}</div>
+            : <div className="notice info">{t('payoutWaiting')}</div>}
+          {app.payout?.status !== 'paid' && bank === null && <div className="notice warn">{t('bankMissing')} <Link to="/app/tai-khoan" className="bold">{t('fillBank')}</Link></div>}
           {app.reviewed ? <div className="small muted">{t('reviewedDone')}</div> : <Btn v="ghost" onClick={() => setDlg('review')}><Ic n="star" size={16} /> {t('reviewCta')}</Btn>}
         </>
       )}
@@ -288,6 +297,32 @@ export function OwnReputation({ userId, employer }: { userId: string; employer: 
           {r.comment && <div>“{r.comment}”</div>}
         </div>
       ))}
+    </div>
+  )
+}
+
+/** Worker's payout account (Account page). Visible only to the owner and the admin. */
+export function BankCard() {
+  const { t } = useI18n()
+  const [f, setF] = useState({ bank_name: '', account_no: '', holder_name: '' })
+  const [saved, setSaved] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<unknown>(null)
+  useEffect(() => { api.myBank().then((b) => { if (b) setF(b) }).catch(() => undefined) }, [])
+  const save = async () => {
+    setBusy(true); setSaved(false); setError(null)
+    try { await api.saveBank(f); setSaved(true) } catch (e) { setError(e) } finally { setBusy(false) }
+  }
+  const set = (k: keyof BankAccount) => (e: { target: { value: string } }) => { setSaved(false); setF({ ...f, [k]: e.target.value }) }
+  return (
+    <div className="card stack">
+      <b>{t('bankTitle')}</b>
+      <div className="sub" style={{ fontSize: 14 }}>{t('bankHint')}</div>
+      <Fld label={t('bankName')} htmlFor="bk-name"><input id="bk-name" className="inp" value={f.bank_name} onChange={set('bank_name')} maxLength={60} placeholder="Vietcombank" /></Fld>
+      <Fld label={t('bankAccount')} htmlFor="bk-acct"><input id="bk-acct" className="inp" inputMode="numeric" value={f.account_no} onChange={set('account_no')} maxLength={24} /></Fld>
+      <Fld label={t('bankHolder')} htmlFor="bk-holder"><input id="bk-holder" className="inp" value={f.holder_name} onChange={set('holder_name')} maxLength={80} /></Fld>
+      {error != null && <ErrorBox error={error} where="BankCard.save" />}
+      <Btn v="ghost" block onClick={save} disabled={busy || !f.bank_name.trim() || !f.account_no.trim() || !f.holder_name.trim()}>{busy ? '…' : saved ? t('bankSaved') : t('save')}</Btn>
     </div>
   )
 }

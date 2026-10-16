@@ -242,3 +242,7 @@ textarea.inp{min-height:84px;resize:vertical}
 .revitem{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
 .stars-n svg{fill:currentColor}
 .escrow .acts .btn-primary,.escrow .acts .btn-ghost{flex:1 1 150px}
+
+.adminrows{display:flex;flex-direction:column;gap:8px;background:var(--bg);border-radius:14px;padding:12px 14px;font-size:14px}
+.adminrows>div{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.adminrows>div>span{color:var(--tx2);min-width:84px}
+.adminrows a{color:var(--p2);font-weight:600}

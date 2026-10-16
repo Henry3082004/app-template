@@ -20,6 +20,7 @@ export interface Profile {
   plan_until: string | null
   locale: Locale
   phone: string | null
+  is_admin?: boolean
 }
 
 export interface Job {
@@ -56,6 +57,7 @@ export interface Escrow {
 }
 
 export interface MyApplication extends Escrow {
+  payout: { status: 'pending' | 'paid'; reference: string | null } | null
   id: string
   status: AppStatus
   message: string | null
@@ -88,6 +90,19 @@ export interface Reputation {
   ratings: number
   avg_stars: number | null
   top_tags: string[]
+}
+
+export interface BankAccount { bank_name: string; account_no: string; holder_name: string }
+
+export interface AdminDispute {
+  application_id: string; job_title: string; employer_name: string; seeker_name: string; employer_phone: string | null; seeker_phone: string | null
+  amount: number | null; fee: number | null; reason: string | null; attendance: Attendance | null; funding_mode: string | null
+  start_date: string; end_date: string; completed_at: string | null
+}
+
+export interface AdminPayout {
+  id: string; application_id: string; seeker_name: string; amount: number; mode: 'test' | 'live'; status: 'pending' | 'paid'; reference: string | null
+  created_at: string; paid_at: string | null; bank_name: string | null; account_no: string | null; holder_name: string | null
 }
 
 export interface Quote { amount: number; fee: number; net: number }
@@ -160,6 +175,13 @@ export interface Api {
   submitReview(applicationId: string, stars: number, tags: string[], comment: string): Promise<void>
   reputations(userIds: string[]): Promise<Record<string, Reputation>>
   receivedReviews(): Promise<ReceivedReview[]>
+  myBank(): Promise<BankAccount | null>
+  saveBank(b: BankAccount): Promise<void>
+  /** admin only (enforced by the database) */
+  adminDisputes(): Promise<AdminDispute[]>
+  resolveDispute(applicationId: string, outcome: 'release' | 'refund', note: string): Promise<void>
+  adminPayouts(): Promise<AdminPayout[]>
+  markPayoutPaid(payoutId: string, reference: string): Promise<void>
   /** settle overdue shifts for the signed-in user (also done hourly on the server) */
   sweep(): Promise<void>
 }

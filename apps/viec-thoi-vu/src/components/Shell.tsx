@@ -25,6 +25,7 @@ export function Shell({ children }: { children: ReactNode }) {
         { to: '/app/da-ung-tuyen', ico: 'clipboard', label: t('navApplied') },
         { to: '/app/tai-khoan', ico: 'user', label: t('navAccount'), match: ['/app/bang-gia'] },
       ]
+  if (profile?.is_admin) items.push({ to: '/app/quan-tri', ico: 'sparkles', label: t('navAdmin') })
   const isOn = (i: Item) => (i.end ? pathname === i.to : pathname.startsWith(i.to)) || !!i.match?.some((m) => pathname.startsWith(m))
 
   const Items = () => (

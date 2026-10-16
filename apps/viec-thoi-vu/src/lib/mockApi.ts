@@ -2,7 +2,7 @@ import { normalizePhone } from './phone'
 import { seedEmployers, seedJobs } from './seed'
 import { addDays, today } from './format'
 import {
-  AppError, type Api, type AppStatus, type Attendance, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
+  AppError, type AdminDispute, type AdminPayout, type Api, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
 } from './types'
 
 // In-memory backend for local UI testing (VITE_MOCK=1). Enforces the same rules as the database.
@@ -29,6 +29,7 @@ function addUser(id: string, digits: string, password: string, role: Role, full_
   }
 }
 addUser('11111111-1111-4111-8111-000000000001', '84900000001', 'demo-tim-viec', 'seeker', 'Minh Anh (dùng thử)', { bio: 'Sinh viên năm 2, rảnh buổi sáng và cuối tuần.', city: 'TP.HCM' })
+addUser('11111111-1111-4111-8111-000000000003', '84900000003', 'quan-tri-thu-1', 'employer', 'Quản trị (dùng thử)', { business_name: 'Quản trị', is_admin: true })
 addUser('11111111-1111-4111-8111-000000000002', '84900000002', 'demo-tuyen-dung', 'employer', 'Chủ quán (dùng thử)', { business_name: 'Quán Cà Phê Dùng Thử', address: '45 Lê Lợi, Q.1', city: 'TP.HCM' })
 Object.entries(seedEmployers).forEach(([id, e], i) => {
   if (!users[id]) addUser(id, '8490000010' + i, 'x-not-usable', 'employer', e.name, { business_name: e.name, plan: e.plan })
@@ -37,6 +38,10 @@ Object.entries(seedEmployers).forEach(([id, e], i) => {
 const jobs: Job[] = seedJobs.map((j) => ({ ...j, filled: 0, status: 'open', created_at: now() }))
 const apps: App[] = [{ id: 'a1', job_id: 'j3', seeker_id: '11111111-1111-4111-8111-000000000001', status: 'pending', message: 'Em rảnh buổi sáng ạ', created_at: now(), seen: false, ...NEW_PAY }]
 const reviews: Rev[] = []
+interface Payout { id: string; application_id: string; seeker_id: string; amount: number; mode: 'test' | 'live'; status: 'pending' | 'paid'; reference: string | null; created_at: string; paid_at: string | null }
+const payouts: Payout[] = []
+const banks: Record<string, BankAccount> = {}
+const resolutions: Record<string, string> = {}
 
 let current: string | null = null
 try { current = sessionStorage.getItem('mock-uid') } catch { /* storage unavailable */ }
@@ -69,6 +74,13 @@ function quoteOf(a: App, hours?: number) {
   const fee = Math.round((amt * FEE_PCT) / 100)
   return { amount: Math.round(amt), fee, net: Math.round(amt) - fee }
 }
+const release = (a: App) => {
+  a.pay_status = 'released'; a.released_at = Date.now(); a.completed_at ??= Date.now()
+  if (!payouts.some((p) => p.application_id === a.id)) {
+    payouts.push({ id: nid(), application_id: a.id, seeker_id: a.seeker_id, amount: (a.escrow_amount ?? 0) - (a.platform_fee ?? 0), mode: a.funding_mode === 'live' ? 'live' : 'test', status: 'pending', reference: null, created_at: now(), paid_at: null })
+  }
+}
+const admin = () => { const p = me(); if (!p.is_admin) throw new AppError('FORBIDDEN'); return p }
 const freeSlot = (a: App) => {
   const j = jobOf(a)
   j.filled = Math.max(j.filled - 1, 0)
@@ -78,7 +90,7 @@ const sweepFor = (uid: string | null) => {
   apps.forEach((a) => {
     if (uid && a.seeker_id !== uid && jobOf(a).employer_id !== uid) return
     if (a.pay_status === 'noshow_reported' && a.completed_at && Date.now() - a.completed_at > 48 * 36e5) { a.pay_status = 'refunded'; freeSlot(a) }
-    if (a.pay_status === 'held' && addDays(jobOf(a).end_date, 2) < today()) { a.pay_status = 'released'; a.released_at = Date.now(); a.completed_at ??= Date.now() }
+    if (a.pay_status === 'held' && addDays(jobOf(a).end_date, 2) < today()) { release(a) }
   })
 }
 const myApp = (id: string, who: 'employer' | 'seeker') => {
@@ -141,7 +153,7 @@ export const mockApi: Api = {
     return wait(apps.filter((a) => a.seeker_id === p.id).reverse().map((a) => {
       const job = jobs.find((j) => j.id === a.job_id)!
       const funded = ['held', 'released', 'noshow_reported', 'disputed'].includes(a.pay_status)
-      return { id: a.id, status: a.status, message: a.message, created_at: a.created_at, job, ...escrowOf(a, p.id), employer_phone: a.status === 'accepted' && funded ? users[job.employer_id]?.profile.phone ?? null : null }
+      return { id: a.id, status: a.status, message: a.message, created_at: a.created_at, job, ...escrowOf(a, p.id), payout: payouts.find((x) => x.application_id === a.id) ? { status: payouts.find((x) => x.application_id === a.id)!.status, reference: payouts.find((x) => x.application_id === a.id)!.reference } : null, employer_phone: a.status === 'accepted' && funded ? users[job.employer_id]?.profile.phone ?? null : null }
     }))
   },
 
@@ -238,7 +250,7 @@ export const mockApi: Api = {
     a.attendance = attendance
     a.completed_at = Date.now()
     if (attendance === 'noshow') a.pay_status = 'noshow_reported'
-    else { a.pay_status = 'released'; a.released_at = Date.now() }
+    else release(a)
     return wait(undefined)
   },
   async respondNoshow(id, accept) {
@@ -292,6 +304,42 @@ export const mockApi: Api = {
   async receivedReviews() {
     const p = me()
     return wait(reviews.filter((r) => r.reviewee_id === p.id && revealed(r.application_id)).map(({ id, stars, tags, comment, created_at, reviewer_role }) => ({ id, stars, tags, comment, created_at, reviewer_role })))
+  },
+  async myBank() { return wait(banks[me().id] ?? null) },
+  async saveBank(b) {
+    const acct = b.account_no.replace(/\s/g, '')
+    if (b.bank_name.trim().length < 2 || b.holder_name.trim().length < 2 || !/^[0-9]{6,20}$/.test(acct)) throw new AppError('BAD_BANK')
+    banks[me().id] = { bank_name: b.bank_name.trim(), account_no: acct, holder_name: b.holder_name.trim().toUpperCase() }
+    return wait(undefined)
+  },
+  async adminDisputes() {
+    admin()
+    return wait(apps.filter((a) => a.pay_status === 'disputed').map((a): AdminDispute => {
+      const j = jobOf(a)
+      return { application_id: a.id, job_title: j.title, employer_name: j.business_name ?? '—', seeker_name: users[a.seeker_id]?.profile.full_name ?? '—', employer_phone: users[j.employer_id]?.profile.phone ?? null, seeker_phone: users[a.seeker_id]?.profile.phone ?? null, amount: a.escrow_amount, fee: a.platform_fee, reason: resolutions[a.id] ?? 'worker_contests_noshow', attendance: a.attendance, funding_mode: a.funding_mode, start_date: j.start_date, end_date: j.end_date, completed_at: a.completed_at ? new Date(a.completed_at).toISOString() : null }
+    }))
+  },
+  async resolveDispute(id, outcome) {
+    admin()
+    if (!['release', 'refund'].includes(outcome)) throw new AppError('BAD_OUTCOME')
+    const a = apps.find((x) => x.id === id)
+    if (!a) throw new AppError('NOT_FOUND')
+    if (a.pay_status !== 'disputed') throw new AppError('NOT_DISPUTED')
+    if (outcome === 'release') { if (a.attendance === 'noshow') a.attendance = null; release(a) } else { a.pay_status = 'refunded'; freeSlot(a) }
+    return wait(undefined)
+  },
+  async adminPayouts() {
+    admin()
+    return wait([...payouts].sort((x, y) => Number(x.status === 'paid') - Number(y.status === 'paid')).map((p): AdminPayout => ({ ...p, seeker_name: users[p.seeker_id]?.profile.full_name ?? '—', bank_name: banks[p.seeker_id]?.bank_name ?? null, account_no: banks[p.seeker_id]?.account_no ?? null, holder_name: banks[p.seeker_id]?.holder_name ?? null })))
+  },
+  async markPayoutPaid(id, reference) {
+    admin()
+    const p = payouts.find((x) => x.id === id)
+    if (!p) throw new AppError('NOT_FOUND')
+    if (p.status !== 'pending') throw new AppError('PAYOUT_DONE')
+    if (p.mode === 'live' && reference.trim().length < 3) throw new AppError('REFERENCE_REQUIRED')
+    Object.assign(p, { status: 'paid', paid_at: now(), reference: reference.trim() || null })
+    return wait(undefined)
   },
   async sweep() { sweepFor(current); return wait(undefined) },
 }

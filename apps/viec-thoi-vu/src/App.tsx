@@ -6,6 +6,7 @@ import { Skel } from './components/ui'
 import { I18nProvider } from './lib/i18n'
 import { SessionProvider } from './lib/session'
 import { IN_ZALO } from './lib/zalo'
+import Admin from './pages/Admin'
 import Account from './pages/Account'
 import EmployerJobs from './pages/EmployerJobs'
 import Jobs from './pages/Jobs'
@@ -32,6 +33,7 @@ function AppPages() {
         <Route path="tin/:id" element={<EmployerJobs />} />
         <Route path="dang-tin" element={<PostJob />} />
         <Route path="bang-gia" element={<Pricing />} />
+        <Route path="quan-tri" element={<Admin />} />
         <Route path="*" element={<Jobs />} />
       </Routes>
     </Shell>

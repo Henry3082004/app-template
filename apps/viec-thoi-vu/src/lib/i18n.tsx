@@ -110,6 +110,16 @@ const vi = {
   ePAYMENT_NOT_AVAILABLE: 'Thanh toán thật chưa mở. Bạn quay lại sau nhé.', eCANNOT_DISPUTE: 'Ca này không báo sự cố được ở trạng thái hiện tại.',
   eNOT_COMPLETED: 'Chỉ đánh giá được sau khi ca đã xong.', eALREADY_REVIEWED: 'Bạn đã đánh giá ca này rồi.', eREVIEW_WINDOW_CLOSED: 'Đã quá hạn 30 ngày để đánh giá ca này.',
   eBAD_HOURS: 'Số giờ chưa hợp lý. Hãy nhập lại nhé.', eBAD_STARS: 'Hãy chọn số sao từ 1 đến 5.', eBAD_TAGS: 'Có nhãn không hợp lệ.', eBAD_ATTENDANCE: 'Lựa chọn không hợp lệ.',
+  // admin + payouts
+  navAdmin: 'Quản trị', adminTitle: 'Quản trị', adminTabDisputes: 'Tranh chấp', adminTabPayouts: 'Chuyển tiền', adminNoAccess: 'Trang này chỉ dành cho quản trị viên.',
+  noDisputes: 'Không có tranh chấp nào đang chờ.', noPayouts: 'Chưa có khoản nào cần chuyển.', adminEmployer: 'Quán', adminWorker: 'Người làm', adminReason: 'Lý do', adminAttendance: 'Chấm công',
+  reasonContest: 'Người làm không đồng ý với báo vắng.', attLabelOk: 'Đến đủ ca', attLabelLate: 'Đến muộn', attLabelNoshow: 'Báo vắng',
+  resolveNote: 'Ghi chú quyết định (không bắt buộc)', resolveRelease: 'Trả cho người làm', resolveRefund: 'Hoàn tiền cho quán',
+  resolveConfirmRelease: 'Trả tiền công cho người làm? Việc này không hoàn tác được.', resolveConfirmRefund: 'Hoàn tiền cho quán? Việc này không hoàn tác được.',
+  payoutPending: 'Chờ chuyển', payoutPaid: 'Đã chuyển', markPaid: 'Đã chuyển khoản', payoutRef: 'Mã giao dịch ngân hàng', copyAcct: 'Sao chép số tài khoản', modeTest: 'Thử', noBankYet: 'Người làm chưa điền tài khoản nhận tiền.',
+  bankTitle: 'Tài khoản nhận tiền', bankHint: 'Chỉ dùng để chuyển tiền công cho bạn. Chỉ bạn và quản trị viên xem được.', bankName: 'Ngân hàng', bankAccount: 'Số tài khoản', bankHolder: 'Tên chủ tài khoản', bankSaved: 'Đã lưu tài khoản',
+  bankMissing: 'Bạn chưa điền tài khoản nhận tiền. Vào Tài khoản để điền, nếu không mình chưa chuyển tiền cho bạn được.', payoutWaiting: 'Đang chờ chuyển khoản cho bạn.', payoutDone: 'Đã chuyển khoản cho bạn.', fillBank: 'Điền tài khoản',
+  eBAD_BANK: 'Thông tin ngân hàng chưa đúng. Số tài khoản chỉ gồm 6 đến 20 chữ số.', eBAD_OUTCOME: 'Lựa chọn không hợp lệ.', eNOT_DISPUTED: 'Ca này không còn ở trạng thái tranh chấp.', ePAYOUT_DONE: 'Khoản này đã được đánh dấu chuyển rồi.', eREFERENCE_REQUIRED: 'Hãy nhập mã giao dịch ngân hàng.',
 }
 
 type Dict = typeof vi
@@ -209,6 +219,16 @@ const en: Dict = {
   ePAYMENT_NOT_AVAILABLE: 'Real payments are not open yet. Please come back later.', eCANNOT_DISPUTE: "This shift can't be reported in its current state.",
   eNOT_COMPLETED: 'You can only review after the shift is done.', eALREADY_REVIEWED: 'You already reviewed this shift.', eREVIEW_WINDOW_CLOSED: 'The 30-day window to review this shift has closed.',
   eBAD_HOURS: "That number of hours doesn't look right. Please try again.", eBAD_STARS: 'Please pick 1 to 5 stars.', eBAD_TAGS: 'Some labels are not valid.', eBAD_ATTENDANCE: 'Invalid choice.',
+  // admin + payouts
+  navAdmin: 'Admin', adminTitle: 'Admin', adminTabDisputes: 'Disputes', adminTabPayouts: 'Payouts', adminNoAccess: 'This page is for administrators only.',
+  noDisputes: 'No disputes waiting.', noPayouts: 'Nothing to pay out yet.', adminEmployer: 'Business', adminWorker: 'Worker', adminReason: 'Reason', adminAttendance: 'Attendance',
+  reasonContest: 'The worker disputes the no-show report.', attLabelOk: 'Full shift', attLabelLate: 'Late', attLabelNoshow: 'No-show reported',
+  resolveNote: 'Decision note (optional)', resolveRelease: 'Pay the worker', resolveRefund: 'Refund the business',
+  resolveConfirmRelease: 'Pay the worker? This cannot be undone.', resolveConfirmRefund: 'Refund the business? This cannot be undone.',
+  payoutPending: 'To pay', payoutPaid: 'Paid', markPaid: 'Mark as transferred', payoutRef: 'Bank transaction reference', copyAcct: 'Copy account number', modeTest: 'Test', noBankYet: "The worker hasn't added a bank account.",
+  bankTitle: 'Payout account', bankHint: 'Only used to send your pay. Only you and the admin can see it.', bankName: 'Bank', bankAccount: 'Account number', bankHolder: 'Account holder name', bankSaved: 'Account saved',
+  bankMissing: "You haven't added a payout account. Add it in Account, otherwise we can't send your pay.", payoutWaiting: 'Waiting for the bank transfer to you.', payoutDone: 'The transfer to you is done.', fillBank: 'Add account',
+  eBAD_BANK: 'The bank details look wrong. The account number must be 6 to 20 digits.', eBAD_OUTCOME: 'Invalid choice.', eNOT_DISPUTED: 'This shift is no longer in dispute.', ePAYOUT_DONE: 'This payout is already marked as sent.', eREFERENCE_REQUIRED: 'Please enter the bank transaction reference.',
 }
 
 export type TKey = keyof Dict

@@ -37,3 +37,10 @@
 - Gọn thẻ việc làm, căn giữa nhãn thanh bên tablet; nối Git để Vercel tự deploy.
 
 - Đã nối GitHub với Vercel (deploy tự động).
+
+## Uy tín + giữ tiền (nhánh `escrow-reputation`, CHƯA gộp vào main)
+- Migration 1 `20261016_escrow_reputation.sql`: đánh giá hai chiều, giữ tiền (chế độ thử), ẩn SĐT quán đến khi nạp tiền, tự hoàn/trả công.
+- Migration 2 `20261017_admin_payouts.sql`: quản trị xử lý tranh chấp, sổ chuyển tiền THỦ CÔNG, tài khoản nhận tiền của người làm.
+- Kiểm thử DB cục bộ: `supabase/tests/` (40 phép kiểm tra, kết thúc `ALL SCENARIOS PASSED`).
+- Thứ tự đưa lên: áp dụng migration 1 → 2 trên Supabase → đặt quản trị: `update public.profiles set is_admin = true where id = '<id của bạn>';` → gộp nhánh vào main.
+- CHƯA làm: nhận tiền thật qua cổng thanh toán, tự động chuyển tiền. Cần giấy phép/đối tác (xem QUY_TRINH). `payment_mode` luôn là `test`.
