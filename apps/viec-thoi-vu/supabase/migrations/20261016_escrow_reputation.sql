@@ -52,7 +52,6 @@ language sql stable security definer set search_path = public as $$
            or (select count(*) from public.reviews r where r.application_id = a.id) >= 2))
 $$;
 
-drop policy if exists reviews_read on public.reviews;
 create policy reviews_read on public.reviews for select to authenticated
   using (reviewer_id = auth.uid() or (reviewee_id = auth.uid() and private.review_revealed(application_id)));
 
@@ -65,8 +64,7 @@ language sql stable security definer set search_path = public as $$
       and j.employer_id = employer and a.seeker_id = seeker)
 $$;
 
-drop policy if exists contacts_read on public.contacts;
-create policy contacts_read on public.contacts for select
+alter policy contacts_read on public.contacts
   using (user_id = auth.uid()
          or private.is_accepted_pair(auth.uid(), user_id)      -- employer sees accepted worker
          or private.is_funded_pair(user_id, auth.uid()));      -- worker sees employer after funding

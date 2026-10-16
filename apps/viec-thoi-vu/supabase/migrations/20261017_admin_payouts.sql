@@ -26,7 +26,6 @@ create table if not exists public.bank_accounts (
 alter table public.bank_accounts enable row level security;
 revoke all on public.bank_accounts from anon, authenticated;
 grant select on public.bank_accounts to authenticated;
-drop policy if exists bank_read on public.bank_accounts;
 create policy bank_read on public.bank_accounts for select to authenticated using (user_id = auth.uid());
 
 create or replace function public.save_bank_account(p_bank text, p_account text, p_holder text) returns void
@@ -59,7 +58,6 @@ create table if not exists public.payouts (
 alter table public.payouts enable row level security;
 revoke all on public.payouts from anon, authenticated;
 grant select on public.payouts to authenticated;
-drop policy if exists payouts_read on public.payouts;
 create policy payouts_read on public.payouts for select to authenticated
   using (seeker_id = auth.uid() or private.is_admin(auth.uid()));
 
@@ -73,7 +71,6 @@ begin
   return new;
 end $$;
 
-drop trigger if exists applications_payout on public.applications;
 create trigger applications_payout after update of pay_status on public.applications
   for each row when (new.pay_status = 'released' and old.pay_status is distinct from 'released')
   execute function private.create_payout();
