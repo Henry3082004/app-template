@@ -33,3 +33,5 @@
 - [ ] Email hỗ trợ công khai cho trang pháp lý (`VITE_SUPPORT_EMAIL`).
 - [ ] Bật "Leaked password protection" trong Supabase Dashboard → Auth.
 - [ ] Zalo App ID (Z1) → đăng nhập Zalo.
+
+- Gọn thẻ việc làm, căn giữa nhãn thanh bên tablet; nối Git để Vercel tự deploy.
