@@ -6,9 +6,9 @@ import { dateRange, money } from '../lib/format'
 import { useI18n, type TKey } from '../lib/i18n'
 import { displayPhone, telHref } from '../lib/phone'
 import { useSession } from '../lib/session'
-import type { AdminDispute, AdminPayout } from '../lib/types'
+import type { AdminDispute, AdminFlag, AdminPayout } from '../lib/types'
 
-type Tab = 'disputes' | 'payouts'
+type Tab = 'disputes' | 'payouts' | 'flags'
 
 function DisputeCard({ d, onDone }: { d: AdminDispute; onDone(): void }) {
   const { t, locale } = useI18n()
@@ -81,17 +81,19 @@ function PayoutCard({ p, onDone }: { p: AdminPayout; onDone(): void }) {
 }
 
 export default function Admin() {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const { profile, ready } = useSession()
   const [tab, setTab] = useState<Tab>('disputes')
   const [disputes, setDisputes] = useState<AdminDispute[] | null>(null)
   const [payouts, setPayouts] = useState<AdminPayout[] | null>(null)
+  const [flags, setFlags] = useState<AdminFlag[] | null>(null)
   const [error, setError] = useState<unknown>(null)
 
   const load = () => {
     setError(null)
     api.adminDisputes().then(setDisputes).catch(setError)
     api.adminPayouts().then(setPayouts).catch(setError)
+    api.adminFlags().then(setFlags).catch(setError)
   }
   useEffect(() => { if (profile?.is_admin) load() }, [profile?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -105,6 +107,7 @@ export default function Admin() {
       <div className="seg" style={{ marginBottom: 16 }}>
         <button type="button" className={tab === 'disputes' ? 'on' : ''} onClick={() => setTab('disputes')}>{t('adminTabDisputes')}{disputes?.length ? ` (${disputes.length})` : ''}</button>
         <button type="button" className={tab === 'payouts' ? 'on' : ''} onClick={() => setTab('payouts')}>{t('adminTabPayouts')}{pendingN ? ` (${pendingN})` : ''}</button>
+        <button type="button" className={tab === 'flags' ? 'on' : ''} onClick={() => setTab('flags')}>{t('adminTabFlags')}{flags?.length ? ` (${flags.length})` : ''}</button>
       </div>
       {error != null && <ErrorBox error={error} where="Admin.load" onRetry={load} />}
       {tab === 'disputes' && (
@@ -119,6 +122,22 @@ export default function Admin() {
           {!payouts && !error && <Skel n={2} />}
           {payouts?.length === 0 && <Empty pose="empty" title={t('noPayouts')} />}
           <div className="g2">{payouts?.map((p) => <PayoutCard key={p.id} p={p} onDone={load} />)}</div>
+        </>
+      )}
+      {tab === 'flags' && (
+        <>
+          {!flags && !error && <Skel n={2} />}
+          {flags?.length === 0 && <Empty pose="empty" title={t('noFlags')} />}
+          <div className="g2">{flags?.map((f, i) => (
+            <article key={i} className="card stack">
+              <Tag tone="urgent">{t(`flag_${f.kind}` as TKey)}</Tag>
+              <div className="adminrows">
+                <div><span>{t('adminEmployer')}</span><b>{f.employer_name}</b></div>
+                <div><span>{t('adminWorker')}</span><b>{f.seeker_name}</b></div>
+                <div><span>{t('repStatShifts')}</span><b>{t('flagShifts', { n: f.shifts })} · {money(f.total, locale)}</b></div>
+              </div>
+            </article>
+          ))}</div>
         </>
       )}
     </div></div>

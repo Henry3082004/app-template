@@ -1,7 +1,7 @@
 import { createClient, type PostgrestError } from '@supabase/supabase-js'
 import { normalizePhone, phoneEmail } from './phone'
 import {
-  AppError, type AdminDispute, type AdminPayout, type Api, type Applicant, type BankAccount, type Escrow, type Job, type JobInput, type MyApplication, type MyJob,
+  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type Api, type Applicant, type BankAccount, type Escrow, type Job, type JobInput, type MyApplication, type MyJob,
   type Profile, type ProfileUpdate, type Reputation, type SignUpInput,
 } from './types'
 
@@ -56,6 +56,13 @@ async function phonesOf(userIds: string[]): Promise<Record<string, string>> {
 
 const ESCROW_COLS = 'pay_status, escrow_amount, platform_fee, attendance, funding_mode'
 
+/** Shifts where the other side already reviewed (content stays hidden until I review). */
+async function otherReviewed(appIds: string[]): Promise<Set<string>> {
+  if (!appIds.length) return new Set()
+  const { data } = await sb.rpc('review_flags', { p_apps: appIds })
+  return new Set(((data ?? []) as { application_id: string; other_reviewed: boolean }[]).filter((r) => r.other_reviewed).map((r) => r.application_id))
+}
+
 /** Which of these applications did the signed-in user already review? */
 async function reviewedSet(appIds: string[], me: string): Promise<Set<string>> {
   if (!appIds.length) return new Set()
@@ -71,8 +78,8 @@ async function payoutsOf(appIds: string[]): Promise<Record<string, { status: 'pe
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const toEscrow = (r: any, reviewed: boolean): Escrow => ({
-  pay_status: r.pay_status, attendance: r.attendance, funding_mode: r.funding_mode, reviewed,
+const toEscrow = (r: any, reviewed: boolean, other: boolean): Escrow => ({
+  pay_status: r.pay_status, attendance: r.attendance, funding_mode: r.funding_mode, reviewed, other_reviewed: other,
   escrow_amount: r.escrow_amount == null ? null : Number(r.escrow_amount),
   platform_fee: r.platform_fee == null ? null : Number(r.platform_fee),
 })
@@ -158,9 +165,10 @@ export const supabaseApi: Api = {
     const rows = (data ?? []).filter((r: any) => r.job) as any[]
     const accepted = rows.filter((r) => r.status === 'accepted').map((r) => r.job.employer_id)
     // The database only returns an employer's phone once the money for that shift is held.
-    const [phones, done, payouts] = await Promise.all([phonesOf(accepted), reviewedSet(rows.map((r) => r.id), id), payoutsOf(rows.map((r) => r.id))])
+    const ids = rows.map((r) => r.id)
+    const [phones, done, payouts, other] = await Promise.all([phonesOf(accepted), reviewedSet(ids, id), payoutsOf(ids), otherReviewed(ids)])
     return rows.map((r): MyApplication => ({
-      id: r.id, status: r.status, message: r.message, created_at: r.created_at, ...toEscrow(r, done.has(r.id)), payout: payouts[r.id] ?? null,
+      id: r.id, status: r.status, message: r.message, created_at: r.created_at, ...toEscrow(r, done.has(r.id), other.has(r.id)), payout: payouts[r.id] ?? null,
       job: toJob(r.job), employer_phone: r.status === 'accepted' ? phones[r.job.employer_id] ?? null : null,
     }))
   },
@@ -207,10 +215,11 @@ export const supabaseApi: Api = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rows = (data ?? []) as any[]
     const me = await uid()
-    const [phones, done] = await Promise.all([phonesOf(rows.filter((r) => r.status === 'accepted').map((r) => r.seeker_id)), reviewedSet(rows.map((r) => r.id), me)])
+    const ids = rows.map((r) => r.id)
+    const [phones, done, other] = await Promise.all([phonesOf(rows.filter((r) => r.status === 'accepted').map((r) => r.seeker_id)), reviewedSet(ids, me), otherReviewed(ids)])
     sb.rpc('mark_applications_seen', { p_job: jobId }).then(() => undefined)
     return rows.map((r): Applicant => ({
-      id: r.id, status: r.status, message: r.message, created_at: r.created_at, seeker_id: r.seeker_id, ...toEscrow(r, done.has(r.id)),
+      id: r.id, status: r.status, message: r.message, created_at: r.created_at, seeker_id: r.seeker_id, ...toEscrow(r, done.has(r.id), other.has(r.id)),
       full_name: r.seeker?.full_name ?? '—', bio: r.seeker?.bio ?? null, phone: phones[r.seeker_id] ?? null,
     }))
   },
@@ -317,6 +326,18 @@ export const supabaseApi: Api = {
   async markPayoutPaid(payoutId, reference) {
     const { error } = await sb.rpc('mark_payout_paid', { p_payout: payoutId, p_reference: reference })
     if (error) fail(error)
+  },
+
+  async adminFlags() {
+    const { data, error } = await sb.rpc('admin_flags')
+    if (error) fail(error)
+    return ((data ?? []) as AdminFlag[]).map((f) => ({ ...f, total: Number(f.total) }))
+  },
+
+  async pendingReviews() {
+    const { data, error } = await sb.rpc('my_pending_reviews')
+    if (error) return 0
+    return Number(data ?? 0)
   },
 
   async sweep() {

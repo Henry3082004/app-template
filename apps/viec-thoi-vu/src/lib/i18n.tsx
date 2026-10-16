@@ -120,6 +120,12 @@ const vi = {
   bankTitle: 'Tài khoản nhận tiền', bankHint: 'Chỉ dùng để chuyển tiền công cho bạn. Chỉ bạn và quản trị viên xem được.', bankName: 'Ngân hàng', bankAccount: 'Số tài khoản', bankHolder: 'Tên chủ tài khoản', bankSaved: 'Đã lưu tài khoản',
   bankMissing: 'Bạn chưa điền tài khoản nhận tiền. Vào Tài khoản để điền, nếu không mình chưa chuyển tiền cho bạn được.', payoutWaiting: 'Đang chờ chuyển khoản cho bạn.', payoutDone: 'Đã chuyển khoản cho bạn.', fillBank: 'Điền tài khoản',
   eBAD_BANK: 'Thông tin ngân hàng chưa đúng. Số tài khoản chỉ gồm 6 đến 20 chữ số.', eBAD_OUTCOME: 'Lựa chọn không hợp lệ.', eNOT_DISPUTED: 'Ca này không còn ở trạng thái tranh chấp.', ePAYOUT_DONE: 'Khoản này đã được đánh dấu chuyển rồi.', eREFERENCE_REQUIRED: 'Hãy nhập mã giao dịch ngân hàng.',
+  // reputation as the core
+  repHeadline: 'Uy tín', repStatShifts: 'Ca hoàn thành', repStatOnTime: 'Đúng giờ', repStatPartners: 'Đối tác', repStatNoshow: 'Lần vắng',
+  repOnTime: '{n}% đúng giờ', repPartners: '{n} đối tác', repNewShop: 'Quán mới', repNewWorker: 'Người mới', repWhy: 'Tính từ các ca đã làm qua app trong 12 tháng. Mỗi đối tác chỉ tính một đánh giá, ca dưới 50.000đ không tính.',
+  pendingReviews: 'Bạn còn {n} ca chưa đánh giá. Đánh giá giúp mọi người tin nhau hơn.', pendingReviewsEmp: 'Bạn còn {n} ca chưa đánh giá. Mở tin để đánh giá người làm.',
+  otherReviewed: 'Bên kia đã đánh giá bạn. Hãy đánh giá lại để xem họ nói gì.', reviewNudge: 'Đánh giá chỉ mất 5 giây và giúp người sau chọn đúng.',
+  adminTabFlags: 'Cảnh báo', noFlags: 'Chưa thấy dấu hiệu bất thường.', flag_repeat_pair: 'Cùng một cặp làm nhiều ca trong 30 ngày', flag_new_accounts: 'Hai tài khoản mới tạo đã làm và trả tiền cho nhau', flagShifts: '{n} ca',
 }
 
 type Dict = typeof vi
@@ -229,6 +235,12 @@ const en: Dict = {
   bankTitle: 'Payout account', bankHint: 'Only used to send your pay. Only you and the admin can see it.', bankName: 'Bank', bankAccount: 'Account number', bankHolder: 'Account holder name', bankSaved: 'Account saved',
   bankMissing: "You haven't added a payout account. Add it in Account, otherwise we can't send your pay.", payoutWaiting: 'Waiting for the bank transfer to you.', payoutDone: 'The transfer to you is done.', fillBank: 'Add account',
   eBAD_BANK: 'The bank details look wrong. The account number must be 6 to 20 digits.', eBAD_OUTCOME: 'Invalid choice.', eNOT_DISPUTED: 'This shift is no longer in dispute.', ePAYOUT_DONE: 'This payout is already marked as sent.', eREFERENCE_REQUIRED: 'Please enter the bank transaction reference.',
+  // reputation as the core
+  repHeadline: 'Reputation', repStatShifts: 'Shifts done', repStatOnTime: 'On time', repStatPartners: 'Partners', repStatNoshow: 'No-shows',
+  repOnTime: '{n}% on time', repPartners: '{n} partners', repNewShop: 'New business', repNewWorker: 'New worker', repWhy: 'Based on shifts done through the app in the last 12 months. Each partner counts once; shifts under 50,000đ are ignored.',
+  pendingReviews: 'You have {n} shifts to review. Reviews help everyone trust each other.', pendingReviewsEmp: 'You have {n} shifts to review. Open a post to review the worker.',
+  otherReviewed: 'The other side reviewed you. Review them to see what they said.', reviewNudge: 'Reviewing takes 5 seconds and helps the next person choose well.',
+  adminTabFlags: 'Alerts', noFlags: 'Nothing unusual so far.', flag_repeat_pair: 'Same pair, many shifts within 30 days', flag_new_accounts: 'Two brand-new accounts paid each other', flagShifts: '{n} shifts',
 }
 
 export type TKey = keyof Dict

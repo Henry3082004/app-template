@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Applicants } from './Applicants'
+import { PendingReviews } from '../components/Escrow'
 import { Ic } from '../components/Ic'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { api } from '../lib/api'
@@ -52,6 +53,7 @@ export default function EmployerJobs() {
         <span>{isPro ? t('proBar') : t('planBar', { open })}</span>
         {!isPro && <Link to="/app/bang-gia">{t('upgrade')}</Link>}
       </div>
+      <PendingReviews employer refresh={list} />
       {error != null && <ErrorBox error={error} where="EmployerJobs.load" onRetry={load} />}
       {!list && !error && <Skel n={2} />}
       {list && list.length === 0 && <Empty pose="empty" title={t('emptyMyJobs')} />}

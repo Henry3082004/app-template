@@ -8,7 +8,7 @@ import { capy } from '../lib/capy'
 import { km, locate, type Coords } from '../lib/geo'
 import { useI18n, type TKey } from '../lib/i18n'
 import { useSession } from '../lib/session'
-import type { AppStatus, Category, Job, PayUnit } from '../lib/types'
+import type { AppStatus, Category, Job, PayUnit, Reputation } from '../lib/types'
 import { useBp } from '../lib/useBp'
 import { JobDetail } from './JobDetail'
 
@@ -34,6 +34,7 @@ export default function Jobs() {
   const { profile, ready, askAuth } = useSession()
   const [params, setParams] = useSearchParams()
   const [jobs, setJobs] = useState<Job[] | null>(null)
+  const [reps, setReps] = useState<Record<string, Reputation>>({})
   const [error, setError] = useState<unknown>(null)
   const [mine, setMine] = useState<Record<string, AppStatus>>({})
   const [q, setQ] = useState('')
@@ -49,7 +50,10 @@ export default function Jobs() {
   const load = useCallback(() => {
     setError(null)
     setJobs(null)
-    api.listOpenJobs().then(setJobs).catch(setError)
+    api.listOpenJobs().then((js) => {
+      setJobs(js)
+      api.reputations([...new Set(js.map((j) => j.employer_id))]).then(setReps).catch(() => undefined)
+    }).catch(setError)
   }, [])
   useEffect(load, [load])
 
@@ -157,7 +161,7 @@ export default function Jobs() {
       ? <><div className="center" style={{ marginBottom: 12 }}><img className="capy sm" src={capy('bath')} alt="" style={{ margin: '0 auto' }} /><div className="sub">{t('capyLoading')}</div></div><Skel n={wide ? 4 : 3} /></>
       : shown.length === 0
         ? <Empty pose="empty" title={t('emptyTitle')} sub={t('emptySub')}><Btn v="ghost" sm onClick={clear}>{t('clearFilters')}</Btn></Empty>
-        : <div className={'cards' + (bp === 'd' ? ' auto' : '')}>{shown.map(({ j, d }) => <JobCard key={j.id} job={j} distance={d} sel={wide && j.id === id} onOpen={() => open(j.id)} />)}</div>
+        : <div className={'cards' + (bp === 'd' ? ' auto' : '')}>{shown.map(({ j, d }) => <JobCard key={j.id} job={j} distance={d} rep={reps[j.employer_id]} sel={wide && j.id === id} onOpen={() => open(j.id)} />)}</div>
 
   return (
     <>

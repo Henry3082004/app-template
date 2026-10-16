@@ -54,6 +54,8 @@ export interface Escrow {
   attendance: Attendance | null
   funding_mode: string | null
   reviewed: boolean
+  /** the other side already reviewed this shift (content stays hidden until I review too) */
+  other_reviewed: boolean
 }
 
 export interface MyApplication extends Escrow {
@@ -85,6 +87,8 @@ export interface Applicant extends Escrow {
 export interface Reputation {
   user_id: string
   shifts_done: number
+  on_time: number
+  partners: number
   noshow: number
   late: number
   ratings: number
@@ -104,6 +108,8 @@ export interface AdminPayout {
   id: string; application_id: string; seeker_name: string; amount: number; mode: 'test' | 'live'; status: 'pending' | 'paid'; reference: string | null
   created_at: string; paid_at: string | null; bank_name: string | null; account_no: string | null; holder_name: string | null
 }
+
+export interface AdminFlag { kind: 'repeat_pair' | 'new_accounts'; employer_name: string; seeker_name: string; shifts: number; total: number; last_at: string }
 
 export interface Quote { amount: number; fee: number; net: number }
 
@@ -182,6 +188,9 @@ export interface Api {
   resolveDispute(applicationId: string, outcome: 'release' | 'refund', note: string): Promise<void>
   adminPayouts(): Promise<AdminPayout[]>
   markPayoutPaid(payoutId: string, reference: string): Promise<void>
+  adminFlags(): Promise<AdminFlag[]>
+  /** finished shifts (last 30 days) I still have to review */
+  pendingReviews(): Promise<number>
   /** settle overdue shifts for the signed-in user (also done hourly on the server) */
   sweep(): Promise<void>
 }

@@ -12,20 +12,73 @@ import { Btn, Dialog, ErrorBox, Fld } from './ui'
 const net = (e: Escrow) => (e.escrow_amount ?? 0) - (e.platform_fee ?? 0)
 type JobTerms = Pick<Job, 'pay_unit' | 'start_date' | 'end_date'>
 
-/** Reputation summary: level chip + the plain numbers behind it. */
-export function Rep({ rep, employer }: { rep?: Reputation; employer?: boolean }) {
+/**
+ * Reputation — the app's core signal. Three sizes:
+ *  sm: one line on job cards · md: applicant cards & job detail · lg: Account page with stat tiles.
+ */
+export function Rep({ rep, employer, size = 'md' }: { rep?: Reputation; employer?: boolean; size?: 'sm' | 'md' | 'lg' }) {
   const { t } = useI18n()
   const lvl = repLevel(rep)
   const cls = { new: 'tag p', good: 'tag ok', ok: 'tag', warn: 'tag warn' }[lvl]
-  const label = { new: t('repNew'), good: t('repGood'), ok: t('repOk'), warn: t('repWarn') }[lvl]
-  const none = !rep || rep.shifts_done === 0
+  const label = { new: employer ? t('repNewShop') : t('repNewWorker'), good: t('repGood'), ok: t('repOk'), warn: t('repWarn') }[lvl]
+  const done = rep?.shifts_done ?? 0
+  const onTimePct = done ? Math.round(((rep?.on_time ?? 0) / done) * 100) : null
+  const stars = rep && rep.ratings > 0 && rep.avg_stars != null
+    ? <span className="stars-n"><Ic n="star" size={size === 'lg' ? 22 : 14} /> <b>{rep.avg_stars.toFixed(1)}</b> <span className="muted">({t('repRatings', { n: rep.ratings })})</span></span>
+    : null
+
+  if (size === 'sm') {
+    return (
+      <div className="rep sm">
+        {stars}
+        {done > 0 ? <span className="muted">{t('repShifts', { n: done })}</span> : <span className="muted">{label}</span>}
+        {(lvl === 'good' || lvl === 'warn') && <span className={cls}>{label}</span>}
+      </div>
+    )
+  }
+  if (size === 'lg') {
+    return (
+      <div className="replg">
+        <div className="rephead"><span className={cls}>{label}</span>{stars}</div>
+        <div className="tiles">
+          <div><b>{done}</b><span>{t('repStatShifts')}</span></div>
+          <div><b>{onTimePct == null ? '—' : onTimePct + '%'}</b><span>{t('repStatOnTime')}</span></div>
+          <div><b>{rep?.partners ?? 0}</b><span>{t('repStatPartners')}</span></div>
+          {!employer && <div className={rep && rep.noshow > 0 ? 'bad' : ''}><b>{rep?.noshow ?? 0}</b><span>{t('repStatNoshow')}</span></div>}
+        </div>
+        {onTimePct != null && <div className="bar" aria-hidden="true"><span style={{ width: onTimePct + '%' }} /></div>}
+        <div className="small muted">{t('repWhy')}</div>
+      </div>
+    )
+  }
   return (
     <div className="rep">
       <span className={cls}>{label}</span>
-      {rep && rep.ratings > 0 && rep.avg_stars != null && <span className="stars-n"><Ic n="star" size={14} /> <b>{rep.avg_stars.toFixed(1)}</b> <span className="muted">({t('repRatings', { n: rep.ratings })})</span></span>}
-      <span className="muted">{none ? (employer ? t('repEmployerNew') : t('repNoShifts')) : t('repShifts', { n: rep!.shifts_done })}</span>
+      {stars}
+      <span className="muted">{done === 0 ? (employer ? t('repEmployerNew') : t('repNoShifts')) : t('repShifts', { n: done })}</span>
+      {onTimePct != null && <span className="muted">{t('repOnTime', { n: onTimePct })}</span>}
+      {rep && rep.partners > 1 && <span className="muted">{t('repPartners', { n: rep.partners })}</span>}
       {!employer && rep && rep.noshow > 0 && <span className="warnt">{t('repNoshow', { n: rep.noshow })}</span>}
-      {!employer && rep && rep.late > 0 && <span className="muted">{t('repLate', { n: rep.late })}</span>}
+    </div>
+  )
+}
+
+/** "You still have N shifts to review" — shown on My applications / My posts. */
+export function PendingReviews({ employer, refresh }: { employer?: boolean; refresh?: unknown }) {
+  const { t } = useI18n()
+  const [n, setN] = useState(0)
+  useEffect(() => { api.pendingReviews().then(setN).catch(() => undefined) }, [refresh])
+  if (!n) return null
+  return <div className="notice warn pendrev"><Ic n="star" size={16} /> {t(employer ? 'pendingReviewsEmp' : 'pendingReviews', { n })}</div>
+}
+
+function ReviewPrompt({ app, onReview }: { app: Escrow; onReview(): void }) {
+  const { t } = useI18n()
+  if (app.reviewed) return <div className="small muted">{t('reviewedDone')}</div>
+  return (
+    <div className="revprompt">
+      <div className={app.other_reviewed ? 'notice info' : 'small muted'}>{t(app.other_reviewed ? 'otherReviewed' : 'reviewNudge')}</div>
+      <Btn onClick={onReview}><Ic n="star" size={16} /> {t('reviewCta')}</Btn>
     </div>
   )
 }
@@ -82,13 +135,13 @@ export function FundDialog({ app, job, onClose, onDone }: { app: Applicant; job:
   )
 }
 
-function CompleteDialog({ app, onClose, onDone }: { app: Applicant; onClose(): void; onDone(): void }) {
+function CompleteDialog({ app, onClose, onDone }: { app: Applicant; onClose(): void; onDone(a: Attendance): void }) {
   const { t } = useI18n()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<unknown>(null)
   const pick = async (a: Attendance) => {
     setBusy(true); setError(null)
-    try { await api.completeShift(app.id, a); onDone() } catch (e) { setError(e); setBusy(false) }
+    try { await api.completeShift(app.id, a); onDone(a) } catch (e) { setError(e); setBusy(false) }
   }
   const opts: [Attendance, TKey, TKey][] = [['ok', 'attOk', 'attOkSub'], ['late', 'attLate', 'attLateSub'], ['noshow', 'attNoshow', 'attNoshowSub']]
   return (
@@ -205,13 +258,13 @@ export function EmployerPay({ app, job, onChanged }: { app: Applicant; job: JobT
       {s === 'released' && (
         <>
           <div className="notice ok">{t('releasedEmp', { amount: money(net(app), locale) })}</div>
-          {app.reviewed ? <div className="small muted">{t('reviewedDone')}</div> : <Btn v="ghost" onClick={() => setDlg('review')}><Ic n="star" size={16} /> {t('reviewCta')}</Btn>}
+          <ReviewPrompt app={app} onReview={() => setDlg('review')} />
         </>
       )}
       {s === 'refunded' && <div className="notice info">{t('refundedNote')}</div>}
       {s === 'disputed' && <div className="notice warn">{t('disputedNote')}</div>}
       {dlg === 'fund' && <FundDialog app={app} job={job} onClose={close} onDone={done} />}
-      {dlg === 'complete' && <CompleteDialog app={app} onClose={close} onDone={done} />}
+      {dlg === 'complete' && <CompleteDialog app={app} onClose={close} onDone={(a) => { onChanged(); setDlg(a === 'noshow' ? null : 'review') }} />}
       {dlg === 'dispute' && <DisputeDialog appId={app.id} onClose={close} onDone={done} />}
       {dlg === 'review' && <ReviewDialog appId={app.id} as="employer" onClose={close} onDone={done} />}
     </div>
@@ -261,7 +314,7 @@ export function SeekerPay({ app, onChanged }: { app: MyApplication; onChanged():
             ? <div className="notice ok">{t('payoutDone')}{app.payout.reference ? ` (${app.payout.reference})` : ''}</div>
             : <div className="notice info">{t('payoutWaiting')}</div>}
           {app.payout?.status !== 'paid' && bank === null && <div className="notice warn">{t('bankMissing')} <Link to="/app/tai-khoan" className="bold">{t('fillBank')}</Link></div>}
-          {app.reviewed ? <div className="small muted">{t('reviewedDone')}</div> : <Btn v="ghost" onClick={() => setDlg('review')}><Ic n="star" size={16} /> {t('reviewCta')}</Btn>}
+          <ReviewPrompt app={app} onReview={() => setDlg('review')} />
         </>
       )}
       {s === 'refunded' && <div className="notice info">{t('refundedNote')}</div>}
@@ -286,7 +339,7 @@ export function OwnReputation({ userId, employer }: { userId: string; employer: 
   return (
     <div className="card stack">
       <b>{t('repTitle')}</b>
-      <Rep rep={rep} employer={employer} />
+      <Rep rep={rep} employer={employer} size="lg" />
       {rep && rep.top_tags.length > 0 && <div className="chiprow wrap">{rep.top_tags.map((k) => <span key={k} className="tag">{t(`tag_${k}` as TKey)}</span>)}</div>}
       <b style={{ fontSize: 15 }}>{t('myReviewsTitle')}</b>
       {reviews.length === 0 && <div className="sub" style={{ fontSize: 14 }}>{t('noReviewsYet')}</div>}

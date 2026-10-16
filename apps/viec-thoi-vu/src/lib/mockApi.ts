@@ -2,17 +2,18 @@ import { normalizePhone } from './phone'
 import { seedEmployers, seedJobs } from './seed'
 import { addDays, today } from './format'
 import {
-  AppError, type AdminDispute, type AdminPayout, type Api, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
+  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type Api, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
 } from './types'
 
 // In-memory backend for local UI testing (VITE_MOCK=1). Enforces the same rules as the database.
 interface User { profile: Profile; password: string }
-interface App extends Omit<Escrow, 'reviewed'> {
+interface App extends Omit<Escrow, 'reviewed' | 'other_reviewed'> {
   id: string; job_id: string; seeker_id: string; status: AppStatus; message: string | null; created_at: string; seen: boolean
   completed_at: number | null; released_at: number | null
 }
 interface Rev { id: string; application_id: string; reviewer_id: string; reviewee_id: string; reviewer_role: Role; stars: number; tags: string[]; comment: string | null; created_at: string }
-const FEE_PCT = 8 // the real value lives in the database (app_settings.fee_percent)
+const FEE_PCT = 8 // the real values live in the database (app_settings)
+const REP_MIN = 50000
 const NEW_PAY = { pay_status: 'none' as PayStatus, escrow_amount: null, platform_fee: null, attendance: null as Attendance | null, funding_mode: null, completed_at: null, released_at: null }
 const SEEKER_TAGS = ['accurate_description', 'friendly', 'clean_safe', 'clear_instructions']
 const EMPLOYER_TAGS = ['hardworking', 'punctual', 'polite', 'fast_learner']
@@ -65,6 +66,7 @@ const revealed = (appId: string) => {
 const escrowOf = (a: App, viewer: string): Escrow => ({
   pay_status: a.pay_status, escrow_amount: a.escrow_amount, platform_fee: a.platform_fee, attendance: a.attendance, funding_mode: a.funding_mode,
   reviewed: reviews.some((r) => r.application_id === a.id && r.reviewer_id === viewer),
+  other_reviewed: reviews.some((r) => r.application_id === a.id && r.reviewer_id !== viewer),
 })
 function quoteOf(a: App, hours?: number) {
   const j = jobOf(a)
@@ -283,17 +285,25 @@ export const mockApi: Api = {
     return wait(undefined)
   },
   async reputations(ids) {
+    // Same rules as the database: shifts >= REP_MIN count, one (latest) review per reviewer→reviewee pair.
     const out: Record<string, Reputation> = {}
+    const q = apps.filter((a) => (a.escrow_amount ?? 0) >= REP_MIN)
+    const party = (a: App, u: string) => a.seeker_id === u || jobOf(a).employer_id === u
     ids.forEach((u) => {
-      const mine = apps.filter((a) => a.seeker_id === u || jobOf(a).employer_id === u)
-      const rs = reviews.filter((r) => r.reviewee_id === u && revealed(r.application_id))
+      const done = q.filter((a) => a.pay_status === 'released' && party(a, u))
+      const latest = new Map<string, Rev>()
+      reviews.filter((r) => r.reviewee_id === u && revealed(r.application_id) && q.some((a) => a.id === r.application_id))
+        .forEach((r) => { const k = r.reviewer_id; if (!latest.has(k) || latest.get(k)!.created_at <= r.created_at) latest.set(k, r) })
+      const rs = [...latest.values()]
       const counts: Record<string, number> = {}
       rs.forEach((r) => r.tags.forEach((t) => { counts[t] = (counts[t] ?? 0) + 1 }))
       out[u] = {
         user_id: u,
-        shifts_done: mine.filter((a) => a.pay_status === 'released').length,
-        noshow: apps.filter((a) => a.seeker_id === u && a.pay_status === 'refunded' && a.attendance === 'noshow').length,
-        late: apps.filter((a) => a.seeker_id === u && a.pay_status === 'released' && a.attendance === 'late').length,
+        shifts_done: done.length,
+        on_time: done.filter((a) => a.attendance !== 'late').length,
+        partners: new Set(done.map((a) => (a.seeker_id === u ? jobOf(a).employer_id : a.seeker_id))).size,
+        noshow: q.filter((a) => a.seeker_id === u && a.pay_status === 'refunded' && a.attendance === 'noshow').length,
+        late: done.filter((a) => a.seeker_id === u && a.attendance === 'late').length,
         ratings: rs.length,
         avg_stars: rs.length ? Math.round((rs.reduce((n, r) => n + r.stars, 0) / rs.length) * 10) / 10 : null,
         top_tags: Object.entries(counts).sort((x, y) => y[1] - x[1]).slice(0, 3).map(([t]) => t),
@@ -340,6 +350,21 @@ export const mockApi: Api = {
     if (p.mode === 'live' && reference.trim().length < 3) throw new AppError('REFERENCE_REQUIRED')
     Object.assign(p, { status: 'paid', paid_at: now(), reference: reference.trim() || null })
     return wait(undefined)
+  },
+  async adminFlags() {
+    admin()
+    const pairs: Record<string, { e: string; s: string; n: number; total: number }> = {}
+    apps.filter((a) => a.pay_status === 'released').forEach((a) => {
+      const k = jobOf(a).employer_id + '|' + a.seeker_id
+      pairs[k] ??= { e: jobOf(a).employer_id, s: a.seeker_id, n: 0, total: 0 }
+      pairs[k].n += 1; pairs[k].total += a.escrow_amount ?? 0
+    })
+    return wait(Object.values(pairs).filter((x) => x.n >= 3).map((x): AdminFlag => ({ kind: 'repeat_pair', employer_name: users[x.e]?.profile.business_name ?? '—', seeker_name: users[x.s]?.profile.full_name ?? '—', shifts: x.n, total: x.total, last_at: now() })))
+  },
+  async pendingReviews() {
+    if (!current) return 0
+    const me = current
+    return wait(apps.filter((a) => a.pay_status === 'released' && (a.seeker_id === me || jobOf(a).employer_id === me) && !reviews.some((r) => r.application_id === a.id && r.reviewer_id === me)).length)
   },
   async sweep() { sweepFor(current); return wait(undefined) },
 }

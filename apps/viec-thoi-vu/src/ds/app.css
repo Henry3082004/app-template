@@ -246,3 +246,15 @@ textarea.inp{min-height:84px;resize:vertical}
 .adminrows{display:flex;flex-direction:column;gap:8px;background:var(--bg);border-radius:14px;padding:12px 14px;font-size:14px}
 .adminrows>div{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.adminrows>div>span{color:var(--tx2);min-width:84px}
 .adminrows a{color:var(--p2);font-weight:600}
+
+/* Reputation — the core signal */
+.rep.sm{gap:4px 8px;font-size:13px}.rep.sm .tag{padding:1px 8px;font-size:12px}
+.replg{display:flex;flex-direction:column;gap:12px}
+.rephead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.rephead .stars-n{font-size:18px}.rephead .stars-n b{font-size:22px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(68px,1fr));gap:6px}
+.tiles>div{background:var(--bg);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:2px}
+.tiles b{font-size:22px;line-height:1.1;color:var(--p2);font-variant-numeric:tabular-nums}.tiles span{font-size:12px;color:var(--tx2)}
+.tiles .bad b{color:var(--errfg)}
+.bar{height:8px;border-radius:99px;background:var(--gray-100,#f1e9df);overflow:hidden}.bar span{display:block;height:100%;background:var(--okfg);border-radius:99px}
+.revprompt{display:flex;flex-direction:column;gap:8px}
+.pendrev{display:flex;align-items:center;gap:8px;margin-bottom:12px}

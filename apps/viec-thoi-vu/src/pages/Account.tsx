@@ -76,6 +76,7 @@ export default function Account() {
     <div className="page-scroll"><div className="pg">
       <h1 className="ptitle" style={{ marginBottom: 16 }}>{t('accountTitle')}</h1>
       <div className="acct">
+        <OwnReputation userId={profile.id} employer={emp} />
         <div className="card stack">
           <div className="row"><Avatar name={name} /><div style={{ flex: 1, minWidth: 0 }}><b>{name}</b><div className="sub" style={{ fontSize: 14 }}>{displayPhone(profile.phone)}</div></div>{emp && <span className={profile.plan === 'pro' ? 'tag sun' : 'tag'}>{t(profile.plan === 'pro' ? 'planpro' : 'planfree')}</span>}</div>
           <Fld label={t('yourName')} htmlFor="ac-name"><input id="ac-name" className="inp" value={f.full_name} onChange={(e) => setF({ ...f, full_name: e.target.value })} maxLength={80} /></Fld>
@@ -95,7 +96,6 @@ export default function Account() {
           {error != null && <ErrorBox error={error} where="Account.save" />}
           <Btn v="ghost" block onClick={save} disabled={saving || !f.full_name.trim()}>{saving ? '…' : saved ? t('saved') : t('save')}</Btn>
         </div>
-        <OwnReputation userId={profile.id} employer={emp} />
         {!emp && <BankCard />}
         {lang}
       </div>

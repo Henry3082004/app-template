@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { SeekerPay } from '../components/Escrow'
+import { PendingReviews, SeekerPay } from '../components/Escrow'
 import { Ic } from '../components/Ic'
 import { Pay } from '../components/JobCard'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
@@ -47,6 +47,7 @@ export default function MyApplications() {
   return (
     <div className="page-scroll"><div className="pg wide">
       <h1 className="ptitle" style={{ marginBottom: 16 }}>{t('appliedTitlePage')}</h1>
+      <PendingReviews refresh={list} />
       {error != null && <ErrorBox error={error} where="MyApplications.load" onRetry={load} />}
       {actErr != null && <div style={{ marginBottom: 12 }}><ErrorBox error={actErr} where="MyApplications.withdraw" /></div>}
       {!list && !error && <Skel n={2} />}
