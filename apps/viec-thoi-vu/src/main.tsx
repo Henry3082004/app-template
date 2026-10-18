@@ -16,8 +16,8 @@ function Crash() {
     <div className="app" style={{ textAlign: 'center', paddingTop: 80 }}>
       <div style={{ fontSize: 44 }}>😵</div>
       <h2 style={{ marginTop: 12 }}>Có lỗi xảy ra / Something went wrong</h2>
-      <p className="muted mt-8">Tải lại trang giúp mình nhé. / Please reload the page.</p>
-      <button className="btn primary mt-24" onClick={() => location.reload()}>Tải lại / Reload</button>
+      <p className="muted" style={{ marginTop: 8 }}>Tải lại trang giúp mình nhé. / Please reload the page.</p>
+      <button type="button" className="btn btn-primary" style={{ marginTop: 24 }} onClick={() => location.reload()}>Tải lại / Reload</button>
     </div>
   )
 }

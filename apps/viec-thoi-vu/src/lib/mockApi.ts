@@ -50,7 +50,7 @@ let current: string | null = null
 try { current = sessionStorage.getItem('mock-uid') } catch { /* storage unavailable */ }
 const setCurrent = (id: string | null) => {
   current = id
-  try { id ? sessionStorage.setItem('mock-uid', id) : sessionStorage.removeItem('mock-uid') } catch { /* ignore */ }
+  try { if (id) sessionStorage.setItem('mock-uid', id); else sessionStorage.removeItem('mock-uid') } catch { /* ignore */ }
 }
 
 const wait = <T>(v: T) => new Promise<T>((r) => setTimeout(() => r(structuredClone(v)), 250))

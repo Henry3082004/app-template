@@ -26,7 +26,7 @@ export default function MyApplications() {
     setError(null)
     api.sweep().catch(() => undefined).then(() => api.myApplications()).then(setList).catch(setError)
   }
-  useEffect(load, [profile]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(load, [profile])
 
   const withdraw = async (id: string) => {
     if (!confirm(t('withdrawConfirm'))) return

@@ -4,7 +4,6 @@ import { BankCard, OwnReputation } from '../components/Escrow'
 import { useAppConfig } from '../lib/config'
 import { Ic } from '../components/Ic'
 import { Avatar, Btn, Empty, ErrorBox, Fld } from '../components/ui'
-import { api } from '../lib/api'
 import { CITIES } from '../lib/geo'
 import { useI18n } from '../lib/i18n'
 import { displayPhone } from '../lib/phone'
@@ -14,7 +13,7 @@ import type { Locale } from '../lib/types'
 export default function Account() {
   const { t, locale, setLocale } = useI18n()
   const nav = useNavigate()
-  const { profile, setProfile, signOut, askAuth } = useSession()
+  const { profile, updateProfile, signOut, askAuth } = useSession()
   const cfg = useAppConfig()
   const [f, setF] = useState({ full_name: '', bio: '', business_name: '', address: '', city: '' })
   const [saving, setSaving] = useState(false)
@@ -27,7 +26,7 @@ export default function Account() {
 
   const changeLang = (l: Locale) => {
     setLocale(l)
-    if (profile) api.updateProfile({ locale: l }).then(setProfile).catch(() => undefined)
+    if (profile) updateProfile({ locale: l }).catch(() => undefined)
   }
 
   const save = async () => {
@@ -36,7 +35,7 @@ export default function Account() {
       const patch = profile?.role === 'employer'
         ? { full_name: f.full_name.trim(), business_name: f.business_name.trim() || null, address: f.address.trim() || null, city: f.city || null }
         : { full_name: f.full_name.trim(), bio: f.bio.trim() || null, city: f.city || null }
-      setProfile(await api.updateProfile(patch))
+      await updateProfile(patch)
       setSaved(true)
     } catch (e) { setError(e) } finally { setSaving(false) }
   }

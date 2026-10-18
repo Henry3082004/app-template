@@ -1,0 +1,54 @@
+import { test as base, expect, type Page } from '@playwright/test'
+
+export const PORTS = { testPay: 4173, free: 4174, prodBefore: 4175, prodAfter: 4176 } as const
+export const url = (port: number, path: string) => `http://localhost:${port}${path}`
+
+/** Helpers shared by every flow. All navigation inside the app is client-side so the in-memory mock keeps its state. */
+export function helpers(p: Page) {
+  const see = (text: string) => expect(p.getByText(text, { exact: false }).locator('visible=true').first()).toBeVisible()
+  const notSee = async (text: string) => {
+    await p.waitForTimeout(300)
+    await expect(p.getByText(text, { exact: false }).locator('visible=true')).toHaveCount(0)
+  }
+  const go = (path: string) => p.evaluate((x) => { history.pushState({}, '', x); dispatchEvent(new PopStateEvent('popstate')) }, path)
+  const noHScroll = async () => expect(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true)
+  const signOut = async () => { await go('/app/tai-khoan'); await p.getByRole('button', { name: 'Đăng xuất' }).click(); await see('Tôi cần tuyển người') }
+  const asEmployer = async () => {
+    await go('/app?tuyen=1'); await p.getByRole('button', { name: 'Dùng thử: Nhà tuyển dụng' }).click(); await see('Tin của tôi'); await p.waitForTimeout(400)
+  }
+  const asSeeker = async () => {
+    await go('/app/da-ung-tuyen'); await p.getByRole('button', { name: 'Đăng nhập' }).first().click()
+    await p.getByRole('button', { name: 'Dùng thử: Người tìm việc' }).click(); await p.waitForTimeout(500)
+  }
+  const asAdmin = async () => {
+    await go('/app/da-ung-tuyen'); await p.getByRole('button', { name: 'Đăng nhập' }).first().click()
+    if (await p.locator('#a-name').count()) await p.getByRole('button', { name: /Đã có tài khoản/ }).click()
+    await p.locator('#a-phone').fill('0900000003'); await p.locator('#a-pass').fill('quan-tri-thu-1')
+    await p.locator('form button[type=submit]').click(); await p.waitForTimeout(600)
+  }
+  const openApplicants = async (title: string) => { await go('/app/tin-cua-toi'); await p.locator('button.job', { hasText: title }).first().click() }
+  const postJob = async (title: string, startToday = false) => {
+    await go('/app/dang-tin'); await see('Đăng tin'); await p.getByLabel('Tên việc').fill(title)
+    if (startToday) await p.getByLabel('Bắt đầu').fill(new Date().toISOString().slice(0, 10))
+    await p.getByRole('button', { name: 'Đăng tin', exact: true }).last().click(); await see('Đã đăng tin!')
+  }
+  return { see, notSee, go, noHScroll, signOut, asEmployer, asSeeker, asAdmin, openApplicants, postJob }
+}
+
+/** Every test fails if the page logs an error/warning or throws; Google Fonts are blocked like in the sandbox. */
+export const test = base.extend<{ problems: string[] }>({
+  problems: [async ({ page }, use) => {
+    const problems: string[] = []
+    const watch = (p: Page) => {
+      p.on('console', (m) => { if (['error', 'warning'].includes(m.type()) && !/Failed to load resource/.test(m.text())) problems.push(m.text()) })
+      p.on('pageerror', (e) => problems.push('pageerror ' + e.message))
+      p.on('dialog', (d) => d.accept())
+    }
+    await page.context().route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort())
+    watch(page)
+    page.context().on('page', watch)
+    await use(problems)
+    expect(problems, 'console errors / page errors').toEqual([])
+  }, { auto: true }],
+})
+export { expect }
