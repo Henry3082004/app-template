@@ -1,5 +1,5 @@
 # Deploys the Zalo Mini App from GitHub's network (the cloud sandbox cannot reach Zalo's login service).
-# Zalo logins last ~24h, so every run needs one QR scan: the QR is published as an artifact "qr-N".
+# Zalo logins last ~24h, so every run needs one QR scan: the QR is published to the temporary branch `zalo-qr` (qr.png).
 # Run it from Claude ("deploy Zalo") or manually: Actions → Deploy Zalo Mini App → Run workflow.
 name: Deploy Zalo Mini App
 on:
@@ -15,7 +15,7 @@ on:
         type: string
         default: 'cap nhat'
 permissions:
-  contents: read
+  contents: write   # only to publish the temporary QR branch `zalo-qr`
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -41,82 +41,12 @@ jobs:
         run: |
           mkdir -p /tmp/zout
           nohup python3 ci/deploy.py > /tmp/zout/log.txt 2>&1 &
+          GH_TOKEN=${{ github.token }} nohup bash ci/publish_qr.sh > /tmp/zout/publish.txt 2>&1 &
           sleep 3
-      - name: Publish login QR 1
-        run: |
-          for _ in $(seq 1 110); do
-            [ -f /tmp/zout/qr1.png ] || [ -f /tmp/zout/done ] && break
-            sleep 1
-          done
-          true
-      - uses: actions/upload-artifact@v4
-        with:
-          name: qr-1
-          path: /tmp/zout/qr1.png
-          if-no-files-found: ignore
-      - name: Publish login QR 2
-        run: |
-          for _ in $(seq 1 110); do
-            [ -f /tmp/zout/qr2.png ] || [ -f /tmp/zout/done ] && break
-            sleep 1
-          done
-          true
-      - uses: actions/upload-artifact@v4
-        with:
-          name: qr-2
-          path: /tmp/zout/qr2.png
-          if-no-files-found: ignore
-      - name: Publish login QR 3
-        run: |
-          for _ in $(seq 1 110); do
-            [ -f /tmp/zout/qr3.png ] || [ -f /tmp/zout/done ] && break
-            sleep 1
-          done
-          true
-      - uses: actions/upload-artifact@v4
-        with:
-          name: qr-3
-          path: /tmp/zout/qr3.png
-          if-no-files-found: ignore
-      - name: Publish login QR 4
-        run: |
-          for _ in $(seq 1 110); do
-            [ -f /tmp/zout/qr4.png ] || [ -f /tmp/zout/done ] && break
-            sleep 1
-          done
-          true
-      - uses: actions/upload-artifact@v4
-        with:
-          name: qr-4
-          path: /tmp/zout/qr4.png
-          if-no-files-found: ignore
-      - name: Publish login QR 5
-        run: |
-          for _ in $(seq 1 110); do
-            [ -f /tmp/zout/qr5.png ] || [ -f /tmp/zout/done ] && break
-            sleep 1
-          done
-          true
-      - uses: actions/upload-artifact@v4
-        with:
-          name: qr-5
-          path: /tmp/zout/qr5.png
-          if-no-files-found: ignore
-      - name: Publish login QR 6
-        run: |
-          for _ in $(seq 1 110); do
-            [ -f /tmp/zout/qr6.png ] || [ -f /tmp/zout/done ] && break
-            sleep 1
-          done
-          true
-      - uses: actions/upload-artifact@v4
-        with:
-          name: qr-6
-          path: /tmp/zout/qr6.png
-          if-no-files-found: ignore
       - name: Wait for result
         run: |
           for _ in $(seq 1 600); do [ -f /tmp/zout/done ] && break; sleep 2; done
           echo "---- log ----"; cat /tmp/zout/log.txt || true
+          cat /tmp/zout/publish.txt || true
           echo "---- result ----"; cat /tmp/zout/result.txt
           grep -q '^OK' /tmp/zout/result.txt
