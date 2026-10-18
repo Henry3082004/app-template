@@ -51,3 +51,8 @@
 - Đã đóng việc mẫu, khóa tài khoản dùng thử.
 - Bật lại tiền / gói trả phí: xem đầu file `supabase/migrations/20261018_free_mode.sql`.
 - Chưa làm: đăng nhập bằng Zalo (chờ Henry xin quyền SĐT + App Secret).
+
+## Deploy Zalo bằng GitHub (từ 18/10/2026)
+- Phiên đăng nhập Zalo chỉ sống ~24h và sandbox của Claude không đăng nhập được (WebSocket bị chặn), nên deploy Zalo chạy trên GitHub: Actions → "Deploy Zalo Mini App" → Run workflow (chọn development/testing).
+- Mỗi lần cần quét 1 mã QR bằng Zalo: workflow đẩy `qr.png` lên nhánh tạm `zalo-qr` (xóa sau khi xong). Claude lấy ảnh và gửi cho Henry.
+- Không cần secret nào. Kết quả (zdev-…) nằm ở cuối nhật ký bước "Wait for result".
