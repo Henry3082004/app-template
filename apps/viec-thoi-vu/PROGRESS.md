@@ -56,3 +56,10 @@
 - Phiên đăng nhập Zalo chỉ sống ~24h và sandbox của Claude không đăng nhập được (WebSocket bị chặn), nên deploy Zalo chạy trên GitHub: Actions → "Deploy Zalo Mini App" → Run workflow (chọn development/testing).
 - Mỗi lần cần quét 1 mã QR bằng Zalo: workflow đẩy `qr.png` lên nhánh tạm `zalo-qr` (xóa sau khi xong). Claude lấy ảnh và gửi cho Henry.
 - Không cần secret nào. Kết quả (zdev-…) nằm ở cuối nhật ký bước "Wait for result".
+
+## Đăng nhập bằng Zalo (18/10/2026)
+- Hàm Supabase `zalo-login` (supabase/functions/zalo-login/index.ts) đã deploy. Cần secret `ZALO_APP_SECRET` (Supabase → Edge Functions → Secrets). Chưa có secret thì hàm trả ZALO_NOT_CONFIGURED và app báo "dùng mật khẩu tạm".
+- Quyền Zalo cần xin: "Thông báo xin người dùng cấp quyền truy cập số điện thoại" (scope.userPhonenumber, mục 100).
+- Trong Zalo, hộp đăng nhập mặc định là "Tiếp tục với Zalo" (có giải thích lý do xin SĐT — chính sách Zalo yêu cầu), mật khẩu là phương án dự phòng.
+- Số điện thoại KHÔNG lấy từ máy khách: app chỉ gửi 2 token của Zalo, máy chủ hỏi Zalo (graph.zalo.me/v2.0/me/info) ra số.
+- Chưa thử với Zalo thật (cần quyền được duyệt + secret). Đã thử: tạo phiên từ token (Supabase thật), khóa tài khoản, dùng lại token, và toàn bộ giao diện (mock).

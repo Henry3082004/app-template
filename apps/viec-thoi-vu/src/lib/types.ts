@@ -146,6 +146,8 @@ export interface JobInput {
   is_urgent: boolean
 }
 
+export type ZaloLoginResult = { profile: Profile } | { ticket: string; phone: string }
+
 export interface ProfileUpdate {
   full_name?: string
   bio?: string | null
@@ -159,6 +161,9 @@ export interface Api {
   me(): Promise<Profile | null>
   signUp(input: SignUpInput): Promise<Profile>
   signIn(phone: string, password: string): Promise<Profile>
+  /** Zalo Mini App: exchange Zalo's tokens for a session, or (new user) a signup ticket */
+  zaloLogin(creds: { access_token: string; phone_token: string }): Promise<ZaloLoginResult>
+  zaloSignUp(ticket: string, input: Omit<SignUpInput, 'phone' | 'password'>): Promise<Profile>
   signOut(): Promise<void>
   listOpenJobs(): Promise<Job[]>
   getJob(id: string): Promise<Job | null>

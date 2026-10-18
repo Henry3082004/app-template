@@ -1,4 +1,6 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
+import { IN_ZALO } from '../lib/zalo'
+import { getZaloCredentials, type ZaloCredentials } from '../lib/zaloAuth'
 import { api, IS_DEMO } from '../lib/api'
 import { capy } from '../lib/capy'
 import { CITIES } from '../lib/geo'
@@ -17,6 +19,13 @@ export function AuthDialog() {
   const [f, setF] = useState({ full_name: '', phone: '', password: '', business_name: '', address: '', city: 'TP.HCM' })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<unknown>(null)
+  // Inside Zalo the default is "continue with Zalo" (no typing, no password); the old form stays as a fallback.
+  const [viaZalo, setViaZalo] = useState(IN_ZALO)
+  const [zalo, setZalo] = useState<{ ticket: string; phone: string; name: string | null } | null>(null)
+  // Every time the dialog opens it starts fresh (no leftover signup ticket / error from last time).
+  useEffect(() => {
+    if (authRequest) { setViaZalo(IN_ZALO); setZalo(null); setError(null) }
+  }, [authRequest])
   if (!authRequest) return null
   const role: Role = authRequest.role
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value })
@@ -36,6 +45,39 @@ export function AuthDialog() {
     }
   }
 
+  const zaloContinue = async () => {
+    tap()
+    setBusy(true)
+    setError(null)
+    try {
+      const creds: ZaloCredentials = await getZaloCredentials()
+      const r = await api.zaloLogin(creds)
+      if ('profile' in r) {
+        setProfile(r.profile)
+        closeAuth()
+        authRequest.onDone?.(r.profile)
+      } else {
+        setF((c) => ({ ...c, full_name: c.full_name || creds.name || '' }))
+        setZalo({ ticket: r.ticket, phone: r.phone, name: creds.name })
+      }
+    } catch (e) {
+      setError(e)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const zaloSignup = (e: FormEvent) => {
+    e.preventDefault()
+    tap()
+    return run(() => api.zaloSignUp(zalo!.ticket, {
+      full_name: f.full_name, role, locale,
+      business_name: role === 'employer' ? f.business_name : undefined,
+      address: role === 'employer' ? f.address : undefined,
+      city: f.city,
+    }))
+  }
+
   const submit = (e: FormEvent) => {
     e.preventDefault()
     tap()
@@ -49,6 +91,41 @@ export function AuthDialog() {
   }
 
   const d = DEMO[role === 'seeker' ? 'seeker' : 'employer']
+  if (viaZalo) {
+    const emp = role === 'employer'
+    return (
+      <Dialog onClose={closeAuth} label={t('zaloTitle')}>
+        <img className="wavecorner" src={capy('wave')} alt="" />
+        <h2>{zalo ? t('zaloNewTitle') : t('zaloTitle')}</h2>
+        {!zalo ? (
+          <>
+            <div className="sub" style={{ marginTop: -8 }}>{t('zaloWhy')}</div>
+            {error != null && <ErrorBox error={error} where="AuthDialog.zalo" />}
+            <Btn block onClick={zaloContinue} disabled={busy}>{busy ? '…' : t('zaloContinue')}</Btn>
+            <Btn v="text" block onClick={() => { setViaZalo(false); setError(null) }}>{t('zaloOther')}</Btn>
+          </>
+        ) : (
+          <form className="stack" onSubmit={zaloSignup}>
+            <div className="notice ok">{t('zaloPhone')}: <b>+{zalo.phone}</b></div>
+            <Fld label={t('yourName')} htmlFor="a-name"><input id="a-name" className="inp" value={f.full_name} onChange={set('full_name')} autoComplete="name" required maxLength={80} /></Fld>
+            {emp && (
+              <>
+                <Fld label={t('businessName')} htmlFor="a-biz"><input id="a-biz" className="inp" value={f.business_name} onChange={set('business_name')} required maxLength={120} placeholder="VD: Quán Cơm Bà Năm" /></Fld>
+                <div className="formgrid">
+                  <Fld label={t('address')} htmlFor="a-addr"><input id="a-addr" className="inp" value={f.address} onChange={set('address')} required maxLength={200} /></Fld>
+                  <Fld label={t('city')} htmlFor="a-city">
+                    <select id="a-city" className="inp" value={f.city} onChange={set('city')}>{Object.keys(CITIES).map((c) => <option key={c}>{c}</option>)}</select>
+                  </Fld>
+                </div>
+              </>
+            )}
+            {error != null && <ErrorBox error={error} where="AuthDialog.zaloSignup" />}
+            <Btn block type="submit" disabled={busy}>{busy ? '…' : emp ? t('saveAndPost') : role === 'seeker' ? t('applyNow') : t('continue')}</Btn>
+          </form>
+        )}
+      </Dialog>
+    )
+  }
   const employerSignup = mode === 'signup' && role === 'employer'
   const title = mode === 'login' ? t('loginTitle') : role === 'employer' ? t('hireHello') : t('loginHello')
 
@@ -84,6 +161,7 @@ export function AuthDialog() {
       <Btn v="ghost" block onClick={() => { setMode(mode === 'signup' ? 'login' : 'signup'); setError(null) }}>
         {mode === 'signup' ? t('haveAccount') : t('noAccount')}
       </Btn>
+      {IN_ZALO && <Btn v="text" block onClick={() => { setViaZalo(true); setError(null) }}>{t('zaloBack')}</Btn>}
       {IS_DEMO && <Btn v="text" block disabled={busy} onClick={() => run(() => api.signIn(d.phone, d.password))}>{role === 'seeker' ? t('demoSeeker') : t('demoEmployer')}</Btn>}
     </Dialog>
   )

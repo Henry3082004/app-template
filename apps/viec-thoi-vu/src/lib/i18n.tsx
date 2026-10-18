@@ -132,6 +132,13 @@ const vi = {
   noshowWaitingFree: 'Bạn đã báo người làm vắng. Chờ họ phản hồi (không trả lời sau 48 giờ thì tự ghi nhận vắng).',
   releasedFree: 'Đã xác nhận ca hoàn thành.', releasedSeekerFree: 'Quán đã xác nhận bạn hoàn thành ca.',
   noshowRecorded: 'Đã ghi nhận người làm vắng.', noshowRecordedSeeker: 'Ca này được ghi nhận là vắng.', disputedFree: 'Hai bên chưa thống nhất. Bên nền tảng sẽ xem xét và liên hệ cả hai.',
+  // Zalo login
+  zaloTitle: 'Đăng nhập bằng Zalo', zaloContinue: 'Tiếp tục với Zalo', zaloOther: 'Dùng số điện thoại và mật khẩu', zaloBack: '← Quay lại đăng nhập bằng Zalo',
+  zaloWhy: 'Việc Thời Vụ dùng số điện thoại Zalo của bạn để tạo tài khoản, để quán và ứng viên liên hệ nhau khi được nhận, và để tính uy tín. Zalo sẽ hỏi bạn có cho phép chia sẻ số điện thoại không. Bạn không cần nhập mật khẩu.',
+  zaloNewTitle: 'Chào bạn mới! Điền nốt để bắt đầu', zaloPhone: 'Số điện thoại từ Zalo',
+  eZALO_DENIED: 'Chưa lấy được số điện thoại từ Zalo. Bạn thử lại và bấm cho phép chia sẻ số điện thoại nhé, hoặc dùng mật khẩu.', eZALO_VERIFY_FAILED: 'Zalo chưa xác nhận được số điện thoại. Bạn thử lại nhé.',
+  eZALO_NOT_CONFIGURED: 'Đăng nhập bằng Zalo chưa sẵn sàng, bạn dùng số điện thoại và mật khẩu tạm nhé.', eTICKET_INVALID: 'Phiên đăng nhập đã hết hạn, bạn thử lại nhé.',
+  eACCOUNT_DISABLED: 'Tài khoản này đang bị khóa.', eLOGIN_FAILED: 'Chưa đăng nhập được, bạn thử lại nhé.',
 }
 
 type Dict = typeof vi
@@ -253,6 +260,13 @@ const en: Dict = {
   noshowWaitingFree: 'You reported the worker as absent. Waiting for their reply (no reply in 48 hours records the absence).',
   releasedFree: 'Shift confirmed as done.', releasedSeekerFree: 'The business confirmed you completed the shift.',
   noshowRecorded: 'Absence recorded.', noshowRecordedSeeker: 'This shift was recorded as an absence.', disputedFree: 'The two sides disagree. The platform will review and contact both of you.',
+  // Zalo login
+  zaloTitle: 'Sign in with Zalo', zaloContinue: 'Continue with Zalo', zaloOther: 'Use phone number and password', zaloBack: '← Back to Zalo sign-in',
+  zaloWhy: 'Việc Thời Vụ uses your Zalo phone number to create your account, so businesses and workers can reach each other once accepted, and to build reputation. Zalo will ask whether you agree to share your phone number. No password needed.',
+  zaloNewTitle: 'Welcome! Just a few details', zaloPhone: 'Phone number from Zalo',
+  eZALO_DENIED: "Couldn't get your phone number from Zalo. Please try again and allow sharing, or use a password.", eZALO_VERIFY_FAILED: "Zalo couldn't confirm the phone number. Please try again.",
+  eZALO_NOT_CONFIGURED: 'Zalo sign-in is not ready yet, please use phone and password for now.', eTICKET_INVALID: 'This sign-in expired, please try again.',
+  eACCOUNT_DISABLED: 'This account is disabled.', eLOGIN_FAILED: "Couldn't sign in, please try again.",
 }
 
 export type TKey = keyof Dict

@@ -132,6 +132,27 @@ export const mockApi: Api = {
     return wait(u.profile)
   },
 
+  async zaloLogin(creds) {
+    // Mock: the "phone token" IS the phone, so tests can choose who is logging in.
+    const d = normalizePhone(creds.phone_token)
+    if (!d) throw new AppError('ZALO_VERIFY_FAILED')
+    const u = byDigits(d)
+    if (u) { setCurrent(u.profile.id); return wait({ profile: u.profile }) }
+    return wait({ ticket: 'mock-ticket-' + d, phone: d })
+  },
+
+  async zaloSignUp(ticket, input) {
+    const d = ticket.replace('mock-ticket-', '')
+    if (!ticket.startsWith('mock-ticket-') || byDigits(d)) throw new AppError('TICKET_INVALID')
+    if (!input.full_name.trim()) throw new AppError('NAME_REQUIRED')
+    const id = nid()
+    addUser(id, d, 'x-zalo-only', input.role, input.full_name.trim(), {
+      bio: input.bio || null, business_name: input.business_name || null, address: input.address || null, city: input.city || null, locale: input.locale,
+    })
+    setCurrent(id)
+    return wait(users[id].profile)
+  },
+
   async signOut() { setCurrent(null) },
 
   async listOpenJobs() { return wait(jobs.filter((j) => j.status === 'open')) },

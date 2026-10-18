@@ -84,6 +84,33 @@ const toEscrow = (r: any, reviewed: boolean, other: boolean): Escrow => ({
   platform_fee: r.platform_fee == null ? null : Number(r.platform_fee),
 })
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function callZaloFn(payload: Record<string, unknown>): Promise<any> {
+  let res: Response
+  try {
+    res = await fetch(`${URL}/functions/v1/zalo-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: `Bearer ${KEY}` },
+      body: JSON.stringify(payload),
+    })
+  } catch (e) {
+    throw new AppError('NETWORK', String(e))
+  }
+  const body = await res.json().catch(() => ({}))
+  if (!res.ok) throw new AppError(body.error || 'LOGIN_FAILED')
+  return body
+}
+
+/** The function returns a one-time token hash; exchanging it gives a normal Supabase session. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function sessionFromHash(body: any): Promise<Profile> {
+  const { data, error } = await sb.auth.verifyOtp({ token_hash: String(body.token_hash), type: 'magiclink' })
+  if (error || !data.user) throw new AppError('LOGIN_FAILED', error?.message)
+  const p = await loadProfile(data.user.id)
+  if (!p) throw new AppError('NO_PROFILE')
+  return p
+}
+
 export const supabaseApi: Api = {
   async me() {
     const { data } = await sb.auth.getSession()
@@ -122,6 +149,16 @@ export const supabaseApi: Api = {
     const p = await loadProfile(data.user.id)
     if (!p) throw new AppError('NO_PROFILE')
     return p
+  },
+
+  async zaloLogin(creds) {
+    const body = await callZaloFn(creds)
+    if (body.needs_signup) return { ticket: String(body.ticket), phone: String(body.phone) }
+    return { profile: await sessionFromHash(body) }
+  },
+
+  async zaloSignUp(ticket, input) {
+    return sessionFromHash(await callZaloFn({ ...input, ticket }))
   },
 
   async signOut() {
