@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Applicants } from './Applicants'
-import { PendingReviews } from '../components/Escrow'
+import { PendingReviews } from '../components/escrow'
 import { isProFor, useAppConfig } from '../lib/config'
 import { Ic } from '../components/Ic'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'

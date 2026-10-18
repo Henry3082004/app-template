@@ -8,6 +8,8 @@ const servers = [
   { port: 4174, env: { VITE_MOCK_PAYMENT: 'off', VITE_MOCK_BILLING: 'off' } },
   { port: 4175, env: { VITE_FORCE_PROD_AUTH: '1', VITE_MOCK_ZALO_PUBLISHED: 'off' } },
   { port: 4176, env: { VITE_FORCE_PROD_AUTH: '1', VITE_MOCK_ZALO_PUBLISHED: 'on' } },
+  // 4177 = the real production bundle (talks to Supabase; tests answer those requests themselves)
+  { port: 4177, env: {}, mode: 'production' },
 ]
 
 export default defineConfig({
@@ -23,8 +25,8 @@ export default defineConfig({
     { name: 'phone', use: { ...devices['Pixel 7'], viewport: { width: 390, height: 844 } } },
     { name: 'tablet', use: { viewport: { width: 834, height: 1112 }, hasTouch: true } },
   ],
-  webServer: servers.map(({ port, env }) => ({
-    command: `npx vite build --mode mock --outDir .e2e/${port} --emptyOutDir --logLevel error && npx vite preview --outDir .e2e/${port} --port ${port} --strictPort`,
+  webServer: servers.map(({ port, env, mode = 'mock' }) => ({
+    command: `npx vite build --mode ${mode} --outDir .e2e/${port} --emptyOutDir --logLevel error && npx vite preview --outDir .e2e/${port} --port ${port} --strictPort`,
     port,
     env,
     reuseExistingServer: !process.env.CI,

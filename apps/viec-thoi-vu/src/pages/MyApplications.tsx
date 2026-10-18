@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PendingReviews, SeekerPay } from '../components/Escrow'
+import { PendingReviews, SeekerPay } from '../components/escrow'
 import { Ic } from '../components/Ic'
 import { Pay } from '../components/JobCard'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'

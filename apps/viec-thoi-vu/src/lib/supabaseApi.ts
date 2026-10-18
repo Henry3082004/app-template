@@ -25,6 +25,15 @@ function fail(e: PostgrestError | Error | null | undefined): never {
   throw new AppError('UNKNOWN', msg)
 }
 
+/** Calls a database function (every state change goes through one); database errors become AppErrors. */
+async function rpc(fn: string, args?: Record<string, unknown>): Promise<unknown> {
+  const { data, error } = await sb.rpc(fn, args)
+  if (error) fail(error)
+  return data
+}
+
+const num = (v: unknown): number | null => (v == null ? null : Number(v))
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toJob(r: any): Job {
   const { employer, ...rest } = r
@@ -46,6 +55,12 @@ async function loadProfile(id: string): Promise<Profile | null> {
   if (error) fail(error)
   if (!p) return null
   return { ...(p as Omit<Profile, 'phone'>), phone: c?.phone ?? null }
+}
+
+async function requireProfile(id: string): Promise<Profile> {
+  const p = await loadProfile(id)
+  if (!p) throw new AppError('NO_PROFILE')
+  return p
 }
 
 async function phonesOf(userIds: string[]): Promise<Record<string, string>> {
@@ -80,15 +95,16 @@ async function payoutsOf(appIds: string[]): Promise<Record<string, { status: 'pe
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const toEscrow = (r: any, reviewed: boolean, other: boolean): Escrow => ({
   pay_status: r.pay_status, attendance: r.attendance, funding_mode: r.funding_mode, reviewed, other_reviewed: other,
-  escrow_amount: r.escrow_amount == null ? null : Number(r.escrow_amount),
-  platform_fee: r.platform_fee == null ? null : Number(r.platform_fee),
+  escrow_amount: num(r.escrow_amount),
+  platform_fee: num(r.platform_fee),
 })
 
+/** POSTs to one of our Edge Functions; a non-2xx answer becomes an AppError with the function's error code. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function callZaloFn(payload: Record<string, unknown>): Promise<any> {
+async function callFunction(name: string, payload: Record<string, unknown>, fallback: string): Promise<any> {
   let res: Response
   try {
-    res = await fetch(`${URL}/functions/v1/zalo-login`, {
+    res = await fetch(`${URL}/functions/v1/${name}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: `Bearer ${KEY}` },
       body: JSON.stringify(payload),
@@ -97,7 +113,7 @@ async function callZaloFn(payload: Record<string, unknown>): Promise<any> {
     throw new AppError('NETWORK', String(e))
   }
   const body = await res.json().catch(() => ({}))
-  if (!res.ok) throw new AppError(body.error || 'LOGIN_FAILED')
+  if (!res.ok) throw new AppError(body.error || fallback)
   return body
 }
 
@@ -106,9 +122,7 @@ async function callZaloFn(payload: Record<string, unknown>): Promise<any> {
 async function sessionFromHash(body: any): Promise<Profile> {
   const { data, error } = await sb.auth.verifyOtp({ token_hash: String(body.token_hash), type: 'magiclink' })
   if (error || !data.user) throw new AppError('LOGIN_FAILED', error?.message)
-  const p = await loadProfile(data.user.id)
-  if (!p) throw new AppError('NO_PROFILE')
-  return p
+  return requireProfile(data.user.id)
 }
 
 export const supabaseApi: Api = {
@@ -121,20 +135,7 @@ export const supabaseApi: Api = {
   async signUp(input: SignUpInput) {
     const digits = normalizePhone(input.phone)
     if (!digits) throw new AppError('INVALID_PHONE')
-    let res: Response
-    try {
-      res = await fetch(`${URL}/functions/v1/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: `Bearer ${KEY}` },
-        body: JSON.stringify({ ...input, phone: digits }),
-      })
-    } catch (e) {
-      throw new AppError('NETWORK', String(e))
-    }
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}))
-      throw new AppError(body.error || 'SIGNUP_FAILED')
-    }
+    await callFunction('signup', { ...input, phone: digits }, 'SIGNUP_FAILED')
     return this.signIn(digits, input.password)
   },
 
@@ -146,9 +147,7 @@ export const supabaseApi: Api = {
       if (error && /invalid login/i.test(error.message)) throw new AppError('INVALID_LOGIN')
       fail(error)
     }
-    const p = await loadProfile(data.user.id)
-    if (!p) throw new AppError('NO_PROFILE')
-    return p
+    return requireProfile(data.user.id)
   },
 
   async signInWithGoogle() {
@@ -170,25 +169,21 @@ export const supabaseApi: Api = {
   },
 
   async completeProfile(i) {
-    const { error } = await sb.rpc('complete_profile', {
+    await rpc('complete_profile', {
       p_role: i.role, p_full_name: i.full_name, p_phone: i.phone, p_bio: i.bio ?? null,
       p_business: i.business_name ?? null, p_address: i.address ?? null, p_city: i.city ?? null, p_locale: i.locale,
     })
-    if (error) fail(error)
-    const id = await uid()
-    const p = await loadProfile(id)
-    if (!p) throw new AppError('NO_PROFILE')
-    return p
+    return requireProfile(await uid())
   },
 
   async zaloLogin(creds) {
-    const body = await callZaloFn(creds)
+    const body = await callFunction('zalo-login', { ...creds }, 'LOGIN_FAILED')
     if (body.needs_signup) return { ticket: String(body.ticket), phone: String(body.phone) }
     return { profile: await sessionFromHash(body) }
   },
 
   async zaloSignUp(ticket, input) {
-    return sessionFromHash(await callZaloFn({ ...input, ticket }))
+    return sessionFromHash(await callFunction('zalo-login', { ...input, ticket }, 'LOGIN_FAILED'))
   },
 
   async signOut() {
@@ -241,8 +236,7 @@ export const supabaseApi: Api = {
   },
 
   async withdraw(applicationId) {
-    const { error } = await sb.rpc('withdraw_application', { p_application: applicationId })
-    if (error) fail(error)
+    await rpc('withdraw_application', { p_application: applicationId })
   },
 
   async myJobs() {
@@ -292,8 +286,7 @@ export const supabaseApi: Api = {
   },
 
   async decide(applicationId, decision) {
-    const { error } = await sb.rpc('decide_application', { p_application: applicationId, p_decision: decision })
-    if (error) fail(error)
+    await rpc('decide_application', { p_application: applicationId, p_decision: decision })
     if (decision !== 'accepted') return { phone: null }
     const { data } = await sb.from('applications').select('seeker_id').eq('id', applicationId).single()
     const phones = await phonesOf(data ? [data.seeker_id] : [])
@@ -304,54 +297,42 @@ export const supabaseApi: Api = {
     const id = await uid()
     const { error } = await sb.from('profiles').update(patch).eq('id', id)
     if (error) fail(error)
-    const p = await loadProfile(id)
-    if (!p) throw new AppError('NO_PROFILE')
-    return p
+    return requireProfile(id)
   },
 
   async appConfig() {
-    const { data, error } = await sb.rpc('app_config')
-    if (error) fail(error)
-    return data as AppConfig
+    return (await rpc('app_config')) as AppConfig
   },
 
   async quote(applicationId, hours) {
-    const { data, error } = await sb.rpc('quote_application', { p_application: applicationId, p_hours: hours ?? null })
-    if (error) fail(error)
-    return data as { amount: number; fee: number; net: number }
+    return (await rpc('quote_application', { p_application: applicationId, p_hours: hours ?? null })) as { amount: number; fee: number; net: number }
   },
 
   async fund(applicationId, hours) {
-    const { error } = await sb.rpc('fund_application', { p_application: applicationId, p_hours: hours ?? null })
-    if (error) fail(error)
+    await rpc('fund_application', { p_application: applicationId, p_hours: hours ?? null })
   },
 
   async completeShift(applicationId, attendance) {
-    const { error } = await sb.rpc('complete_shift', { p_application: applicationId, p_attendance: attendance })
-    if (error) fail(error)
+    await rpc('complete_shift', { p_application: applicationId, p_attendance: attendance })
   },
 
   async respondNoshow(applicationId, accept) {
-    const { error } = await sb.rpc('respond_noshow', { p_application: applicationId, p_accept: accept })
-    if (error) fail(error)
+    await rpc('respond_noshow', { p_application: applicationId, p_accept: accept })
   },
 
   async openDispute(applicationId, reason) {
-    const { error } = await sb.rpc('open_dispute', { p_application: applicationId, p_reason: reason })
-    if (error) fail(error)
+    await rpc('open_dispute', { p_application: applicationId, p_reason: reason })
   },
 
   async submitReview(applicationId, stars, tags, comment) {
-    const { error } = await sb.rpc('submit_review', { p_application: applicationId, p_stars: stars, p_tags: tags, p_comment: comment })
-    if (error) fail(error)
+    await rpc('submit_review', { p_application: applicationId, p_stars: stars, p_tags: tags, p_comment: comment })
   },
 
   async reputations(userIds) {
     const ids = [...new Set(userIds)].filter(Boolean)
     if (!ids.length) return {}
-    const { data, error } = await sb.rpc('reputations', { p_users: ids })
-    if (error) fail(error)
-    return Object.fromEntries(((data ?? []) as Reputation[]).map((r) => [r.user_id, { ...r, avg_stars: r.avg_stars == null ? null : Number(r.avg_stars) }]))
+    const data = await rpc('reputations', { p_users: ids })
+    return Object.fromEntries(((data ?? []) as Reputation[]).map((r) => [r.user_id, { ...r, avg_stars: num(r.avg_stars) }]))
   },
 
   async receivedReviews() {
@@ -370,42 +351,34 @@ export const supabaseApi: Api = {
   },
 
   async saveBank(b) {
-    const { error } = await sb.rpc('save_bank_account', { p_bank: b.bank_name, p_account: b.account_no, p_holder: b.holder_name })
-    if (error) fail(error)
+    await rpc('save_bank_account', { p_bank: b.bank_name, p_account: b.account_no, p_holder: b.holder_name })
   },
 
   async adminDisputes() {
-    const { data, error } = await sb.rpc('admin_disputes')
-    if (error) fail(error)
-    return ((data ?? []) as AdminDispute[]).map((d) => ({ ...d, amount: d.amount == null ? null : Number(d.amount), fee: d.fee == null ? null : Number(d.fee) }))
+    const data = await rpc('admin_disputes')
+    return ((data ?? []) as AdminDispute[]).map((d) => ({ ...d, amount: num(d.amount), fee: num(d.fee) }))
   },
 
   async resolveDispute(applicationId, outcome, note) {
-    const { error } = await sb.rpc('resolve_dispute', { p_application: applicationId, p_outcome: outcome, p_note: note })
-    if (error) fail(error)
+    await rpc('resolve_dispute', { p_application: applicationId, p_outcome: outcome, p_note: note })
   },
 
   async adminPayouts() {
-    const { data, error } = await sb.rpc('admin_payouts')
-    if (error) fail(error)
+    const data = await rpc('admin_payouts')
     return ((data ?? []) as AdminPayout[]).map((p) => ({ ...p, amount: Number(p.amount) }))
   },
 
   async markPayoutPaid(payoutId, reference) {
-    const { error } = await sb.rpc('mark_payout_paid', { p_payout: payoutId, p_reference: reference })
-    if (error) fail(error)
+    await rpc('mark_payout_paid', { p_payout: payoutId, p_reference: reference })
   },
 
   async adminFlags() {
-    const { data, error } = await sb.rpc('admin_flags')
-    if (error) fail(error)
+    const data = await rpc('admin_flags')
     return ((data ?? []) as AdminFlag[]).map((f) => ({ ...f, total: Number(f.total) }))
   },
 
   async adminStats() {
-    const { data, error } = await sb.rpc('admin_stats')
-    if (error) fail(error)
-    return data as AdminStats
+    return (await rpc('admin_stats')) as AdminStats
   },
 
   async pendingReviews() {

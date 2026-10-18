@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Ic } from '../components/Ic'
-import { Rep } from '../components/Escrow'
+import { Rep } from '../components/escrow'
 import { Pay } from '../components/JobCard'
 import { Btn, ErrorBox, Fld, Tag } from '../components/ui'
 import { api } from '../lib/api'

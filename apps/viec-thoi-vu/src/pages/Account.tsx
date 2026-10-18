@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { BankCard, OwnReputation } from '../components/Escrow'
+import { BankCard, OwnReputation } from '../components/escrow'
 import { useAppConfig } from '../lib/config'
 import { Ic } from '../components/Ic'
 import { Avatar, Btn, Empty, ErrorBox, Fld } from '../components/ui'

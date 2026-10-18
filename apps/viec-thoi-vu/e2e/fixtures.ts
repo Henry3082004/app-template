@@ -1,6 +1,6 @@
 import { test as base, expect, type Page } from '@playwright/test'
 
-export const PORTS = { testPay: 4173, free: 4174, prodBefore: 4175, prodAfter: 4176 } as const
+export const PORTS = { testPay: 4173, free: 4174, prodBefore: 4175, prodAfter: 4176, real: 4177 } as const
 export const url = (port: number, path: string) => `http://localhost:${port}${path}`
 
 /** Helpers shared by every flow. All navigation inside the app is client-side so the in-memory mock keeps its state. */

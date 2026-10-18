@@ -2,7 +2,7 @@ import { dateRange, money, payUnitKey } from '../lib/format'
 import { fmtKm } from '../lib/geo'
 import { useI18n } from '../lib/i18n'
 import type { Job, Reputation } from '../lib/types'
-import { Rep } from './Escrow'
+import { Rep } from './escrow'
 import { Tag } from './ui'
 
 export function Pay({ job, xl }: { job: Job; xl?: boolean }) {

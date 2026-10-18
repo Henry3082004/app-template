@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Ic } from '../components/Ic'
-import { EmployerPay, Rep } from '../components/Escrow'
+import { EmployerPay, Rep } from '../components/escrow'
 import { Avatar, Btn, Dialog, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { api } from '../lib/api'
 import { capy } from '../lib/capy'
