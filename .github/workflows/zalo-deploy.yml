@@ -49,4 +49,5 @@ jobs:
           echo "---- log ----"; cat /tmp/zout/log.txt || true
           cat /tmp/zout/publish.txt || true
           echo "---- result ----"; cat /tmp/zout/result.txt
+          sleep 25   # let publish_qr.sh delete the temporary QR branch before the job ends
           grep -q '^OK' /tmp/zout/result.txt
