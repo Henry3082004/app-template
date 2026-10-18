@@ -30,7 +30,7 @@ jobs:
       - name: Install + build
         run: |
           npm ci --prefix apps/viec-thoi-vu
-          npm ci --prefix apps/viec-thoi-vu/zalo
+          npm install --no-audit --no-fund --prefix apps/viec-thoi-vu/zalo
           npm run build --prefix apps/viec-thoi-vu/zalo
       - name: Login (QR) + deploy in background
         working-directory: apps/viec-thoi-vu/zalo
