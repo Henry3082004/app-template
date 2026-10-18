@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { Ic } from '../components/Ic'
 import { Btn, Tag } from '../components/ui'
+import { useAppConfig } from '../lib/config'
 import { useI18n } from '../lib/i18n'
 import { useSession } from '../lib/session'
 
@@ -33,6 +34,8 @@ export default function Pricing() {
   const { t } = useI18n()
   const nav = useNavigate()
   const [soon, setSoon] = useState(false)
+  const cfg = useAppConfig()
+  if (cfg?.billing === 'off') return <Navigate to="/app" replace />
   return (
     <div className="page-scroll"><div className="pg wide">
       <div className="row" style={{ marginBottom: 4 }}>

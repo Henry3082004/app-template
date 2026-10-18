@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Applicants } from './Applicants'
 import { PendingReviews } from '../components/Escrow'
+import { isProFor, useAppConfig } from '../lib/config'
 import { Ic } from '../components/Ic'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { api } from '../lib/api'
@@ -19,6 +20,7 @@ export default function EmployerJobs() {
   const bp = useBp()
   const wide = bp !== 'm'
   const { profile, ready } = useSession()
+  const cfg = useAppConfig()
   const [list, setList] = useState<MyJob[] | null>(null)
   const [error, setError] = useState<unknown>(null)
 
@@ -33,7 +35,7 @@ export default function EmployerJobs() {
   if (profile?.role !== 'employer') return <Navigate to="/app" replace />
 
   const open = list?.filter((j) => j.status === 'open').length ?? 0
-  const isPro = profile.plan === 'pro'
+  const isPro = isProFor(profile, cfg)
   const post = id ? list?.find((j) => j.id === id) : undefined
   const post_ = () => { tap(); nav('/app/dang-tin') }
 
@@ -49,10 +51,12 @@ export default function EmployerJobs() {
         <h1 className="ptitle">{t('myJobsTitle')}</h1>
         {wide && <Btn sm onClick={post_}>{t('postJob')}</Btn>}
       </div>
-      <div className="plan" style={{ marginBottom: 12 }}>
-        <span>{isPro ? t('proBar') : t('planBar', { open })}</span>
-        {!isPro && <Link to="/app/bang-gia">{t('upgrade')}</Link>}
-      </div>
+      {cfg?.billing === 'on' && (
+        <div className="plan" style={{ marginBottom: 12 }}>
+          <span>{isPro ? t('proBar') : t('planBar', { open })}</span>
+          {!isPro && <Link to="/app/bang-gia">{t('upgrade')}</Link>}
+        </div>
+      )}
       <PendingReviews employer refresh={list} />
       {error != null && <ErrorBox error={error} where="EmployerJobs.load" onRetry={load} />}
       {!list && !error && <Skel n={2} />}

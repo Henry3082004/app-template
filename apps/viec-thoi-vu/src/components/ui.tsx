@@ -3,6 +3,7 @@ import { IS_DEMO } from '../lib/api'
 import { capy, type CapyPose } from '../lib/capy'
 import { errorKey, errorReport } from '../lib/errors'
 import { initials } from '../lib/format'
+import { useSession } from '../lib/session'
 import { useI18n } from '../lib/i18n'
 import { Ic } from './Ic'
 
@@ -81,16 +82,18 @@ export function Skel({ n = 4 }: { n?: number }) {
 export function ErrorBox({ error, where, onRetry }: { error: unknown; where: string; onRetry?: () => void }) {
   const { t } = useI18n()
   const [copied, setCopied] = useState(false)
+  const { profile } = useSession()
+  const debug = IS_DEMO || !!profile?.is_admin
   const copy = async () => {
     try { await navigator.clipboard.writeText(errorReport(error, where)); setCopied(true) } catch { /* clipboard blocked */ }
   }
   return (
     <div className="notice error" role="alert">
       {t(errorKey(error))}
-      {(onRetry || IS_DEMO) && (
+      {(onRetry || debug) && (
         <div className="row" style={{ gap: 4, flexWrap: 'wrap' }}>
           {onRetry && <Btn v="ghost" sm className="mt8" onClick={onRetry}>{t('retry')}</Btn>}
-          {IS_DEMO && <Btn v="text" sm className="mt8" onClick={copy}>{copied ? t('copied') : t('copyForClaude')}</Btn>}
+          {debug && <Btn v="text" sm className="mt8" onClick={copy}>{copied ? t('copied') : t('copyForClaude')}</Btn>}
         </div>
       )}
     </div>

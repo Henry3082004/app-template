@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { BankCard, OwnReputation } from '../components/Escrow'
+import { useAppConfig } from '../lib/config'
 import { Ic } from '../components/Ic'
 import { Avatar, Btn, Empty, ErrorBox, Fld } from '../components/ui'
 import { api } from '../lib/api'
@@ -14,6 +15,7 @@ export default function Account() {
   const { t, locale, setLocale } = useI18n()
   const nav = useNavigate()
   const { profile, setProfile, signOut, askAuth } = useSession()
+  const cfg = useAppConfig()
   const [f, setF] = useState({ full_name: '', bio: '', business_name: '', address: '', city: '' })
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -53,7 +55,7 @@ export default function Account() {
           <button type="button" className={locale === 'en' ? 'on' : ''} onClick={() => changeLang('en')}>English</button>
         </div>
       </Fld>
-      {profile?.role === 'employer' && <Btn v="ghost" onClick={() => nav('/app/bang-gia')}><Ic n="gem" size={18} /> {t('pricing')}</Btn>}
+      {profile?.role === 'employer' && cfg?.billing === 'on' && <Btn v="ghost" onClick={() => nav('/app/bang-gia')}><Ic n="gem" size={18} /> {t('pricing')}</Btn>}
     </div>
   )
 
@@ -78,7 +80,7 @@ export default function Account() {
       <div className="acct">
         <OwnReputation userId={profile.id} employer={emp} />
         <div className="card stack">
-          <div className="row"><Avatar name={name} /><div style={{ flex: 1, minWidth: 0 }}><b>{name}</b><div className="sub" style={{ fontSize: 14 }}>{displayPhone(profile.phone)}</div></div>{emp && <span className={profile.plan === 'pro' ? 'tag sun' : 'tag'}>{t(profile.plan === 'pro' ? 'planpro' : 'planfree')}</span>}</div>
+          <div className="row"><Avatar name={name} /><div style={{ flex: 1, minWidth: 0 }}><b>{name}</b><div className="sub" style={{ fontSize: 14 }}>{displayPhone(profile.phone)}</div></div>{emp && cfg?.billing === 'on' && <span className={profile.plan === 'pro' ? 'tag sun' : 'tag'}>{t(profile.plan === 'pro' ? 'planpro' : 'planfree')}</span>}</div>
           <Fld label={t('yourName')} htmlFor="ac-name"><input id="ac-name" className="inp" value={f.full_name} onChange={(e) => setF({ ...f, full_name: e.target.value })} maxLength={80} /></Fld>
           {emp ? (
             <>
@@ -96,7 +98,7 @@ export default function Account() {
           {error != null && <ErrorBox error={error} where="Account.save" />}
           <Btn v="ghost" block onClick={save} disabled={saving || !f.full_name.trim()}>{saving ? '…' : saved ? t('saved') : t('save')}</Btn>
         </div>
-        {!emp && <BankCard />}
+        {!emp && cfg && cfg.payment_mode !== 'off' && <BankCard />}
         {lang}
       </div>
       <p className="small mt24"><Link to="/dieu-khoan">{t('legal')}</Link></p>

@@ -44,3 +44,10 @@
 - Kiểm thử DB cục bộ: `supabase/tests/` (40 phép kiểm tra, kết thúc `ALL SCENARIOS PASSED`).
 - Thứ tự đưa lên: áp dụng migration 1 → 2 trên Supabase → đặt quản trị: `update public.profiles set is_admin = true where id = '<id của bạn>';` → gộp nhánh vào main.
 - CHƯA làm: nhận tiền thật qua cổng thanh toán, tự động chuyển tiền. Cần giấy phép/đối tác (xem QUY_TRINH). `payment_mode` luôn là `test`.
+
+## 18/10/2026 — Chạy thật, MIỄN PHÍ
+- `payment_mode = off`, `billing = off` (bảng app_settings). Nhận người → hiện SĐT ngay; quán vẫn xác nhận ca + hai bên đánh giá → dữ liệu uy tín có từ ngày đầu. Không giới hạn số tin.
+- Bản chính thức tắt nút "Dùng thử" (VITE_DEMO=0). Nút "Sao chép gửi Claude" chỉ hiện cho quản trị.
+- Đã đóng việc mẫu, khóa tài khoản dùng thử.
+- Bật lại tiền / gói trả phí: xem đầu file `supabase/migrations/20261018_free_mode.sql`.
+- Chưa làm: đăng nhập bằng Zalo (chờ Henry xin quyền SĐT + App Secret).

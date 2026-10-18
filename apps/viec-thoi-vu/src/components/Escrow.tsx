@@ -4,6 +4,7 @@ import { api } from '../lib/api'
 import { today } from '../lib/format'
 import { money } from '../lib/format'
 import { useI18n, type TKey } from '../lib/i18n'
+import { useAppConfig } from '../lib/config'
 import { repLevel } from '../lib/reputation'
 import type { Applicant, Attendance, BankAccount, Escrow, Job, MyApplication, Quote, ReceivedReview, Reputation, Role } from '../lib/types'
 import { Ic } from './Ic'
@@ -98,7 +99,8 @@ export function FundDialog({ app, job, onClose, onDone }: { app: Applicant; job:
   const [error, setError] = useState<unknown>(null)
   const h = job.pay_unit === 'hour' ? Number(hours) : undefined
 
-  useEffect(() => { api.paymentMode().then((m) => setTest(m === 'test')).catch(() => undefined) }, [])
+  const cfg = useAppConfig()
+  useEffect(() => { if (cfg) setTest(cfg.payment_mode === 'test') }, [cfg])
   useEffect(() => {
     if (h !== undefined && !(h >= 1)) { setQ(null); return }
     let live = true
@@ -135,7 +137,7 @@ export function FundDialog({ app, job, onClose, onDone }: { app: Applicant; job:
   )
 }
 
-function CompleteDialog({ app, onClose, onDone }: { app: Applicant; onClose(): void; onDone(a: Attendance): void }) {
+function CompleteDialog({ app, free, onClose, onDone }: { app: Applicant; free?: boolean; onClose(): void; onDone(a: Attendance): void }) {
   const { t } = useI18n()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<unknown>(null)
@@ -143,7 +145,9 @@ function CompleteDialog({ app, onClose, onDone }: { app: Applicant; onClose(): v
     setBusy(true); setError(null)
     try { await api.completeShift(app.id, a); onDone(a) } catch (e) { setError(e); setBusy(false) }
   }
-  const opts: [Attendance, TKey, TKey][] = [['ok', 'attOk', 'attOkSub'], ['late', 'attLate', 'attLateSub'], ['noshow', 'attNoshow', 'attNoshowSub']]
+  const opts: [Attendance, TKey, TKey][] = free
+    ? [['ok', 'attOk', 'attOkSubFree'], ['late', 'attLate', 'attLateSubFree'], ['noshow', 'attNoshow', 'attNoshowSubFree']]
+    : [['ok', 'attOk', 'attOkSub'], ['late', 'attLate', 'attLateSub'], ['noshow', 'attNoshow', 'attNoshowSub']]
   return (
     <Dialog label={t('completeTitle')} onClose={onClose}>
       <div className="stack">
@@ -236,6 +240,33 @@ export function EmployerPay({ app, job, onChanged }: { app: Applicant; job: JobT
   const done = () => { close(); onChanged() }
   const early = today() < job.start_date
   const s = app.pay_status
+  const cfg = useAppConfig()
+  if (!cfg && s === 'none') return null
+  const free = app.funding_mode === 'off' || (s === 'none' && cfg?.payment_mode === 'off')
+  if (free) {
+    return (
+      <div className="escrow">
+        {s === 'none' && (
+          <>
+            <div className="small muted">{t('freeConfirmHint')}</div>
+            <Btn onClick={() => setDlg('complete')} disabled={early}>{t('completeCta')}</Btn>
+            {early && <div className="small muted">{t('completeTooEarly')}</div>}
+          </>
+        )}
+        {s === 'noshow_reported' && <div className="notice info">{t('noshowWaitingFree')}</div>}
+        {s === 'released' && (
+          <>
+            <div className="notice ok">{t('releasedFree')}</div>
+            <ReviewPrompt app={app} onReview={() => setDlg('review')} />
+          </>
+        )}
+        {s === 'refunded' && <div className="notice info">{t('noshowRecorded')}</div>}
+        {s === 'disputed' && <div className="notice warn">{t('disputedFree')}</div>}
+        {dlg === 'complete' && <CompleteDialog app={app} free onClose={close} onDone={(a) => { onChanged(); setDlg(a === 'noshow' ? null : 'review') }} />}
+        {dlg === 'review' && <ReviewDialog appId={app.id} as="employer" onClose={close} onDone={done} />}
+      </div>
+    )
+  }
   return (
     <div className="escrow">
       {s === 'none' && (
@@ -281,6 +312,8 @@ export function SeekerPay({ app, onChanged }: { app: MyApplication; onChanged():
   const done = () => { close(); onChanged() }
   const s = app.pay_status
   const testy = app.funding_mode === 'test'
+  const cfg = useAppConfig()
+  const free = app.funding_mode === 'off' || (s === 'none' && cfg?.payment_mode === 'off')
   const [bank, setBank] = useState<BankAccount | null | undefined>(undefined)
   useEffect(() => {
     if (s === 'released' && app.payout?.status !== 'paid') api.myBank().then(setBank).catch(() => undefined)
@@ -288,6 +321,33 @@ export function SeekerPay({ app, onChanged }: { app: MyApplication; onChanged():
   const answer = async (accept: boolean) => {
     setBusy(true); setError(null)
     try { await api.respondNoshow(app.id, accept); onChanged() } catch (e) { setError(e) } finally { setBusy(false) }
+  }
+  if (!cfg && s === 'none') return null
+  if (free) {
+    return (
+      <div className="escrow">
+        {s === 'none' && <div className="small muted">{t('freeSeekerHint')}</div>}
+        {s === 'noshow_reported' && (
+          <>
+            <div className="notice warn">{t('noshowAsk')}</div>
+            <div className="acts">
+              <Btn v="ghost" disabled={busy} onClick={() => answer(true)}>{t('noshowYes')}</Btn>
+              <Btn disabled={busy} onClick={() => answer(false)}>{t('noshowNo')}</Btn>
+            </div>
+          </>
+        )}
+        {s === 'released' && (
+          <>
+            <div className="notice ok">{t('releasedSeekerFree')}</div>
+            <ReviewPrompt app={app} onReview={() => setDlg('review')} />
+          </>
+        )}
+        {s === 'refunded' && <div className="notice info">{t('noshowRecordedSeeker')}</div>}
+        {s === 'disputed' && <div className="notice warn">{t('disputedFree')}</div>}
+        {error != null && <ErrorBox error={error} where="SeekerPay" />}
+        {dlg === 'review' && <ReviewDialog appId={app.id} as="seeker" onClose={close} onDone={done} />}
+      </div>
+    )
   }
   return (
     <div className="escrow">

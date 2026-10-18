@@ -126,6 +126,12 @@ const vi = {
   pendingReviews: 'Bạn còn {n} ca chưa đánh giá. Đánh giá giúp mọi người tin nhau hơn.', pendingReviewsEmp: 'Bạn còn {n} ca chưa đánh giá. Mở tin để đánh giá người làm.',
   otherReviewed: 'Bên kia đã đánh giá bạn. Hãy đánh giá lại để xem họ nói gì.', reviewNudge: 'Đánh giá chỉ mất 5 giây và giúp người sau chọn đúng.',
   adminTabFlags: 'Cảnh báo', noFlags: 'Chưa thấy dấu hiệu bất thường.', flag_repeat_pair: 'Cùng một cặp làm nhiều ca trong 30 ngày', flag_new_accounts: 'Hai tài khoản mới tạo đã làm và trả tiền cho nhau', flagShifts: '{n} ca',
+  // free mode (no money yet)
+  freeConfirmHint: 'Sau ca, bấm xác nhận để tính uy tín cho người làm.', freeSeekerHint: 'Sau ca, quán sẽ xác nhận để tính uy tín cho bạn.',
+  attOkSubFree: 'Ghi nhận hoàn thành ca', attLateSubFree: 'Ghi nhận hoàn thành, có đến muộn', attNoshowSubFree: 'Ghi nhận vắng (người làm sẽ được hỏi lại)',
+  noshowWaitingFree: 'Bạn đã báo người làm vắng. Chờ họ phản hồi (không trả lời sau 48 giờ thì tự ghi nhận vắng).',
+  releasedFree: 'Đã xác nhận ca hoàn thành.', releasedSeekerFree: 'Quán đã xác nhận bạn hoàn thành ca.',
+  noshowRecorded: 'Đã ghi nhận người làm vắng.', noshowRecordedSeeker: 'Ca này được ghi nhận là vắng.', disputedFree: 'Hai bên chưa thống nhất. Bên nền tảng sẽ xem xét và liên hệ cả hai.',
 }
 
 type Dict = typeof vi
@@ -241,6 +247,12 @@ const en: Dict = {
   pendingReviews: 'You have {n} shifts to review. Reviews help everyone trust each other.', pendingReviewsEmp: 'You have {n} shifts to review. Open a post to review the worker.',
   otherReviewed: 'The other side reviewed you. Review them to see what they said.', reviewNudge: 'Reviewing takes 5 seconds and helps the next person choose well.',
   adminTabFlags: 'Alerts', noFlags: 'Nothing unusual so far.', flag_repeat_pair: 'Same pair, many shifts within 30 days', flag_new_accounts: 'Two brand-new accounts paid each other', flagShifts: '{n} shifts',
+  // free mode (no money yet)
+  freeConfirmHint: 'After the shift, confirm it so it counts toward the worker’s reputation.', freeSeekerHint: 'After the shift, the business confirms it so it counts toward your reputation.',
+  attOkSubFree: 'Record the shift as done', attLateSubFree: 'Record as done, but late', attNoshowSubFree: 'Record as absent (the worker will be asked)',
+  noshowWaitingFree: 'You reported the worker as absent. Waiting for their reply (no reply in 48 hours records the absence).',
+  releasedFree: 'Shift confirmed as done.', releasedSeekerFree: 'The business confirmed you completed the shift.',
+  noshowRecorded: 'Absence recorded.', noshowRecordedSeeker: 'This shift was recorded as an absence.', disputedFree: 'The two sides disagree. The platform will review and contact both of you.',
 }
 
 export type TKey = keyof Dict

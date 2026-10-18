@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Ic, type IconName } from '../components/Ic'
 import { JobCard } from '../components/JobCard'
 import { capy, LOGO } from '../lib/capy'
+import { useAppConfig } from '../lib/config'
 import { useI18n } from '../lib/i18n'
 import { seedJobs } from '../lib/seed'
 import type { Job } from '../lib/types'
@@ -20,7 +21,7 @@ const copy = {
     e: [['sparkles', 'Đăng tin 1 phút', 'Tin sau điền sẵn theo tin trước.'], ['users', 'Chọn người dễ dàng', 'Xem lời nhắn, nhận hoặc từ chối bằng một nút.'], ['target', 'Đúng đợt, đúng ca', 'Đặt số chỗ theo từng đợt cần người; đủ người tin tự đóng.']],
     priceTitle: 'Bảng giá đơn giản', priceSub: 'Người tìm việc luôn miễn phí.',
     faqTitle: 'Câu hỏi thường gặp',
-    faq: [['Tôi có cần đăng nhập để xem việc không?', 'Không. Bạn chỉ đăng ký khi bấm Ứng tuyển.'], ['Ứng tuyển có mất phí không?', 'Người tìm việc luôn miễn phí.'], ['Bao lâu thì nhà tuyển dụng liên hệ?', 'Thường trong ngày. Khi được nhận, bạn thấy số điện thoại để gọi hoặc nhắn Zalo.'], ['Gói Miễn phí có giới hạn gì?', 'Mỗi nhà tuyển dụng mở tối đa 2 tin cùng lúc. Gói Pro không giới hạn và có nhãn Gấp.'], ['Tôi có dùng được trong Zalo không?', 'Có, Việc Thời Vụ chạy cả trên web và trong Zalo Mini App.']],
+    faq: [['Tôi có cần đăng nhập để xem việc không?', 'Không. Bạn chỉ đăng ký khi bấm Ứng tuyển.'], ['Ứng tuyển có mất phí không?', 'Người tìm việc luôn miễn phí.'], ['Bao lâu thì nhà tuyển dụng liên hệ?', 'Thường trong ngày. Khi được nhận, bạn thấy số điện thoại để gọi hoặc nhắn Zalo.'], ['Có mất phí không?', 'Hiện tại Việc Thời Vụ miễn phí hoàn toàn cho cả người tìm việc và nhà tuyển dụng.'], ['Tôi có dùng được trong Zalo không?', 'Có, Việc Thời Vụ chạy cả trên web và trong Zalo Mini App.']],
     bandT: 'Sẵn sàng tìm việc đầu tiên?', bandS: 'Mở app và xem việc quanh bạn ngay hôm nay.',
     terms: 'Điều khoản', privacy: 'Bảo mật', refund: 'Hoàn tiền',
   },
@@ -33,7 +34,7 @@ const copy = {
     e: [['sparkles', 'Post in 1 minute', 'New posts are pre-filled from the last one.'], ['users', 'Choose people easily', 'Read messages, accept or decline with one button.'], ['target', 'Right shift, right time', 'Set spots per round; posts close automatically when full.']],
     priceTitle: 'Simple pricing', priceSub: 'Always free for job seekers.',
     faqTitle: 'FAQ',
-    faq: [['Do I need to sign in to browse jobs?', 'No. You only sign up when you tap Apply.'], ['Does applying cost anything?', 'Job seekers always use it for free.'], ['How soon will employers get in touch?', "Usually the same day. Once you're accepted you'll see their phone number."], ['What are the Free plan limits?', 'Employers can have up to 2 open posts at once. Pro is unlimited and adds the Urgent badge.'], ['Does it work in Zalo?', 'Yes — on the web and as a Zalo Mini App.']],
+    faq: [['Do I need to sign in to browse jobs?', 'No. You only sign up when you tap Apply.'], ['Does applying cost anything?', 'Job seekers always use it for free.'], ['How soon will employers get in touch?', "Usually the same day. Once you're accepted you'll see their phone number."], ['Does it cost anything?', 'Right now Việc Thời Vụ is completely free for both job seekers and employers.'], ['Does it work in Zalo?', 'Yes — on the web and as a Zalo Mini App.']],
     bandT: 'Ready for your first job?', bandS: 'Open the app and see jobs around you today.',
     terms: 'Terms', privacy: 'Privacy', refund: 'Refunds',
   },
@@ -41,11 +42,12 @@ const copy = {
 
 export function LandingBar() {
   const { locale, setLocale, t } = useI18n()
+  const cfg = useAppConfig()
   const c = copy[locale]
   return (
     <header className="bar">
       <Link to="/" className="logo"><img src={LOGO} alt="" />{t('appName')}</Link>
-      <nav><a href="/#loi-ich">{c.nav[0]}</a><a href="/#bang-gia">{c.nav[1]}</a><a href="/#hoi-dap">{c.nav[2]}</a></nav>
+      <nav><a href="/#loi-ich">{c.nav[0]}</a>{cfg?.billing === 'on' && <a href="/#bang-gia">{c.nav[1]}</a>}<a href="/#hoi-dap">{c.nav[2]}</a></nav>
       <span className="sp" />
       <div className="lang">
         <button type="button" className={locale === 'vi' ? 'on' : ''} onClick={() => setLocale('vi')}>VI</button>
@@ -72,6 +74,7 @@ export function LandingFooter() {
 
 export default function Landing() {
   const { locale } = useI18n()
+  const cfg = useAppConfig()
   const nav = useNavigate()
   const c = copy[locale]
   useEffect(() => { document.title = locale === 'vi' ? 'Việc Thời Vụ — tìm việc thời vụ gần bạn' : 'Việc Thời Vụ — short-term jobs near you' }, [locale])
@@ -100,10 +103,10 @@ export default function Landing() {
         ))}
       </div></div></section>
 
-      <section id="bang-gia" style={{ background: '#fff' }}><div className="wrap">
+      {cfg?.billing === 'on' && <section id="bang-gia" style={{ background: '#fff' }}><div className="wrap">
         <h2 style={{ textAlign: 'center', marginBottom: 6 }}>{c.priceTitle}</h2><p className="sub" style={{ textAlign: 'center', marginBottom: 20 }}>{c.priceSub}</p>
         <div className="pr"><PricingCards onPro={() => nav('/app/bang-gia')} /></div>
-      </div></section>
+      </div></section>}
 
       <section id="hoi-dap"><div className="wrap">
         <h2 style={{ textAlign: 'center' }}>{c.faqTitle}</h2>

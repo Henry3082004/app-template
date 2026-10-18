@@ -36,3 +36,6 @@ begin
   end if;
   update public.applications set status = p_decision, decided_at = now(), seen_by_employer = true where id = a.id returning * into a; return a;
 end $$;
+
+-- prod has private.is_pro from init_schema; stub it here so 20261018_free_mode.sql can replace it
+create function private.is_pro(uid uuid) returns boolean language sql stable as $$ select false $$;

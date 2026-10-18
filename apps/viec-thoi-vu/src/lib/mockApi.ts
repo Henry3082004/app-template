@@ -2,7 +2,7 @@ import { normalizePhone } from './phone'
 import { seedEmployers, seedJobs } from './seed'
 import { addDays, today } from './format'
 import {
-  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type Api, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
+  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type Api, type AppConfig, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
 } from './types'
 
 // In-memory backend for local UI testing (VITE_MOCK=1). Enforces the same rules as the database.
@@ -14,6 +14,8 @@ interface App extends Omit<Escrow, 'reviewed' | 'other_reviewed'> {
 interface Rev { id: string; application_id: string; reviewer_id: string; reviewee_id: string; reviewer_role: Role; stars: number; tags: string[]; comment: string | null; created_at: string }
 const FEE_PCT = 8 // the real values live in the database (app_settings)
 const REP_MIN = 50000
+const CFG: AppConfig = { payment_mode: (import.meta.env.VITE_MOCK_PAYMENT as AppConfig['payment_mode']) || 'test', billing: (import.meta.env.VITE_MOCK_BILLING as AppConfig['billing']) || 'on' }
+const isPro = (p: Profile) => p.plan === 'pro' || CFG.billing === 'off'
 const NEW_PAY = { pay_status: 'none' as PayStatus, escrow_amount: null, platform_fee: null, attendance: null as Attendance | null, funding_mode: null, completed_at: null, released_at: null }
 const SEEKER_TAGS = ['accurate_description', 'friendly', 'clean_safe', 'clear_instructions']
 const EMPLOYER_TAGS = ['hardworking', 'punctual', 'polite', 'fast_learner']
@@ -78,7 +80,7 @@ function quoteOf(a: App, hours?: number) {
 }
 const release = (a: App) => {
   a.pay_status = 'released'; a.released_at = Date.now(); a.completed_at ??= Date.now()
-  if (!payouts.some((p) => p.application_id === a.id)) {
+  if (a.funding_mode !== 'off' && !payouts.some((p) => p.application_id === a.id)) {
     payouts.push({ id: nid(), application_id: a.id, seeker_id: a.seeker_id, amount: (a.escrow_amount ?? 0) - (a.platform_fee ?? 0), mode: a.funding_mode === 'live' ? 'live' : 'test', status: 'pending', reference: null, created_at: now(), paid_at: null })
   }
 }
@@ -154,7 +156,7 @@ export const mockApi: Api = {
     const p = me()
     return wait(apps.filter((a) => a.seeker_id === p.id).reverse().map((a) => {
       const job = jobs.find((j) => j.id === a.job_id)!
-      const funded = ['held', 'released', 'noshow_reported', 'disputed'].includes(a.pay_status)
+      const funded = CFG.payment_mode === 'off' || ['held', 'released', 'noshow_reported', 'disputed'].includes(a.pay_status)
       return { id: a.id, status: a.status, message: a.message, created_at: a.created_at, job, ...escrowOf(a, p.id), payout: payouts.find((x) => x.application_id === a.id) ? { status: payouts.find((x) => x.application_id === a.id)!.status, reference: payouts.find((x) => x.application_id === a.id)!.reference } : null, employer_phone: a.status === 'accepted' && funded ? users[job.employer_id]?.profile.phone ?? null : null }
     }))
   },
@@ -177,8 +179,8 @@ export const mockApi: Api = {
   async createJob(input) {
     const p = me()
     if (p.role !== 'employer') throw new AppError('FORBIDDEN')
-    if (input.is_urgent && p.plan !== 'pro') throw new AppError('URGENT_REQUIRES_PRO')
-    if (p.plan !== 'pro' && jobs.filter((j) => j.employer_id === p.id && j.status === 'open').length >= 2) throw new AppError('FREE_PLAN_LIMIT')
+    if (input.is_urgent && !isPro(p)) throw new AppError('URGENT_REQUIRES_PRO')
+    if (!isPro(p) && jobs.filter((j) => j.employer_id === p.id && j.status === 'open').length >= 2) throw new AppError('FREE_PLAN_LIMIT')
     const job: Job = { ...input, id: nid(), employer_id: p.id, business_name: p.business_name || p.full_name, filled: 0, status: 'open', created_at: now() }
     jobs.unshift(job)
     return wait(job)
@@ -188,7 +190,7 @@ export const mockApi: Api = {
     const p = me()
     const j = jobs.find((x) => x.id === id && x.employer_id === p.id)
     if (!j) throw new AppError('NOT_FOUND')
-    if (status === 'open' && p.plan !== 'pro' && jobs.filter((x) => x.employer_id === p.id && x.status === 'open').length >= 2) throw new AppError('FREE_PLAN_LIMIT')
+    if (status === 'open' && !isPro(p) && jobs.filter((x) => x.employer_id === p.id && x.status === 'open').length >= 2) throw new AppError('FREE_PLAN_LIMIT')
     j.status = status
     return wait(undefined)
   },
@@ -226,7 +228,7 @@ export const mockApi: Api = {
     return wait(p)
   },
 
-  async paymentMode() { return wait('test' as const) },
+  async appConfig() { return wait(CFG) },
   async quote(id, hours) {
     const p = me()
     const a = apps.find((x) => x.id === id)
@@ -235,6 +237,7 @@ export const mockApi: Api = {
     return wait(quoteOf(a, hours))
   },
   async fund(id, hours) {
+    if (CFG.payment_mode !== 'test') throw new AppError('PAYMENT_NOT_AVAILABLE')
     const a = myApp(id, 'employer')
     if (a.status !== 'accepted') throw new AppError('NOT_ACCEPTED')
     if (a.pay_status !== 'none') throw new AppError('ALREADY_FUNDED')
@@ -246,8 +249,11 @@ export const mockApi: Api = {
   async completeShift(id, attendance) {
     const a = myApp(id, 'employer')
     if (!['ok', 'late', 'noshow'].includes(attendance)) throw new AppError('BAD_ATTENDANCE')
-    if (a.pay_status === 'none') throw new AppError('NOT_FUNDED')
-    if (a.pay_status !== 'held') throw new AppError('ALREADY_SETTLED')
+    if (a.status !== 'accepted') throw new AppError('NOT_ACCEPTED')
+    if (a.pay_status === 'none') {
+      if (CFG.payment_mode !== 'off') throw new AppError('NOT_FUNDED')
+      Object.assign(a, { escrow_amount: quoteOf(a).amount, platform_fee: 0, funding_mode: 'off' })
+    } else if (a.pay_status !== 'held') throw new AppError('ALREADY_SETTLED')
     if (today() < jobOf(a).start_date) throw new AppError('TOO_EARLY')
     a.attendance = attendance
     a.completed_at = Date.now()

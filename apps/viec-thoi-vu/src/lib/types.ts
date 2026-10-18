@@ -111,6 +111,8 @@ export interface AdminPayout {
 
 export interface AdminFlag { kind: 'repeat_pair' | 'new_accounts'; employer_name: string; seeker_name: string; shifts: number; total: number; last_at: string }
 
+export interface AppConfig { payment_mode: 'off' | 'test' | 'live'; billing: 'on' | 'off' }
+
 export interface Quote { amount: number; fee: number; net: number }
 
 export interface ReceivedReview { id: string; stars: number; tags: string[]; comment: string | null; created_at: string; reviewer_role: Role }
@@ -171,8 +173,8 @@ export interface Api {
   applicantsFor(jobId: string): Promise<Applicant[]>
   decide(applicationId: string, decision: 'accepted' | 'rejected'): Promise<{ phone: string | null }>
   updateProfile(patch: ProfileUpdate): Promise<Profile>
-  /** 'test' = nothing is charged; 'live' = real payments (not available yet) */
-  paymentMode(): Promise<'test' | 'live'>
+  /** payment_mode: off = free (no deposit step) · test = deposit simulated · live = real money (not built yet) */
+  appConfig(): Promise<AppConfig>
   quote(applicationId: string, hours?: number): Promise<Quote>
   fund(applicationId: string, hours?: number): Promise<void>
   completeShift(applicationId: string, attendance: Attendance): Promise<void>

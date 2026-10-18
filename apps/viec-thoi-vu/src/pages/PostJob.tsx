@@ -11,6 +11,7 @@ import { CITIES } from '../lib/geo'
 import { tap } from '../lib/haptics'
 import { useI18n, type TKey } from '../lib/i18n'
 import { report } from '../lib/sentry'
+import { isProFor, useAppConfig } from '../lib/config'
 import { useSession } from '../lib/session'
 import type { Category, Job, JobInput, PayUnit } from '../lib/types'
 import { useBp } from '../lib/useBp'
@@ -23,6 +24,7 @@ export default function PostJob() {
   const nav = useNavigate()
   const bp = useBp()
   const { profile, ready } = useSession()
+  const cfg = useAppConfig()
   const start = addDays(today(), 1)
   const [f, setF] = useState<JobInput>({
     title: '', description: '', category: 'service', pay_amount: 30000, pay_unit: 'hour',
@@ -34,7 +36,7 @@ export default function PostJob() {
   const [error, setError] = useState<unknown>(null)
   const [formErr, setFormErr] = useState<TKey | null>(null)
   const [done, setDone] = useState(false)
-  const isPro = profile?.plan === 'pro'
+  const isPro = isProFor(profile, cfg)
 
   useEffect(() => {
     if (profile?.role !== 'employer') return
@@ -103,7 +105,7 @@ export default function PostJob() {
         <Fld label={t('city')} htmlFor="p-city"><select id="p-city" className="inp" value={f.city} onChange={(e) => setF((c) => ({ ...c, city: e.target.value, lat: null, lng: null }))}>{Object.keys(CITIES).map((c) => <option key={c}>{c}</option>)}</select></Fld>
         <div className="span"><Fld label={t('description')} htmlFor="p-desc"><textarea id="p-desc" className="inp" value={f.description} onChange={(e) => set('description', e.target.value)} placeholder={t('descriptionPh')} maxLength={2000} /></Fld></div>
         <div className="span sw">
-          <div><b>{t('urgentToggle')}</b> <Tag tone="sun">{t('proOnly')}</Tag>{!isPro && <div><button type="button" className="back" style={{ minHeight: 0, padding: 0, fontSize: 13 }} onClick={() => nav('/app/bang-gia')}>{t('upgrade')} →</button></div>}</div>
+          <div><b>{t('urgentToggle')}</b> {cfg?.billing === 'on' && <Tag tone="sun">{t('proOnly')}</Tag>}{!isPro && cfg?.billing === 'on' && <div><button type="button" className="back" style={{ minHeight: 0, padding: 0, fontSize: 13 }} onClick={() => nav('/app/bang-gia')}>{t('upgrade')} →</button></div>}</div>
           <button type="button" className={'tog' + (isPro && f.is_urgent ? ' on' : '')} role="switch" aria-checked={isPro && f.is_urgent} disabled={!isPro} onClick={() => set('is_urgent', !f.is_urgent)} aria-label={t('urgentToggle')} />
         </div>
       </div>
@@ -111,7 +113,7 @@ export default function PostJob() {
       {error != null && (
         <div>
           <ErrorBox error={error} where="PostJob.submit" />
-          {limit && <Btn v="ghost" block className="mt8" onClick={() => nav('/app/bang-gia')}>{t('upgrade')}</Btn>}
+          {limit && cfg?.billing === 'on' && <Btn v="ghost" block className="mt8" onClick={() => nav('/app/bang-gia')}>{t('upgrade')}</Btn>}
         </div>
       )}
     </div>
