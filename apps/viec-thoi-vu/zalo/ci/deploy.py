@@ -133,4 +133,7 @@ open(f'{OUT}/deploy_log.txt', 'w').write(txt[-4000:])
 m = re.findall(r'\bz(?:dev|test)-[0-9a-f]+', txt)
 if m:
     finish(True, f'version={m[-1]} status={STATUS}')
+# Testing uploads print no zdev-/ztest- id; zmp still reports the quota after a successful upload.
+if 'Deploy Quota' in txt and not re.search(r'(?i)\berror\b|failed', txt):
+    finish(True, f'status={STATUS} (see Danh sách phiên bản) — ' + re.sub(r'\s+', ' ', txt[-600:]))
 finish(False, 'deploy: no version id in output — ' + re.sub(r'\s+', ' ', txt[-300:]))
