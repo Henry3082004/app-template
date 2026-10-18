@@ -63,3 +63,10 @@
 - Trong Zalo, hộp đăng nhập mặc định là "Tiếp tục với Zalo" (có giải thích lý do xin SĐT — chính sách Zalo yêu cầu), mật khẩu là phương án dự phòng.
 - Số điện thoại KHÔNG lấy từ máy khách: app chỉ gửi 2 token của Zalo, máy chủ hỏi Zalo (graph.zalo.me/v2.0/me/info) ra số.
 - Chưa thử với Zalo thật (cần quyền được duyệt + secret). Đã thử: tạo phiên từ token (Supabase thật), khóa tài khoản, dùng lại token, và toàn bộ giao diện (mock).
+
+## Đăng nhập nhiều cách (18/10/2026)
+- Người Việt: Zalo (số điện thoại do Zalo xác minh). Người nước ngoài: Google + tự nhập số điện thoại (CHƯA xác minh, `contacts.verified = false`).
+- Web bản chính thức không còn đăng ký bằng mật khẩu (chỉ bản demo/mock). Hộp đăng nhập web: thẻ "Bạn ở Việt Nam? → Mở trong Zalo" + thẻ Google (chỉ hiện khi `app_settings.google_login = 'on'`).
+- Bật Google: cấu hình Google Cloud + Supabase (xem hướng dẫn trong chat), rồi `update public.app_settings set value = 'on' where key = 'google_login';`
+- Số điện thoại đã xác minh là duy nhất (index một phần); số tự nhập không chiếm được chỗ của số đã xác minh.
+- CHƯA làm: đăng nhập Zalo trên web (OAuth). Zalo web thường chỉ trả mã Zalo + tên, KHÔNG có số điện thoại → cần quyết định cách gộp tài khoản. Cần App ID/Secret của Zalo App có bật "Đăng nhập Zalo".

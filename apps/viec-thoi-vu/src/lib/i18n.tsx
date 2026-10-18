@@ -139,6 +139,12 @@ const vi = {
   eZALO_DENIED: 'Chưa lấy được số điện thoại từ Zalo. Bạn thử lại và bấm cho phép chia sẻ số điện thoại nhé, hoặc dùng mật khẩu.', eZALO_VERIFY_FAILED: 'Zalo chưa xác nhận được số điện thoại. Bạn thử lại nhé.',
   eZALO_NOT_CONFIGURED: 'Đăng nhập bằng Zalo chưa sẵn sàng, bạn dùng số điện thoại và mật khẩu tạm nhé.', eTICKET_INVALID: 'Phiên đăng nhập đã hết hạn, bạn thử lại nhé.',
   eACCOUNT_DISABLED: 'Tài khoản này đang bị khóa.', eLOGIN_FAILED: 'Chưa đăng nhập được, bạn thử lại nhé.',
+  // Google / international
+  googleContinue: 'Tiếp tục với Google', zaloOpenTitle: 'Bạn ở Việt Nam?', zaloOpenText: 'Việc Thời Vụ dùng Zalo để xác minh số điện thoại. Hãy mở app trong Zalo để đăng nhập một chạm.', zaloOpenBtn: 'Mở trong Zalo',
+  intlTitle: 'Bạn ở nước ngoài?', intlText: 'Đăng nhập bằng Google, sau đó nhập số điện thoại của bạn (kèm mã nước).',
+  googleCompleteTitle: 'Điền nốt để bắt đầu', phoneIntl: 'Số điện thoại (kèm mã nước)', phoneIntlPh: '+1 415 555 0100',
+  phoneIntlHint: 'Người kia dùng số này để liên hệ bạn sau khi được nhận. Số này chưa được xác minh, nên hãy nhập đúng số của bạn.', signedInAs: 'Đăng nhập bằng', completeSignOut: 'Dùng tài khoản khác',
+  eBAD_PHONE: 'Số điện thoại chưa đúng. Hãy nhập kèm mã nước, ví dụ +1 415 555 0100.', ePROFILE_EXISTS: 'Tài khoản này đã có hồ sơ rồi.', eINVALID_ROLE: 'Hãy chọn bạn là người tìm việc hay nhà tuyển dụng.',
 }
 
 type Dict = typeof vi
@@ -267,6 +273,12 @@ const en: Dict = {
   eZALO_DENIED: "Couldn't get your phone number from Zalo. Please try again and allow sharing, or use a password.", eZALO_VERIFY_FAILED: "Zalo couldn't confirm the phone number. Please try again.",
   eZALO_NOT_CONFIGURED: 'Zalo sign-in is not ready yet, please use phone and password for now.', eTICKET_INVALID: 'This sign-in expired, please try again.',
   eACCOUNT_DISABLED: 'This account is disabled.', eLOGIN_FAILED: "Couldn't sign in, please try again.",
+  // Google / international
+  googleContinue: 'Continue with Google', zaloOpenTitle: 'In Vietnam?', zaloOpenText: 'Việc Thời Vụ uses Zalo to verify your phone number. Open the app in Zalo to sign in with one tap.', zaloOpenBtn: 'Open in Zalo',
+  intlTitle: 'Outside Vietnam?', intlText: 'Sign in with Google, then enter your phone number (with country code).',
+  googleCompleteTitle: 'Just a few details', phoneIntl: 'Phone number (with country code)', phoneIntlPh: '+1 415 555 0100',
+  phoneIntlHint: 'The other side uses this number to reach you once accepted. It is not verified, so please enter your real number.', signedInAs: 'Signed in as', completeSignOut: 'Use a different account',
+  eBAD_PHONE: "That phone number doesn't look right. Include the country code, e.g. +1 415 555 0100.", ePROFILE_EXISTS: 'This account already has a profile.', eINVALID_ROLE: 'Please choose job seeker or employer.',
 }
 
 export type TKey = keyof Dict

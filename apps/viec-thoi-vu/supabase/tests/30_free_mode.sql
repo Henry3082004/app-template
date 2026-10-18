@@ -3,6 +3,7 @@
 \set E '11111111-1111-4111-8111-00000000000e'
 \set S2 '11111111-1111-4111-8111-0000000000a2'
 reset role;
+update public.app_settings set value = 'off' where key = 'payment_mode';
 insert into jobs (id, employer_id, title, pay_amount, pay_unit, start_date, end_date, slots) values
   ('00000000-0000-4000-8000-000000000301', :'E', 'free job', 300000, 'day', current_date, current_date, 1);
 insert into jobs (id, employer_id, title, pay_amount, pay_unit, start_date, end_date, slots, status) values

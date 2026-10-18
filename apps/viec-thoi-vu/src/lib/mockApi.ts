@@ -14,7 +14,7 @@ interface App extends Omit<Escrow, 'reviewed' | 'other_reviewed'> {
 interface Rev { id: string; application_id: string; reviewer_id: string; reviewee_id: string; reviewer_role: Role; stars: number; tags: string[]; comment: string | null; created_at: string }
 const FEE_PCT = 8 // the real values live in the database (app_settings)
 const REP_MIN = 50000
-const CFG: AppConfig = { payment_mode: (import.meta.env.VITE_MOCK_PAYMENT as AppConfig['payment_mode']) || 'test', billing: (import.meta.env.VITE_MOCK_BILLING as AppConfig['billing']) || 'on' }
+const CFG: AppConfig = { google_login: (import.meta.env.VITE_MOCK_GOOGLE as 'on' | 'off') || 'on', zalo_web_login: 'off', payment_mode: (import.meta.env.VITE_MOCK_PAYMENT as AppConfig['payment_mode']) || 'test', billing: (import.meta.env.VITE_MOCK_BILLING as AppConfig['billing']) || 'on' }
 const isPro = (p: Profile) => p.plan === 'pro' || CFG.billing === 'off'
 const NEW_PAY = { pay_status: 'none' as PayStatus, escrow_amount: null, platform_fee: null, attendance: null as Attendance | null, funding_mode: null, completed_at: null, released_at: null }
 const SEEKER_TAGS = ['accurate_description', 'friendly', 'clean_safe', 'clear_instructions']
@@ -130,6 +130,38 @@ export const mockApi: Api = {
     if (!u || u.password !== password) throw new AppError('INVALID_LOGIN')
     setCurrent(u.profile.id)
     return wait(u.profile)
+  },
+
+  async signInWithGoogle() {
+    let g = { email: 'ann@example.com', name: 'Ann Lee' }
+    try { g = JSON.parse(sessionStorage.getItem('mock-google') || 'null') || g } catch { /* ignore */ }
+    const existing = Object.values(users).find((u) => (u.profile as Profile & { email?: string }).email === g.email)
+    if (existing) setCurrent(existing.profile.id)
+    else { try { sessionStorage.setItem('mock-google-pending', JSON.stringify(g)) } catch { /* ignore */ } }
+    return wait(undefined)
+  },
+  async pendingProfile() {
+    if (current && users[current]) return wait(null)
+    try { const g = JSON.parse(sessionStorage.getItem('mock-google-pending') || 'null'); return wait(g ? { email: g.email, name: g.name } : null) } catch { return wait(null) }
+  },
+  async completeProfile(i) {
+    let g: { email: string } | null = null
+    try { g = JSON.parse(sessionStorage.getItem('mock-google-pending') || 'null') } catch { /* ignore */ }
+    if (!g) throw new AppError('NOT_SIGNED_IN')
+    const raw = i.phone.trim()
+    const digits = raw.replace(/\D/g, '')
+    const ok = (raw.startsWith('+') || raw.startsWith('0')) && /^[0-9]{8,15}$/.test(raw.startsWith('0') ? '84' + digits.slice(1) : digits)
+    if (!ok) throw new AppError('BAD_PHONE')
+    if (!i.full_name.trim()) throw new AppError('NAME_REQUIRED')
+    const id = nid()
+    addUser(id, raw.startsWith('0') ? '84' + digits.slice(1) : digits, 'x-google-only', i.role, i.full_name.trim(), {
+      bio: i.role === 'seeker' ? i.bio || null : null, business_name: i.role === 'employer' ? i.business_name || null : null,
+      address: i.role === 'employer' ? i.address || null : null, city: i.city || null, locale: i.locale,
+    })
+    ;(users[id].profile as Profile & { email?: string }).email = g.email
+    try { sessionStorage.removeItem('mock-google-pending') } catch { /* ignore */ }
+    setCurrent(id)
+    return wait(users[id].profile)
   },
 
   async zaloLogin(creds) {

@@ -6,3 +6,6 @@ Khác biệt duy nhất so với file: hàm `public.reputations` được tạo 
 
 18/10/2026: `20261018_free_mode.sql` áp dụng thành `free_mode_a_settings` + `free_mode_b_complete_shift`.
 Dữ liệu: đóng 10 việc mẫu (status = closed) và khóa 8 tài khoản dùng thử (auth.users.banned_until = infinity) — hoàn tác được, không xóa.
+
+18/10/2026: `20261019_multi_login.sql` áp dụng thành `multi_login_a_columns`, `multi_login_b_mark_existing_verified`, `multi_login_c_config_and_complete_profile`
+(tách nhỏ; câu `update ... set verified = true` phải có `where verified = false` mới được chạy). Hàm `zalo-login` v3 dùng cột `verified`.

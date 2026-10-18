@@ -102,12 +102,14 @@ Deno.serve(async (req) => {
     const { data: u } = await admin.auth.admin.getUserById(uid);
     const banned = u?.user?.banned_until && new Date(u.user.banned_until).getTime() > Date.now();
     if (banned) return json({ error: "ACCOUNT_DISABLED" }, 403);
-    const { data, error } = await admin.auth.admin.generateLink({ type: "magiclink", email });
+    const loginEmail = u?.user?.email ?? email; // the account's real email (legacy accounts share the phone-based scheme)
+    const { data, error } = await admin.auth.admin.generateLink({ type: "magiclink", email: loginEmail });
     if (error || !data?.properties?.hashed_token) return json({ error: "LOGIN_FAILED" }, 500);
-    return json({ ok: true, token_hash: data.properties.hashed_token, email });
+    return json({ ok: true, token_hash: data.properties.hashed_token, email: loginEmail });
   };
 
-  const { data: existing } = await admin.from("contacts").select("user_id").eq("phone", "+" + digits).maybeSingle();
+  // Only phones VERIFIED by Zalo count as an account's identity (a typed phone can't take a verified one's place).
+  const { data: existing } = await admin.from("contacts").select("user_id").eq("phone", "+" + digits).eq("verified", true).maybeSingle();
   if (existing) return mint(existing.user_id); // the phone is verified by Zalo, so this is the same person
 
   if (!signingUp) {
@@ -139,9 +141,10 @@ Deno.serve(async (req) => {
     business_name: role === "employer" ? text(body.business_name, 120) || null : null,
     address: role === "employer" ? text(body.address, 200) || null : null,
     city: text(body.city, 60) || null,
+    auth_provider: "zalo",
   };
   const { error: pErr } = await admin.from("profiles").insert(profile);
-  const { error: cErr } = pErr ? { error: null } : await admin.from("contacts").insert({ user_id: uid, phone: "+" + digits });
+  const { error: cErr } = pErr ? { error: null } : await admin.from("contacts").insert({ user_id: uid, phone: "+" + digits, verified: true });
   if (pErr || cErr) {
     await admin.auth.admin.deleteUser(uid);
     return json({ error: "SIGNUP_FAILED" }, 500);

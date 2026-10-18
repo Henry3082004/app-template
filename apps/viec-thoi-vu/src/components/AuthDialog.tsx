@@ -1,7 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { IN_ZALO } from '../lib/zalo'
 import { getZaloCredentials, type ZaloCredentials } from '../lib/zaloAuth'
-import { api, IS_DEMO } from '../lib/api'
+import { ALLOW_PASSWORD, api, IS_DEMO } from '../lib/api'
+import { useAppConfig } from '../lib/config'
 import { capy } from '../lib/capy'
 import { CITIES } from '../lib/geo'
 import { tap } from '../lib/haptics'
@@ -13,7 +14,8 @@ import { Btn, Dialog, ErrorBox, Fld } from './ui'
 
 /** Sign-up / sign-in, opened only when an action needs an account (apply, post). */
 export function AuthDialog() {
-  const { authRequest, closeAuth, setProfile } = useSession()
+  const { authRequest, closeAuth, setProfile, refresh } = useSession()
+  const cfg = useAppConfig()
   const { t, locale } = useI18n()
   const [mode, setMode] = useState<'signup' | 'login'>('signup')
   const [f, setF] = useState({ full_name: '', phone: '', password: '', business_name: '', address: '', city: 'TP.HCM' })
@@ -67,6 +69,26 @@ export function AuthDialog() {
     }
   }
 
+  const googleContinue = async () => {
+    tap()
+    setBusy(true)
+    setError(null)
+    try {
+      try { localStorage.setItem('vtv-intended-role', role) } catch { /* storage unavailable */ }
+      await api.signInWithGoogle() // real: leaves the page and comes back signed in; mock: returns at once
+      await refresh()
+      closeAuth()
+    } catch (e) {
+      setError(e)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const googleBtn = cfg?.google_login === 'on'
+    ? <Btn v={locale === 'en' ? 'primary' : 'ghost'} block onClick={googleContinue} disabled={busy}>{t('googleContinue')}</Btn>
+    : null
+
   const zaloSignup = (e: FormEvent) => {
     e.preventDefault()
     tap()
@@ -91,6 +113,27 @@ export function AuthDialog() {
   }
 
   const d = DEMO[role === 'seeker' ? 'seeker' : 'employer']
+  if (!IN_ZALO && !ALLOW_PASSWORD) {
+    return (
+      <Dialog onClose={closeAuth} label={t('loginTitle')}>
+        <img className="wavecorner" src={capy('wave')} alt="" />
+        <h2>{t('loginTitle')}</h2>
+        <div className="card stack" style={{ boxShadow: 'none' }}>
+          <b>{t('zaloOpenTitle')}</b>
+          <div className="sub" style={{ fontSize: 14 }}>{t('zaloOpenText')}</div>
+          <a className="btn btn-primary block" href="https://zalo.me/s/2847107362388346804/" target="_blank" rel="noreferrer">{t('zaloOpenBtn')}</a>
+        </div>
+        {googleBtn && (
+          <div className="card stack" style={{ boxShadow: 'none' }}>
+            <b>{t('intlTitle')}</b>
+            <div className="sub" style={{ fontSize: 14 }}>{t('intlText')}</div>
+            {googleBtn}
+          </div>
+        )}
+        {error != null && <ErrorBox error={error} where="AuthDialog.web" />}
+      </Dialog>
+    )
+  }
   if (viaZalo) {
     const emp = role === 'employer'
     return (
@@ -134,6 +177,7 @@ export function AuthDialog() {
       <img className="wavecorner" src={capy('wave')} alt="" />
       <h2>{title}</h2>
       {mode === 'signup' && <div className="sub" style={{ marginTop: -8 }}>{role === 'employer' ? t('authEmployerSub') : t('authSeekerSub')}</div>}
+      {!IN_ZALO && googleBtn}
       <form className="stack" onSubmit={submit}>
         {mode === 'signup' && (
           <Fld label={t('yourName')} htmlFor="a-name"><input id="a-name" className="inp" value={f.full_name} onChange={set('full_name')} autoComplete="name" required maxLength={80} /></Fld>

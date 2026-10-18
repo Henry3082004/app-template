@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { api } from './api'
 import { setSentryUser } from './sentry'
-import type { Profile, Role } from './types'
+import type { PendingProfile, Profile, Role } from './types'
 
 export interface AuthRequest { role: Role; onDone?: (p: Profile) => void }
 
@@ -9,6 +9,10 @@ interface Session {
   profile: Profile | null
   ready: boolean
   setProfile(p: Profile | null): void
+  /** signed in (e.g. Google) but the profile isn't created yet */
+  pending: PendingProfile | null
+  /** re-read who is signed in (after a sign-in that doesn't go through setProfile) */
+  refresh(): Promise<void>
   signOut(): Promise<void>
   authRequest: AuthRequest | null
   askAuth(req: AuthRequest): void
@@ -20,6 +24,7 @@ const Ctx = createContext<Session>(null as unknown as Session)
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [profile, setProfileState] = useState<Profile | null>(null)
   const [ready, setReady] = useState(false)
+  const [pending, setPending] = useState<PendingProfile | null>(null)
   const [authRequest, setAuthRequest] = useState<AuthRequest | null>(null)
 
   const setProfile = useCallback((p: Profile | null) => {
@@ -27,20 +32,29 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setSentryUser(p ? { id: p.id, role: p.role } : null)
   }, [])
 
-  useEffect(() => {
-    api.me().then(setProfile).catch(() => setProfile(null)).finally(() => setReady(true))
+  const refresh = useCallback(async () => {
+    try {
+      const p = await api.me()
+      setProfile(p)
+      setPending(p ? null : await api.pendingProfile())
+    } catch {
+      setProfile(null)
+    }
   }, [setProfile])
+
+  useEffect(() => { refresh().finally(() => setReady(true)) }, [refresh])
 
   const signOut = useCallback(async () => {
     await api.signOut()
     setProfile(null)
+    setPending(null)
   }, [setProfile])
 
   const value = useMemo<Session>(() => ({
-    profile, ready, setProfile, signOut, authRequest,
+    profile, ready, setProfile, pending, refresh, signOut, authRequest,
     askAuth: (r) => setAuthRequest(r),
     closeAuth: () => setAuthRequest(null),
-  }), [profile, ready, setProfile, signOut, authRequest])
+  }), [profile, ready, setProfile, pending, refresh, signOut, authRequest])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

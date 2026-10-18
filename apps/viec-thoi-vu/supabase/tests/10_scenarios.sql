@@ -10,6 +10,8 @@ begin
   raise exception 'ASSERT FAILED: should have failed with % : %', needle, q;
 end $$;
 grant execute on function public.t_check(boolean, text), public.t_err(text, text) to anon, authenticated;
+-- this file tests the deposit flow, so payments are in test mode here
+update public.app_settings set value = 'test' where key = 'payment_mode';
 
 \set E '11111111-1111-4111-8111-00000000000e'
 \set S '11111111-1111-4111-8111-0000000000a1'

@@ -111,7 +111,10 @@ export interface AdminPayout {
 
 export interface AdminFlag { kind: 'repeat_pair' | 'new_accounts'; employer_name: string; seeker_name: string; shifts: number; total: number; last_at: string }
 
-export interface AppConfig { payment_mode: 'off' | 'test' | 'live'; billing: 'on' | 'off' }
+export interface AppConfig { payment_mode: 'off' | 'test' | 'live'; billing: 'on' | 'off'; google_login?: 'on' | 'off'; zalo_web_login?: 'on' | 'off' }
+
+export interface CompleteProfileInput { role: Role; full_name: string; phone: string; locale: Locale; business_name?: string; address?: string; city?: string; bio?: string }
+export interface PendingProfile { email: string | null; name: string | null }
 
 export interface Quote { amount: number; fee: number; net: number }
 
@@ -164,6 +167,11 @@ export interface Api {
   /** Zalo Mini App: exchange Zalo's tokens for a session, or (new user) a signup ticket */
   zaloLogin(creds: { access_token: string; phone_token: string }): Promise<ZaloLoginResult>
   zaloSignUp(ticket: string, input: Omit<SignUpInput, 'phone' | 'password'>): Promise<Profile>
+  /** International users: Google sign-in (leaves the page; the session is there when it comes back) */
+  signInWithGoogle(): Promise<void>
+  /** Signed in with Google but no profile yet → we still need role, name and phone */
+  pendingProfile(): Promise<PendingProfile | null>
+  completeProfile(input: CompleteProfileInput): Promise<Profile>
   signOut(): Promise<void>
   listOpenJobs(): Promise<Job[]>
   getJob(id: string): Promise<Job | null>

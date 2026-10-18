@@ -14,7 +14,7 @@ const JOB_COLS = '*, employer:profiles!jobs_employer_id_fkey(business_name, full
 const KNOWN = ['FREE_PLAN_LIMIT', 'URGENT_REQUIRES_PRO', 'JOB_NOT_OPEN', 'SLOTS_BELOW_FILLED', 'FORBIDDEN',
   'ALREADY_DECIDED', 'JOB_FULL', 'NOT_FOUND', 'CANNOT_WITHDRAW', 'NOT_FUNDED', 'TOO_EARLY', 'ALREADY_FUNDED', 'ALREADY_SETTLED',
   'NOT_ACCEPTED', 'JOB_ENDED', 'PAYMENT_NOT_AVAILABLE', 'CANNOT_DISPUTE', 'NOT_COMPLETED', 'ALREADY_REVIEWED', 'REVIEW_WINDOW_CLOSED',
-  'BAD_HOURS', 'BAD_STARS', 'BAD_TAGS', 'BAD_ATTENDANCE', 'BAD_BANK', 'BAD_OUTCOME', 'NOT_DISPUTED', 'PAYOUT_DONE', 'REFERENCE_REQUIRED']
+  'BAD_PHONE', 'PROFILE_EXISTS', 'INVALID_ROLE', 'NAME_REQUIRED', 'BAD_HOURS', 'BAD_STARS', 'BAD_TAGS', 'BAD_ATTENDANCE', 'BAD_BANK', 'BAD_OUTCOME', 'NOT_DISPUTED', 'PAYOUT_DONE', 'REFERENCE_REQUIRED']
 
 function fail(e: PostgrestError | Error | null | undefined): never {
   const msg = e?.message ?? ''
@@ -147,6 +147,36 @@ export const supabaseApi: Api = {
       fail(error)
     }
     const p = await loadProfile(data.user.id)
+    if (!p) throw new AppError('NO_PROFILE')
+    return p
+  },
+
+  async signInWithGoogle() {
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${location.origin}/app`, queryParams: { prompt: 'select_account' } },
+    })
+    if (error) fail(error)
+  },
+
+  async pendingProfile() {
+    const { data } = await sb.auth.getSession()
+    const u = data.session?.user
+    if (!u) return null
+    const p = await loadProfile(u.id)
+    if (p) return null
+    const meta = (u.user_metadata ?? {}) as Record<string, unknown>
+    return { email: u.email ?? null, name: String(meta.full_name ?? meta.name ?? '') || null }
+  },
+
+  async completeProfile(i) {
+    const { error } = await sb.rpc('complete_profile', {
+      p_role: i.role, p_full_name: i.full_name, p_phone: i.phone, p_bio: i.bio ?? null,
+      p_business: i.business_name ?? null, p_address: i.address ?? null, p_city: i.city ?? null, p_locale: i.locale,
+    })
+    if (error) fail(error)
+    const id = await uid()
+    const p = await loadProfile(id)
     if (!p) throw new AppError('NO_PROFILE')
     return p
   },
