@@ -52,7 +52,7 @@ h1,h2,h3,p{margin:0}
 @media(min-width:600px){.page-scroll{height:100%;overflow-y:auto}.pcol{height:100%;overflow-y:auto}.pg{padding:24px 32px 32px}}
 .pg.wide{max-width:1200px;margin:0 auto}
 .muted{color:var(--tx2)}.small{font-size:13px}.bold{font-weight:700}.center{text-align:center}
-.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt24{margin-top:24px}
+.mt8{margin-top:8px}.mt16{margin-top:16px}.mt24{margin-top:24px}
 
 /* ---------- Cards / jobs ---------- */
 .card{background:#fff;border-radius:20px;box-shadow:var(--sh);padding:16px;border:2px solid transparent}
@@ -104,7 +104,7 @@ textarea.inp{min-height:84px;resize:vertical}
 .empty .em{font-size:56px;line-height:1}.empty b{color:var(--tx);font-size:18px}
 .capy{display:block;width:140px;height:auto}.capy.sm{width:110px}.empty .capy{width:150px}.capy.hop{animation:hop .4s ease-out 2}
 .plan{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--pbg);color:var(--p2);border-radius:14px;padding:10px 14px;font-size:14px;font-weight:500}
-.plan.ok{background:var(--okbg);color:var(--okfg)}.plan.gray{background:var(--gray-100);color:var(--tx2)}
+.plan.ok{background:var(--okbg);color:var(--okfg)}
 .cand{display:flex;flex-direction:column;gap:10px}.cand .row{display:flex;gap:12px;align-items:center}
 .cand .acts{display:flex;gap:10px}.cand .acts .btn{flex:1}
 .row{display:flex;gap:12px;align-items:center}

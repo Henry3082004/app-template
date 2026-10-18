@@ -21,6 +21,7 @@
 
 ### Cách chạy
 - `npm install` → `npm run dev` (dùng Supabase thật) · `npm run build:mock && npx vite preview --mode mock` (dữ liệu giả, không cần mạng).
+- **Kiểm tra trước mỗi lần đưa lên:** `npm test` = kiểm tra kiểu + ESLint + mọi class CSS có thật + 26 bài test trình duyệt (điện thoại + máy tính bảng). Database: `supabase/tests/run.sh` (cần Postgres cục bộ).
 - Tài khoản dùng thử: người tìm việc `0900000001` / `demo-tim-viec`; nhà tuyển dụng `0900000002` / `demo-tuyen-dung`.
 
 ### Lưu ý kỹ thuật
@@ -70,3 +71,9 @@
 - Bật Google: cấu hình Google Cloud + Supabase (xem hướng dẫn trong chat), rồi `update public.app_settings set value = 'on' where key = 'google_login';`
 - Số điện thoại đã xác minh là duy nhất (index một phần); số tự nhập không chiếm được chỗ của số đã xác minh.
 - CHƯA làm: đăng nhập Zalo trên web (OAuth). Zalo web thường chỉ trả mã Zalo + tên, KHÔNG có số điện thoại → cần quyết định cách gộp tài khoản. Cần App ID/Secret của Zalo App có bật "Đăng nhập Zalo".
+
+## 18/10/2026 — Đợt dọn code lớn (không đổi giao diện)
+- Lưới an toàn: `npm test` (xem "Cách chạy"); test trong `e2e/` gồm luồng tìm việc, đăng tin, giữ tiền, vắng mặt, tranh chấp + quản trị, chế độ miễn phí, đăng nhập Zalo/Google, hộp đăng nhập bản chính thức, và bản build thật với Supabase giả lập.
+- Sửa lỗi tìm được nhờ test: đổi ngôn ngữ rồi đăng xuất ngay → giao diện bị "đăng nhập lại"; màn hình báo lỗi dùng class CSS không tồn tại.
+- `components/Escrow.tsx` tách thành `components/escrow/`; `supabaseApi.ts` gom xử lý lỗi lặp lại; bỏ 27 câu chữ và 2 style không dùng.
+- Trang Quản trị: thẻ "Sức khoẻ app" + nút "Gửi lỗi thử" (Sentry đã nhận, có monitor gửi email). Google login đã Publish (xác minh tên miền bằng file `public/google15bb4cb2df076218.html` — đừng xoá).
