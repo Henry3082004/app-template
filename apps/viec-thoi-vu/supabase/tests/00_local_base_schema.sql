@@ -22,6 +22,15 @@ create policy applications_read on applications for select using (seeker_id = au
 create policy contacts_read on contacts for select using (user_id = auth.uid() or private.is_accepted_pair(auth.uid(), user_id) or private.is_accepted_pair(user_id, auth.uid()));
 create policy jobs_read on jobs for select using (status = 'open' or employer_id = auth.uid() or private.has_applied(id, auth.uid()));
 create policy profiles_read on profiles for select using (role = 'employer' or id = auth.uid() or private.is_my_applicant(id, auth.uid()));
+-- write policies as on the real DB (added 21/10 so 20261021_perf_admin_stats.sql can alter them)
+create policy applications_insert_own on applications for insert to authenticated with check (seeker_id = auth.uid() and private.current_role_of(auth.uid()) = 'seeker');
+create policy contacts_insert_own on contacts for insert to authenticated with check (user_id = auth.uid());
+create policy contacts_update_own on contacts for update to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
+create policy jobs_delete_own on jobs for delete to authenticated using (employer_id = auth.uid());
+create policy jobs_insert_own on jobs for insert to authenticated with check (employer_id = auth.uid() and private.current_role_of(auth.uid()) = 'employer');
+create policy jobs_update_own on jobs for update to authenticated using (employer_id = auth.uid()) with check (employer_id = auth.uid());
+create policy profiles_insert_own on profiles for insert to authenticated with check (id = auth.uid());
+create policy profiles_update_own on profiles for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
 grant select on all tables in schema public to anon, authenticated;
 grant update (full_name, bio, business_name, address, city, locale) on profiles to authenticated;
 create function public.decide_application(p_application uuid, p_decision application_status) returns applications language plpgsql security definer set search_path = public as $$

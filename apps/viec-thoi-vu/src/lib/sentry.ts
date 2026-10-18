@@ -26,4 +26,11 @@ export function setSentryUser(u: { id: string; role: string } | null) {
   if (on) Sentry.setUser(u ? { id: u.id, segment: u.role } : null)
 }
 
+/** Admin self-check: false when Sentry is not configured in this build. */
+export async function sendTestError(): Promise<boolean> {
+  if (!on) return false
+  Sentry.captureException(new Error('Sentry test from admin page'), { tags: { test: 'admin' } })
+  return Sentry.flush(5000)
+}
+
 export const ErrorBoundary = Sentry.ErrorBoundary

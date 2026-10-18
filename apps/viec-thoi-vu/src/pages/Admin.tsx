@@ -5,8 +5,9 @@ import { api } from '../lib/api'
 import { dateRange, money } from '../lib/format'
 import { useI18n, type TKey } from '../lib/i18n'
 import { displayPhone, telHref } from '../lib/phone'
+import { sendTestError } from '../lib/sentry'
 import { useSession } from '../lib/session'
-import type { AdminDispute, AdminFlag, AdminPayout } from '../lib/types'
+import type { AdminDispute, AdminFlag, AdminPayout, AdminStats } from '../lib/types'
 
 type Tab = 'disputes' | 'payouts' | 'flags'
 
@@ -80,6 +81,45 @@ function PayoutCard({ p, onDone }: { p: AdminPayout; onDone(): void }) {
   )
 }
 
+function HealthCard({ s }: { s: AdminStats | null }) {
+  const { t } = useI18n()
+  return (
+    <section className="card stack" style={{ marginBottom: 16 }}>
+      <h2 style={{ fontSize: 17 }}>{t('healthTitle')}</h2>
+      {!s ? <Skel n={1} /> : (
+        <div className="tiles stats">
+          <div><b>{s.employers}</b><span>{t('statEmployers')}</span></div>
+          <div><b>{s.seekers}</b><span>{t('statSeekers')}</span></div>
+          <div><b>{s.new_users_7d}</b><span>{t('statNewUsers', { n: s.new_users_today })}</span></div>
+          <div><b>{s.open_jobs}</b><span>{t('statOpenJobs')}</span></div>
+          <div><b>{s.applications_7d}</b><span>{t('statApps', { n: s.applications_today })}</span></div>
+          <div><b>{s.shifts_done}</b><span>{t('statShiftsDone')}</span></div>
+          <div><b>{s.reviews_total}</b><span>{t('statReviews')}</span></div>
+          <div className={s.open_disputes > 0 ? 'bad' : ''}><b>{s.open_disputes}</b><span>{t('statDisputes')}</span></div>
+        </div>
+      )}
+    </section>
+  )
+}
+
+function SentryCheck() {
+  const { t } = useI18n()
+  const [state, setState] = useState<'idle' | 'busy' | 'sent' | 'off'>('idle')
+  const send = async () => {
+    setState('busy')
+    setState((await sendTestError()) ? 'sent' : 'off')
+  }
+  return (
+    <section className="card stack" style={{ marginTop: 24 }}>
+      <h2 style={{ fontSize: 17 }}>{t('sentryTestTitle')}</h2>
+      <p className="small muted">{t('sentryTestHint')}</p>
+      <div><Btn v="ghost" sm disabled={state === 'busy'} onClick={send}>{state === 'busy' ? '…' : t('sentryTestBtn')}</Btn></div>
+      {state === 'sent' && <div className="notice ok">{t('sentryTestSent')}</div>}
+      {state === 'off' && <div className="notice warn">{t('sentryTestOff')}</div>}
+    </section>
+  )
+}
+
 export default function Admin() {
   const { t, locale } = useI18n()
   const { profile, ready } = useSession()
@@ -87,6 +127,7 @@ export default function Admin() {
   const [disputes, setDisputes] = useState<AdminDispute[] | null>(null)
   const [payouts, setPayouts] = useState<AdminPayout[] | null>(null)
   const [flags, setFlags] = useState<AdminFlag[] | null>(null)
+  const [stats, setStats] = useState<AdminStats | null>(null)
   const [error, setError] = useState<unknown>(null)
 
   const load = () => {
@@ -94,6 +135,7 @@ export default function Admin() {
     api.adminDisputes().then(setDisputes).catch(setError)
     api.adminPayouts().then(setPayouts).catch(setError)
     api.adminFlags().then(setFlags).catch(setError)
+    api.adminStats().then(setStats).catch(setError)
   }
   useEffect(() => { if (profile?.is_admin) load() }, [profile?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -104,6 +146,7 @@ export default function Admin() {
   return (
     <div className="page-scroll"><div className="pg wide">
       <h1 className="ptitle" style={{ marginBottom: 16 }}>{t('adminTitle')}</h1>
+      <HealthCard s={stats} />
       <div className="seg" style={{ marginBottom: 16 }}>
         <button type="button" className={tab === 'disputes' ? 'on' : ''} onClick={() => setTab('disputes')}>{t('adminTabDisputes')}{disputes?.length ? ` (${disputes.length})` : ''}</button>
         <button type="button" className={tab === 'payouts' ? 'on' : ''} onClick={() => setTab('payouts')}>{t('adminTabPayouts')}{pendingN ? ` (${pendingN})` : ''}</button>
@@ -140,6 +183,7 @@ export default function Admin() {
           ))}</div>
         </>
       )}
+      <SentryCheck />
     </div></div>
   )
 }

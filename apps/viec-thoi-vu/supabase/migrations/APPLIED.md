@@ -9,3 +9,6 @@ Dữ liệu: đóng 10 việc mẫu (status = closed) và khóa 8 tài khoản d
 
 18/10/2026: `20261019_multi_login.sql` áp dụng thành `multi_login_a_columns`, `multi_login_b_mark_existing_verified`, `multi_login_c_config_and_complete_profile`
 (tách nhỏ; câu `update ... set verified = true` phải có `where verified = false` mới được chạy). Hàm `zalo-login` v3 dùng cột `verified`.
+
+18/10/2026: `20261021_perf_admin_stats.sql` áp dụng thành `perf_rls_initplan` (15 `alter policy`), `perf_fk_indexes`, `admin_stats`.
+Cố vấn hiệu năng Supabase hết cảnh báo WARN; chỉ còn INFO "unused index" cho các chỉ mục mới tạo.

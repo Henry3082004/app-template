@@ -2,7 +2,7 @@ import { normalizePhone } from './phone'
 import { seedEmployers, seedJobs } from './seed'
 import { addDays, today } from './format'
 import {
-  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type Api, type AppConfig, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
+  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminStats, type Api, type AppConfig, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
 } from './types'
 
 // In-memory backend for local UI testing (VITE_MOCK=1). Enforces the same rules as the database.
@@ -419,6 +419,26 @@ export const mockApi: Api = {
       pairs[k].n += 1; pairs[k].total += a.escrow_amount ?? 0
     })
     return wait(Object.values(pairs).filter((x) => x.n >= 3).map((x): AdminFlag => ({ kind: 'repeat_pair', employer_name: users[x.e]?.profile.business_name ?? '—', seeker_name: users[x.s]?.profile.full_name ?? '—', shifts: x.n, total: x.total, last_at: now() })))
+  },
+  async adminStats() {
+    admin()
+    const day = new Date(); day.setHours(0, 0, 0, 0)
+    const since = (iso: string, from: number) => new Date(iso).getTime() >= from
+    const week = Date.now() - 7 * 864e5
+    const profiles = Object.values(users).map((u) => u.profile)
+    return wait<AdminStats>({
+      employers: profiles.filter((p) => p.role === 'employer').length,
+      seekers: profiles.filter((p) => p.role === 'seeker').length,
+      new_users_today: 0, new_users_7d: 0,
+      open_jobs: jobs.filter((j) => j.status === 'open').length,
+      jobs_7d: jobs.filter((j) => since(j.created_at, week)).length,
+      applications_today: apps.filter((a) => since(a.created_at, day.getTime())).length,
+      applications_7d: apps.filter((a) => since(a.created_at, week)).length,
+      accepted_total: apps.filter((a) => a.status === 'accepted').length,
+      shifts_done: apps.filter((a) => a.completed_at != null).length,
+      reviews_total: reviews.length,
+      open_disputes: apps.filter((a) => a.pay_status === 'disputed' || a.pay_status === 'noshow_reported').length,
+    })
   },
   async pendingReviews() {
     if (!current) return 0

@@ -126,6 +126,10 @@ const vi = {
   pendingReviews: 'Bạn còn {n} ca chưa đánh giá. Đánh giá giúp mọi người tin nhau hơn.', pendingReviewsEmp: 'Bạn còn {n} ca chưa đánh giá. Mở tin để đánh giá người làm.',
   otherReviewed: 'Bên kia đã đánh giá bạn. Hãy đánh giá lại để xem họ nói gì.', reviewNudge: 'Đánh giá chỉ mất 5 giây và giúp người sau chọn đúng.',
   adminTabFlags: 'Cảnh báo', noFlags: 'Chưa thấy dấu hiệu bất thường.', flag_repeat_pair: 'Cùng một cặp làm nhiều ca trong 30 ngày', flag_new_accounts: 'Hai tài khoản mới tạo đã làm và trả tiền cho nhau', flagShifts: '{n} ca',
+  healthTitle: 'Sức khoẻ app', statEmployers: 'Quán', statSeekers: 'Người tìm việc', statNewUsers: 'Người mới 7 ngày · {n} hôm nay', statOpenJobs: 'Việc đang mở',
+  statApps: 'Ứng tuyển 7 ngày · {n} hôm nay', statShiftsDone: 'Ca đã xong', statReviews: 'Đánh giá', statDisputes: 'Tranh chấp chờ xử lý',
+  sentryTestTitle: 'Kiểm tra báo lỗi (Sentry)', sentryTestHint: 'Gửi một lỗi thử. Sau vài phút, lỗi "Sentry test from admin page" phải hiện trong Sentry (lọc app:viec-thoi-vu).',
+  sentryTestBtn: 'Gửi lỗi thử', sentryTestSent: 'Đã gửi. Vào Sentry xem có lỗi thử không.', sentryTestOff: 'Bản này chưa bật Sentry, nên lỗi không được gửi đi.',
   // free mode (no money yet)
   freeConfirmHint: 'Sau ca, bấm xác nhận để tính uy tín cho người làm.', freeSeekerHint: 'Sau ca, quán sẽ xác nhận để tính uy tín cho bạn.',
   attOkSubFree: 'Ghi nhận hoàn thành ca', attLateSubFree: 'Ghi nhận hoàn thành, có đến muộn', attNoshowSubFree: 'Ghi nhận vắng (người làm sẽ được hỏi lại)',
@@ -262,6 +266,10 @@ const en: Dict = {
   pendingReviews: 'You have {n} shifts to review. Reviews help everyone trust each other.', pendingReviewsEmp: 'You have {n} shifts to review. Open a post to review the worker.',
   otherReviewed: 'The other side reviewed you. Review them to see what they said.', reviewNudge: 'Reviewing takes 5 seconds and helps the next person choose well.',
   adminTabFlags: 'Alerts', noFlags: 'Nothing unusual so far.', flag_repeat_pair: 'Same pair, many shifts within 30 days', flag_new_accounts: 'Two brand-new accounts paid each other', flagShifts: '{n} shifts',
+  healthTitle: 'App health', statEmployers: 'Businesses', statSeekers: 'Job seekers', statNewUsers: 'New in 7 days · {n} today', statOpenJobs: 'Open jobs',
+  statApps: 'Applications 7 days · {n} today', statShiftsDone: 'Shifts done', statReviews: 'Reviews', statDisputes: 'Open disputes',
+  sentryTestTitle: 'Error reporting check (Sentry)', sentryTestHint: 'Sends a test error. Within a few minutes "Sentry test from admin page" should appear in Sentry (filter app:viec-thoi-vu).',
+  sentryTestBtn: 'Send test error', sentryTestSent: 'Sent. Check Sentry for the test error.', sentryTestOff: 'Sentry is not enabled in this build, so nothing was sent.',
   // free mode (no money yet)
   freeConfirmHint: 'After the shift, confirm it so it counts toward the worker’s reputation.', freeSeekerHint: 'After the shift, the business confirms it so it counts toward your reputation.',
   attOkSubFree: 'Record the shift as done', attLateSubFree: 'Record as done, but late', attNoshowSubFree: 'Record as absent (the worker will be asked)',

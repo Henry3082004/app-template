@@ -111,6 +111,12 @@ export interface AdminPayout {
 
 export interface AdminFlag { kind: 'repeat_pair' | 'new_accounts'; employer_name: string; seeker_name: string; shifts: number; total: number; last_at: string }
 
+export interface AdminStats {
+  employers: number; seekers: number; new_users_today: number; new_users_7d: number
+  open_jobs: number; jobs_7d: number; applications_today: number; applications_7d: number
+  accepted_total: number; shifts_done: number; reviews_total: number; open_disputes: number
+}
+
 export interface AppConfig { payment_mode: 'off' | 'test' | 'live'; billing: 'on' | 'off'; google_login?: 'on' | 'off'; zalo_web_login?: 'on' | 'off'; zalo_published?: 'on' | 'off' }
 
 export interface CompleteProfileInput { role: Role; full_name: string; phone: string; locale: Locale; business_name?: string; address?: string; city?: string; bio?: string }
@@ -204,6 +210,7 @@ export interface Api {
   adminPayouts(): Promise<AdminPayout[]>
   markPayoutPaid(payoutId: string, reference: string): Promise<void>
   adminFlags(): Promise<AdminFlag[]>
+  adminStats(): Promise<AdminStats>
   /** finished shifts (last 30 days) I still have to review */
   pendingReviews(): Promise<number>
   /** settle overdue shifts for the signed-in user (also done hourly on the server) */

@@ -1,7 +1,7 @@
 import { createClient, type PostgrestError } from '@supabase/supabase-js'
 import { normalizePhone, phoneEmail } from './phone'
 import {
-  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type Api, type AppConfig, type Applicant, type BankAccount, type Escrow, type Job, type JobInput, type MyApplication, type MyJob,
+  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminStats, type Api, type AppConfig, type Applicant, type BankAccount, type Escrow, type Job, type JobInput, type MyApplication, type MyJob,
   type Profile, type ProfileUpdate, type Reputation, type SignUpInput,
 } from './types'
 
@@ -400,6 +400,12 @@ export const supabaseApi: Api = {
     const { data, error } = await sb.rpc('admin_flags')
     if (error) fail(error)
     return ((data ?? []) as AdminFlag[]).map((f) => ({ ...f, total: Number(f.total) }))
+  },
+
+  async adminStats() {
+    const { data, error } = await sb.rpc('admin_stats')
+    if (error) fail(error)
+    return data as AdminStats
   },
 
   async pendingReviews() {
