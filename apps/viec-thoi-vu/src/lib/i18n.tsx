@@ -145,6 +145,8 @@ const vi = {
   googleCompleteTitle: 'Điền nốt để bắt đầu', phoneIntl: 'Số điện thoại', countryCode: 'Quốc gia', phoneNationalPh: 'Số điện thoại của bạn',
   phoneIntlHint: 'Người kia dùng số này để liên hệ bạn sau khi được nhận. Số này chưa được xác minh, nên hãy nhập đúng số của bạn.', signedInAs: 'Đăng nhập bằng', completeSignOut: 'Dùng tài khoản khác',
   eBAD_PHONE: 'Số điện thoại chưa đúng. Hãy chọn đúng quốc gia và nhập số của bạn.', ePROFILE_EXISTS: 'Tài khoản này đã có hồ sơ rồi.', eINVALID_ROLE: 'Hãy chọn bạn là người tìm việc hay nhà tuyển dụng.',
+  zaloSoonTitle: 'Đăng nhập bằng Zalo sắp có', zaloSoonText: 'Zalo đang duyệt Việc Thời Vụ. Khi xong, người dùng ở Việt Nam sẽ đăng nhập một chạm bằng Zalo. Trong lúc chờ, bạn có thể đăng nhập bằng Google.',
+  googleOnlyTitle: 'Đăng nhập bằng Google', googleOnlyText: 'Sau khi đăng nhập, bạn chọn quốc gia và nhập số điện thoại để liên hệ.',
 }
 
 type Dict = typeof vi
@@ -279,6 +281,8 @@ const en: Dict = {
   googleCompleteTitle: 'Just a few details', phoneIntl: 'Phone number', countryCode: 'Country', phoneNationalPh: 'Your phone number',
   phoneIntlHint: 'The other side uses this number to reach you once accepted. It is not verified, so please enter your real number.', signedInAs: 'Signed in as', completeSignOut: 'Use a different account',
   eBAD_PHONE: "That phone number doesn't look right. Pick your country and enter your number.", ePROFILE_EXISTS: 'This account already has a profile.', eINVALID_ROLE: 'Please choose job seeker or employer.',
+  zaloSoonTitle: 'Zalo sign-in is coming', zaloSoonText: 'Zalo is reviewing Việc Thời Vụ. Once approved, users in Vietnam will sign in with one tap through Zalo. Meanwhile you can sign in with Google.',
+  googleOnlyTitle: 'Sign in with Google', googleOnlyText: 'After signing in, pick your country and enter your phone number so people can reach you.',
 }
 
 export type TKey = keyof Dict

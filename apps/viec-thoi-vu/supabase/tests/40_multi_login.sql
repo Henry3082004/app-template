@@ -32,4 +32,17 @@ insert into auth.users (id) values ('11111111-1111-4111-8111-0000000000b5'), ('1
 insert into profiles (id, role, full_name) values ('11111111-1111-4111-8111-0000000000b5', 'seeker', 'V1'), ('11111111-1111-4111-8111-0000000000b6', 'seeker', 'V2');
 select t_err($$insert into contacts (user_id, phone, verified) values ('11111111-1111-4111-8111-0000000000b5', '+84911000222', true), ('11111111-1111-4111-8111-0000000000b6', '+84911000222', true)$$, 'duplicate key');
 select t_check((app_config()->>'google_login') = 'off', 'google login is off until configured');
-\echo ALL MULTI-LOGIN SCENARIOS PASSED
+
+-- ── admin by Google email ──
+\set G3 '11111111-1111-4111-8111-0000000000b7'
+reset role;
+insert into auth.users (id, email, raw_app_meta_data) values (:'G3', 'Boss@Example.com', '{"provider":"google"}');
+update public.app_settings set value = 'boss@example.com, other@x.com' where key = 'admin_emails';
+set role authenticated; select set_config('request.jwt.claim.sub', :'G3', false);
+select complete_profile('seeker', 'Boss', '+14155550111', null, null, null, null, 'en') is not null;
+select t_check((select is_admin from profiles where id = :'G3'), 'email in admin_emails (case-insensitive) becomes admin');
+reset role;
+select t_check((select not is_admin from profiles where id = :'G'), 'other google users are NOT admin');
+set role authenticated;
+select t_check((app_config()->>'zalo_published') = 'off', 'zalo_published is off by default');
+\echo ALL ADMIN-EMAIL SCENARIOS PASSED

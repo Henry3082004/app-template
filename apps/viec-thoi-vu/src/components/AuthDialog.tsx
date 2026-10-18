@@ -118,15 +118,19 @@ export function AuthDialog() {
       <Dialog onClose={closeAuth} label={t('loginTitle')}>
         <img className="wavecorner" src={capy('wave')} alt="" />
         <h2>{t('loginTitle')}</h2>
-        <div className="card stack" style={{ boxShadow: 'none' }}>
-          <b>{t('zaloOpenTitle')}</b>
-          <div className="sub" style={{ fontSize: 14 }}>{t('zaloOpenText')}</div>
-          <a className="btn btn-primary block" href="https://zalo.me/s/2847107362388346804/" target="_blank" rel="noreferrer">{t('zaloOpenBtn')}</a>
-        </div>
+        {cfg?.zalo_published === 'on' ? (
+          <div className="card stack" style={{ boxShadow: 'none' }}>
+            <b>{t('zaloOpenTitle')}</b>
+            <div className="sub" style={{ fontSize: 14 }}>{t('zaloOpenText')}</div>
+            <a className="btn btn-primary block" href="https://zalo.me/s/2847107362388346804/" target="_blank" rel="noreferrer">{t('zaloOpenBtn')}</a>
+          </div>
+        ) : (
+          <div className="notice info"><b>{t('zaloSoonTitle')}</b><br />{t('zaloSoonText')}</div>
+        )}
         {googleBtn && (
           <div className="card stack" style={{ boxShadow: 'none' }}>
-            <b>{t('intlTitle')}</b>
-            <div className="sub" style={{ fontSize: 14 }}>{t('intlText')}</div>
+            <b>{t(cfg?.zalo_published === 'on' ? 'intlTitle' : 'googleOnlyTitle')}</b>
+            <div className="sub" style={{ fontSize: 14 }}>{t(cfg?.zalo_published === 'on' ? 'intlText' : 'googleOnlyText')}</div>
             {googleBtn}
           </div>
         )}

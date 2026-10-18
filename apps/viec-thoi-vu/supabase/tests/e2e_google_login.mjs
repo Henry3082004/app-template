@@ -1,5 +1,5 @@
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs'
-const S = process.argv[2], B = 'http://localhost:4173', P = 'http://localhost:4175'
+const S = process.argv[2], B = 'http://localhost:4173', P = 'http://localhost:4175', PP = 'http://localhost:4176'
 const sizes = { phone: [390, 844], tabP: [834, 1112] }
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' })
 const problems = []
@@ -51,9 +51,16 @@ for (const [name, [w, h]] of Object.entries(sizes)) {
   await q.goto(P + '/app'); await q.waitForTimeout(500)
   await q.evaluate(() => { history.pushState({}, '', '/app/da-ung-tuyen'); dispatchEvent(new PopStateEvent('popstate')) })
   await q.getByRole('button', { name: 'Đăng nhập' }).first().click()
-  await q.getByText('Bạn ở Việt Nam?').first().waitFor({ timeout: 6000 }); await q.getByText('Bạn ở nước ngoài?').first().waitFor({ timeout: 6000 })
+  await q.getByText('Đăng nhập bằng Zalo sắp có').first().waitFor({ timeout: 6000 }); await q.getByRole('button', { name: 'Tiếp tục với Google' }).waitFor({ timeout: 6000 })
+  if (await q.getByText('Mở trong Zalo').count()) problems.push(`[${name}] no 'open in Zalo' button before the Mini App is public`)
   if (await q.locator('#a-pass').count()) problems.push(`[${name}] password field must not exist in production auth`)
-  await q.screenshot({ path: `${S}/shots/e7-${name}-prod-dialog.png` }); ok('production dialog: Zalo + Google, no password')
+  await q.screenshot({ path: `${S}/shots/e7-${name}-prod-dialog.png` }); ok('production dialog before Zalo approval: notice + Google, no password, no dead Zalo link')
+  await q.goto(PP + '/app'); await q.waitForTimeout(500)
+  await q.evaluate(() => { history.pushState({}, '', '/app/da-ung-tuyen'); dispatchEvent(new PopStateEvent('popstate')) })
+  await q.getByRole('button', { name: 'Đăng nhập' }).first().click()
+  await q.getByText('Bạn ở Việt Nam?').first().waitFor({ timeout: 6000 }); await q.getByText('Bạn ở nước ngoài?').first().waitFor({ timeout: 6000 })
+  if (!(await q.locator('a[href^="https://zalo.me/s/"]').count())) problems.push(`[${name}] Zalo link missing once published`)
+  ok('production dialog after Zalo approval: Open in Zalo + Google')
   await ctx2.close()
 }
 console.log('PROBLEMS:', problems.length ? '\n' + problems.join('\n') : 'none')

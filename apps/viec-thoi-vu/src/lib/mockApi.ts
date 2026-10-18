@@ -14,7 +14,7 @@ interface App extends Omit<Escrow, 'reviewed' | 'other_reviewed'> {
 interface Rev { id: string; application_id: string; reviewer_id: string; reviewee_id: string; reviewer_role: Role; stars: number; tags: string[]; comment: string | null; created_at: string }
 const FEE_PCT = 8 // the real values live in the database (app_settings)
 const REP_MIN = 50000
-const CFG: AppConfig = { google_login: (import.meta.env.VITE_MOCK_GOOGLE as 'on' | 'off') || 'on', zalo_web_login: 'off', payment_mode: (import.meta.env.VITE_MOCK_PAYMENT as AppConfig['payment_mode']) || 'test', billing: (import.meta.env.VITE_MOCK_BILLING as AppConfig['billing']) || 'on' }
+const CFG: AppConfig = { google_login: (import.meta.env.VITE_MOCK_GOOGLE as 'on' | 'off') || 'on', zalo_web_login: 'off', zalo_published: (import.meta.env.VITE_MOCK_ZALO_PUBLISHED as 'on' | 'off') || 'on', payment_mode: (import.meta.env.VITE_MOCK_PAYMENT as AppConfig['payment_mode']) || 'test', billing: (import.meta.env.VITE_MOCK_BILLING as AppConfig['billing']) || 'on' }
 const isPro = (p: Profile) => p.plan === 'pro' || CFG.billing === 'off'
 const NEW_PAY = { pay_status: 'none' as PayStatus, escrow_amount: null, platform_fee: null, attendance: null as Attendance | null, funding_mode: null, completed_at: null, released_at: null }
 const SEEKER_TAGS = ['accurate_description', 'friendly', 'clean_safe', 'clear_instructions']
