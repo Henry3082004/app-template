@@ -24,8 +24,11 @@ for (const [name, [w, h]] of Object.entries(sizes)) {
   await openLogin(); await p.getByRole('button', { name: 'Tiếp tục với Google' }).click()
   await see('Điền nốt để bắt đầu'); await see('ann@example.com'); await shot('complete')
   if ((await p.locator('#c-name').inputValue()) !== 'Ann Lee') problems.push(`[${name}] name not prefilled from Google`)
-  await p.locator('#c-phone').fill('14155550100'); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click(); await see('Số điện thoại chưa đúng'); ok('phone without country code rejected')
-  await p.locator('#c-phone').fill('+1 415 555 0100'); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click(); await p.waitForTimeout(600)
+  const sel = p.locator('select[aria-label="Quốc gia"]')
+  if ((await sel.inputValue()) !== 'VN') problems.push(`[${name}] default country should be VN for the Vietnamese UI`)
+  await p.getByText('+84 · Việt Nam').first().waitFor({ state: 'attached' }); await shot('country-picker')
+  await p.locator('#c-phone').fill('12'); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click(); await see('Số điện thoại chưa đúng'); ok('too-short number rejected')
+  await sel.selectOption('US'); await p.locator('#c-phone').fill('415 555 0100'); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click(); await p.waitForTimeout(600)
   await go('/app/tai-khoan'); await see('Ann Lee'); ok('first Google sign-in creates the profile')
   await signOut()
   // 2. same Google account → straight in

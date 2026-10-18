@@ -258,3 +258,6 @@ textarea.inp{min-height:84px;resize:vertical}
 .bar{height:8px;border-radius:99px;background:var(--gray-100,#f1e9df);overflow:hidden}.bar span{display:block;height:100%;background:var(--okfg);border-radius:99px}
 .revprompt{display:flex;flex-direction:column;gap:8px}
 .pendrev{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+
+.phonerow{display:grid;grid-template-columns:minmax(128px,40%) 1fr;gap:8px}
+.phonerow select{min-width:0}

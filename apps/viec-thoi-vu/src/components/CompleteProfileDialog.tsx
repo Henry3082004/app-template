@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { api } from '../lib/api'
 import { capy } from '../lib/capy'
+import { COUNTRIES, fullPhone, guessCountry } from '../lib/countries'
 import { CITIES } from '../lib/geo'
 import { tap } from '../lib/haptics'
 import { useI18n } from '../lib/i18n'
@@ -13,6 +14,7 @@ export function CompleteProfileDialog() {
   const { pending, setProfile, refresh, signOut } = useSession()
   const { t, locale } = useI18n()
   const [role, setRole] = useState<Role>('seeker')
+  const [iso, setIso] = useState(() => guessCountry(locale).iso)
   const [f, setF] = useState({ full_name: '', phone: '', business_name: '', address: '', city: 'TP.HCM' })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<unknown>(null)
@@ -34,7 +36,7 @@ export function CompleteProfileDialog() {
     setError(null)
     try {
       const p = await api.completeProfile({
-        role, full_name: f.full_name, phone: f.phone, locale,
+        role, full_name: f.full_name, phone: fullPhone(COUNTRIES.find((c) => c.iso === iso)!, f.phone), locale,
         business_name: emp ? f.business_name : undefined, address: emp ? f.address : undefined, city: f.city,
       })
       setProfile(p)
@@ -60,7 +62,12 @@ export function CompleteProfileDialog() {
         </Fld>
         <Fld label={t('yourName')} htmlFor="c-name"><input id="c-name" className="inp" value={f.full_name} onChange={set('full_name')} autoComplete="name" required maxLength={80} /></Fld>
         <Fld label={t('phoneIntl')} htmlFor="c-phone" hint={t('phoneIntlHint')}>
-          <input id="c-phone" className="inp" type="tel" inputMode="tel" value={f.phone} onChange={set('phone')} autoComplete="tel" required placeholder={t('phoneIntlPh')} />
+          <div className="phonerow">
+            <select aria-label={t('countryCode')} className="inp" value={iso} onChange={(e) => setIso(e.target.value)}>
+              {COUNTRIES.map((c) => <option key={c.iso} value={c.iso}>+{c.dial} · {c[locale]}</option>)}
+            </select>
+            <input id="c-phone" className="inp" type="tel" inputMode="tel" value={f.phone} onChange={set('phone')} autoComplete="tel-national" required placeholder={t('phoneNationalPh')} />
+          </div>
         </Fld>
         {emp && (
           <>
