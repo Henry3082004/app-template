@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { BankCard, OwnReputation } from '../components/escrow'
 import { useAppConfig } from '../lib/config'
 import { Ic } from '../components/Ic'
+import { RolesCard } from '../components/RolesCard'
 import { Avatar, Btn, Empty, ErrorBox, Fld } from '../components/ui'
 import { WorkerFields, workerInfoOf } from '../components/WorkerFields'
 import { CITIES } from '../lib/geo'
@@ -102,6 +103,7 @@ export default function Account() {
           {error != null && <ErrorBox error={error} where="Account.save" />}
           <Btn v="ghost" block onClick={save} disabled={saving || !f.full_name.trim()}>{saving ? '…' : saved ? t('saved') : t('save')}</Btn>
         </div>
+        <RolesCard />
         {!emp && cfg && cfg.payment_mode !== 'off' && <BankCard />}
         {lang}
       </div>

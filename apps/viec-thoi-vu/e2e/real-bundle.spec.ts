@@ -21,7 +21,7 @@ test('production bundle: anonymous visitor sees jobs, employer reputation and jo
     calls.push(r.request().method() + ' ' + u.pathname)
     const json = (body: unknown) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) })
     if (u.pathname.endsWith('/rpc/app_config')) return json(config)
-    if (u.pathname.endsWith('/rpc/reputations')) return json([rep])
+    if (u.pathname.endsWith('/rpc/role_reputations')) return json([rep])
     if (u.pathname.endsWith('/rest/v1/jobs')) {
       const single = r.request().headers()['accept']?.includes('vnd.pgrst.object')
       return json(single ? job : [job])
@@ -34,5 +34,5 @@ test('production bundle: anonymous visitor sees jobs, employer reputation and jo
   await p.getByRole('button', { name: 'Ứng tuyển ngay' }).first().click(); await h.see('Tiếp tục với Google')
   await expect(p.locator('#a-pass')).toHaveCount(0)
   expect(calls).toContain('POST /rest/v1/rpc/app_config')
-  expect(calls).toContain('POST /rest/v1/rpc/reputations')
+  expect(calls).toContain('POST /rest/v1/rpc/role_reputations')
 })

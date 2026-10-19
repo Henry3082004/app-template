@@ -15,3 +15,9 @@ Cố vấn hiệu năng Supabase hết cảnh báo WARN; chỉ còn INFO "unused
 
 19/10/2026: `20261022_seeker_profile.sql` áp dụng thành `seeker_profile_a_columns`, `seeker_profile_b_checks_grants`;
 `20261022_avatars_storage.sql` áp dụng thành `avatars_storage` (bucket `avatars` công khai, ≤300 KB, chỉ chủ thư mục được thêm/xoá ảnh).
+
+19/10/2026: `20261023_dual_role.sql` áp dụng thành `dual_role_1_roles`, `dual_role_2_worker_profiles`, `dual_role_2b_worker_grants`,
+`dual_role_3_add_switch_role`, `dual_role_4_complete_profile`, `dual_role_5_submit_review`, `dual_role_6_role_reputations`,
+`dual_role_7_admin_stats`, rồi `dual_role_8_move_worker_data` (chuyển dữ liệu + thu quyền, chạy cùng lúc đưa web mới lên).
+Hàm `zalo-login` v4: tạo dòng `worker_profiles` cho người tìm việc mới. Các cột cũ trên `profiles` (bio, birth_year, experience,
+availability, avatar_path) đã để trống và không ai ghi được — xoá hẳn khi tiện (`alter table public.profiles drop column …`).

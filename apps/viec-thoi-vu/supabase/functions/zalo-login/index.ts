@@ -137,7 +137,6 @@ Deno.serve(async (req) => {
     role,
     full_name: fullName,
     locale,
-    bio: role === "seeker" ? text(body.bio, 500) || null : null,
     business_name: role === "employer" ? text(body.business_name, 120) || null : null,
     address: role === "employer" ? text(body.address, 200) || null : null,
     city: text(body.city, 60) || null,
@@ -145,7 +144,11 @@ Deno.serve(async (req) => {
   };
   const { error: pErr } = await admin.from("profiles").insert(profile);
   const { error: cErr } = pErr ? { error: null } : await admin.from("contacts").insert({ user_id: uid, phone: "+" + digits, verified: true });
-  if (pErr || cErr) {
+  // worker details live in their own table (only businesses the worker applies to can read them)
+  const { error: wErr } = pErr || cErr || role !== "seeker"
+    ? { error: null }
+    : await admin.from("worker_profiles").insert({ user_id: uid, bio: text(body.bio, 500) || null });
+  if (pErr || cErr || wErr) {
     await admin.auth.admin.deleteUser(uid);
     return json({ error: "SIGNUP_FAILED" }, 500);
   }

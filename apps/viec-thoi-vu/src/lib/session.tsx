@@ -25,7 +25,7 @@ interface Session {
   closeIntro(): void
 }
 
-export interface IntroRequest { onDone?: () => void }
+export interface IntroRequest { onDone?: () => void; /** asked right before an application goes out */ beforeApply?: boolean }
 
 const Ctx = createContext<Session>(null as unknown as Session)
 

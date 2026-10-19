@@ -14,7 +14,7 @@ const JOB_COLS = '*, employer:profiles!jobs_employer_id_fkey(business_name, full
 const KNOWN = ['FREE_PLAN_LIMIT', 'URGENT_REQUIRES_PRO', 'JOB_NOT_OPEN', 'SLOTS_BELOW_FILLED', 'FORBIDDEN',
   'ALREADY_DECIDED', 'JOB_FULL', 'NOT_FOUND', 'CANNOT_WITHDRAW', 'NOT_FUNDED', 'TOO_EARLY', 'ALREADY_FUNDED', 'ALREADY_SETTLED',
   'NOT_ACCEPTED', 'JOB_ENDED', 'PAYMENT_NOT_AVAILABLE', 'CANNOT_DISPUTE', 'NOT_COMPLETED', 'ALREADY_REVIEWED', 'REVIEW_WINDOW_CLOSED',
-  'BAD_PHONE', 'PROFILE_EXISTS', 'INVALID_ROLE', 'NAME_REQUIRED', 'BAD_HOURS', 'BAD_STARS', 'BAD_TAGS', 'BAD_ATTENDANCE', 'BAD_BANK', 'BAD_OUTCOME', 'NOT_DISPUTED', 'PAYOUT_DONE', 'REFERENCE_REQUIRED']
+  'BAD_PHONE', 'PROFILE_EXISTS', 'INVALID_ROLE', 'NAME_REQUIRED', 'BAD_HOURS', 'BAD_STARS', 'BAD_TAGS', 'BAD_ATTENDANCE', 'BAD_BANK', 'BAD_OUTCOME', 'NOT_DISPUTED', 'PAYOUT_DONE', 'REFERENCE_REQUIRED', 'ROLE_EXISTS', 'BUSINESS_REQUIRED', 'ROLE_NOT_OWNED']
 
 function fail(e: PostgrestError | Error | null | undefined): never {
   const msg = e?.message ?? ''
@@ -47,14 +47,23 @@ async function uid(): Promise<string> {
   return id
 }
 
+const WORKER_COLS = 'bio, birth_year, experience, availability, avatar_path'
+const WORKER_KEYS = ['bio', 'birth_year', 'experience', 'availability', 'avatar_path'] as const
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const toWorker = (w: any) => ({
+  bio: w?.bio ?? null, birth_year: w?.birth_year ?? null, experience: w?.experience ?? [], availability: w?.availability ?? [], avatar_path: w?.avatar_path ?? null,
+})
+
+/** Profile = public account row + phone + the worker details (own table, private to businesses the worker applied to). */
 async function loadProfile(id: string): Promise<Profile | null> {
-  const [{ data: p, error }, { data: c }] = await Promise.all([
+  const [{ data: p, error }, { data: c }, { data: w }] = await Promise.all([
     sb.from('profiles').select('*').eq('id', id).maybeSingle(),
     sb.from('contacts').select('phone').eq('user_id', id).maybeSingle(),
+    sb.from('worker_profiles').select(WORKER_COLS).eq('user_id', id).maybeSingle(),
   ])
   if (error) fail(error)
   if (!p) return null
-  return { ...(p as Omit<Profile, 'phone'>), phone: c?.phone ?? null }
+  return { ...(p as Omit<Profile, 'phone'>), ...toWorker(w), phone: c?.phone ?? null }
 }
 
 async function requireProfile(id: string): Promise<Profile> {
@@ -270,7 +279,7 @@ export const supabaseApi: Api = {
 
   async applicantsFor(jobId) {
     const { data, error } = await sb.from('applications')
-      .select(`id, status, message, created_at, seeker_id, ${ESCROW_COLS}, seeker:profiles!applications_seeker_id_fkey(full_name, bio, birth_year, experience, availability, avatar_path)`)
+      .select(`id, status, message, created_at, seeker_id, ${ESCROW_COLS}, seeker:profiles!applications_seeker_id_fkey(full_name, worker_profiles(${WORKER_COLS}))`)
       .eq('job_id', jobId).neq('status', 'withdrawn').order('created_at', { ascending: true })
     if (error) fail(error)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -281,8 +290,8 @@ export const supabaseApi: Api = {
     sb.rpc('mark_applications_seen', { p_job: jobId }).then(() => undefined)
     return rows.map((r): Applicant => ({
       id: r.id, status: r.status, message: r.message, created_at: r.created_at, seeker_id: r.seeker_id, ...toEscrow(r, done.has(r.id), other.has(r.id)),
-      full_name: r.seeker?.full_name ?? '—', bio: r.seeker?.bio ?? null, phone: phones[r.seeker_id] ?? null,
-      birth_year: r.seeker?.birth_year ?? null, experience: r.seeker?.experience ?? [], availability: r.seeker?.availability ?? [], avatar_path: r.seeker?.avatar_path ?? null,
+      full_name: r.seeker?.full_name ?? '—', phone: phones[r.seeker_id] ?? null,
+      ...toWorker([r.seeker?.worker_profiles].flat()[0]),
     }))
   },
 
@@ -296,9 +305,27 @@ export const supabaseApi: Api = {
 
   async updateProfile(patch: ProfileUpdate) {
     const id = await uid()
-    const { error } = await sb.from('profiles').update(patch).eq('id', id)
-    if (error) fail(error)
+    const worker = Object.fromEntries(Object.entries(patch).filter(([k]) => (WORKER_KEYS as readonly string[]).includes(k)))
+    const account = Object.fromEntries(Object.entries(patch).filter(([k]) => !(WORKER_KEYS as readonly string[]).includes(k)))
+    if (Object.keys(account).length) {
+      const { error } = await sb.from('profiles').update(account).eq('id', id)
+      if (error) fail(error)
+    }
+    if (Object.keys(worker).length) {
+      const { error } = await sb.from('worker_profiles').upsert({ user_id: id, ...worker }, { onConflict: 'user_id' })
+      if (error) fail(error)
+    }
     return requireProfile(id)
+  },
+
+  async addRole(role, business) {
+    await rpc('add_role', { p_role: role, p_business: business?.business_name ?? null, p_address: business?.address ?? null, p_city: business?.city ?? null })
+    return requireProfile(await uid())
+  },
+
+  async switchRole(role) {
+    await rpc('switch_role', { p_role: role })
+    return requireProfile(await uid())
   },
 
   async uploadAvatar(photo) {
@@ -336,10 +363,10 @@ export const supabaseApi: Api = {
     await rpc('submit_review', { p_application: applicationId, p_stars: stars, p_tags: tags, p_comment: comment })
   },
 
-  async reputations(userIds) {
+  async reputations(userIds, as) {
     const ids = [...new Set(userIds)].filter(Boolean)
     if (!ids.length) return {}
-    const data = await rpc('reputations', { p_users: ids })
+    const data = await rpc('role_reputations', { p_users: ids, p_as: as })
     return Object.fromEntries(((data ?? []) as Reputation[]).map((r) => [r.user_id, { ...r, avg_stars: num(r.avg_stars) }]))
   },
 

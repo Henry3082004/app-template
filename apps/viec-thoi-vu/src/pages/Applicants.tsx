@@ -26,7 +26,7 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
     setError(null)
     api.sweep().catch(() => undefined)
       .then(() => api.applicantsFor(job.id))
-      .then((a) => { setList(a); onChanged(); api.reputations(a.map((x) => x.seeker_id)).then(setReps).catch(() => undefined) })
+      .then((a) => { setList(a); onChanged(); api.reputations(a.map((x) => x.seeker_id), 'seeker').then(setReps).catch(() => undefined) })
       .catch(setError)
   }
   useEffect(() => { setList(null); load() }, [job.id]) // eslint-disable-line react-hooks/exhaustive-deps

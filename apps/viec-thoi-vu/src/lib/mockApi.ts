@@ -28,7 +28,7 @@ const users: Record<string, User> = {}
 function addUser(id: string, digits: string, password: string, role: Role, full_name: string, extra: Partial<Profile> = {}) {
   users[id] = {
     password,
-    profile: { id, role, full_name, bio: null, business_name: null, address: null, city: null, plan: 'free', plan_until: null, locale: 'vi', phone: '+' + digits,
+    profile: { id, role, roles: [role], full_name, bio: null, business_name: null, address: null, city: null, plan: 'free', plan_until: null, locale: 'vi', phone: '+' + digits,
       birth_year: null, experience: [], availability: [], avatar_path: null, ...extra },
   }
 }
@@ -198,9 +198,10 @@ export const mockApi: Api = {
 
   async apply(jobId, message) {
     const p = me()
-    if (p.role !== 'seeker') throw new AppError('FORBIDDEN')
+    if (!p.roles.includes('seeker')) throw new AppError('FORBIDDEN')
     const job = jobs.find((j) => j.id === jobId)
     if (!job || job.status !== 'open') throw new AppError('JOB_NOT_OPEN')
+    if (job.employer_id === p.id) throw new AppError('FORBIDDEN')
     if (apps.some((a) => a.job_id === jobId && a.seeker_id === p.id)) throw new AppError('ALREADY_APPLIED')
     apps.push({ id: nid(), job_id: jobId, seeker_id: p.id, status: 'pending', message: message.trim() || null, created_at: now(), seen: false, ...NEW_PAY })
     return wait(undefined)
@@ -232,7 +233,7 @@ export const mockApi: Api = {
 
   async createJob(input) {
     const p = me()
-    if (p.role !== 'employer') throw new AppError('FORBIDDEN')
+    if (!p.roles.includes('employer')) throw new AppError('FORBIDDEN')
     if (input.is_urgent && !isPro(p)) throw new AppError('URGENT_REQUIRES_PRO')
     if (!isPro(p) && jobs.filter((j) => j.employer_id === p.id && j.status === 'open').length >= 2) throw new AppError('FREE_PLAN_LIMIT')
     const job: Job = { ...input, id: nid(), employer_id: p.id, business_name: p.business_name || p.full_name, filled: 0, status: 'open', created_at: now() }
@@ -281,6 +282,19 @@ export const mockApi: Api = {
     const p = me()
     if (patch.experience?.includes('none') && patch.experience.length > 1) throw new AppError('UNKNOWN', 'profiles_experience_chk')
     Object.assign(p, patch)
+    return wait(p)
+  },
+  async addRole(role, business) {
+    const p = me()
+    if (p.roles.includes(role)) throw new AppError('ROLE_EXISTS')
+    if (role === 'employer' && ((business?.business_name.trim().length ?? 0) < 2 || (business?.address.trim().length ?? 0) < 3)) throw new AppError('BUSINESS_REQUIRED')
+    Object.assign(p, { roles: [...p.roles, role], role }, role === 'employer' ? { business_name: business!.business_name.trim(), address: business!.address.trim(), city: business!.city || p.city } : {})
+    return wait(p)
+  },
+  async switchRole(role) {
+    const p = me()
+    if (!p.roles.includes(role)) throw new AppError('ROLE_NOT_OWNED')
+    p.role = role
     return wait(p)
   },
   async uploadAvatar(photo) {
@@ -349,21 +363,23 @@ export const mockApi: Api = {
     if (p.id !== a.seeker_id && p.id !== j.employer_id) throw new AppError('FORBIDDEN')
     if (a.pay_status !== 'released') throw new AppError('NOT_COMPLETED')
     if (!(stars >= 1 && stars <= 5)) throw new AppError('BAD_STARS')
-    const allowed = p.role === 'employer' ? EMPLOYER_TAGS : SEEKER_TAGS
+    const side: Role = p.id === j.employer_id ? 'employer' : 'seeker' // from the shift, not the role in use
+    const allowed = side === 'employer' ? EMPLOYER_TAGS : SEEKER_TAGS
     if (!tags.every((t) => allowed.includes(t))) throw new AppError('BAD_TAGS')
     if (reviews.some((r) => r.application_id === id && r.reviewer_id === p.id)) throw new AppError('ALREADY_REVIEWED')
-    reviews.push({ id: nid(), application_id: id, reviewer_id: p.id, reviewee_id: p.role === 'employer' ? a.seeker_id : j.employer_id, reviewer_role: p.role, stars, tags, comment: comment.trim().slice(0, 300) || null, created_at: now() })
+    reviews.push({ id: nid(), application_id: id, reviewer_id: p.id, reviewee_id: side === 'employer' ? a.seeker_id : j.employer_id, reviewer_role: side, stars, tags, comment: comment.trim().slice(0, 300) || null, created_at: now() })
     return wait(undefined)
   },
-  async reputations(ids) {
-    // Same rules as the database: shifts >= REP_MIN count, one (latest) review per reviewer→reviewee pair.
+  async reputations(ids, as) {
+    // Same rules as the database: shifts >= REP_MIN count, one (latest) review per reviewer→reviewee pair,
+    // only on the asked side (as a worker or as a business).
     const out: Record<string, Reputation> = {}
     const q = apps.filter((a) => (a.escrow_amount ?? 0) >= REP_MIN)
-    const party = (a: App, u: string) => a.seeker_id === u || jobOf(a).employer_id === u
+    const party = (a: App, u: string) => (as === 'seeker' ? a.seeker_id === u : jobOf(a).employer_id === u)
     ids.forEach((u) => {
       const done = q.filter((a) => a.pay_status === 'released' && party(a, u))
       const latest = new Map<string, Rev>()
-      reviews.filter((r) => r.reviewee_id === u && revealed(r.application_id) && q.some((a) => a.id === r.application_id))
+      reviews.filter((r) => r.reviewee_id === u && r.reviewer_role !== as && revealed(r.application_id) && q.some((a) => a.id === r.application_id))
         .forEach((r) => { const k = r.reviewer_id; if (!latest.has(k) || latest.get(k)!.created_at <= r.created_at) latest.set(k, r) })
       const rs = [...latest.values()]
       const counts: Record<string, number> = {}
@@ -373,8 +389,8 @@ export const mockApi: Api = {
         shifts_done: done.length,
         on_time: done.filter((a) => a.attendance !== 'late').length,
         partners: new Set(done.map((a) => (a.seeker_id === u ? jobOf(a).employer_id : a.seeker_id))).size,
-        noshow: q.filter((a) => a.seeker_id === u && a.pay_status === 'refunded' && a.attendance === 'noshow').length,
-        late: done.filter((a) => a.seeker_id === u && a.attendance === 'late').length,
+        noshow: as === 'seeker' ? q.filter((a) => a.seeker_id === u && a.pay_status === 'refunded' && a.attendance === 'noshow').length : 0,
+        late: as === 'seeker' ? done.filter((a) => a.attendance === 'late').length : 0,
         ratings: rs.length,
         avg_stars: rs.length ? Math.round((rs.reduce((n, r) => n + r.stars, 0) / rs.length) * 10) / 10 : null,
         top_tags: Object.entries(counts).sort((x, y) => y[1] - x[1]).slice(0, 3).map(([t]) => t),
@@ -439,8 +455,8 @@ export const mockApi: Api = {
     const week = Date.now() - 7 * 864e5
     const profiles = Object.values(users).map((u) => u.profile)
     return wait<AdminStats>({
-      employers: profiles.filter((p) => p.role === 'employer').length,
-      seekers: profiles.filter((p) => p.role === 'seeker').length,
+      employers: profiles.filter((p) => p.roles.includes('employer')).length,
+      seekers: profiles.filter((p) => p.roles.includes('seeker')).length,
       new_users_today: 0, new_users_7d: 0,
       open_jobs: jobs.filter((j) => j.status === 'open').length,
       jobs_7d: jobs.filter((j) => since(j.created_at, week)).length,

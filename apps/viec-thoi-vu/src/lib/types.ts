@@ -23,7 +23,10 @@ export interface WorkerInfo {
 
 export interface Profile extends WorkerInfo {
   id: string
+  /** the role in use right now */
   role: Role
+  /** roles this account owns (one at sign-up, the other can be added later) */
+  roles: Role[]
   full_name: string
   bio: string | null
   business_name: string | null
@@ -219,7 +222,11 @@ export interface Api {
   respondNoshow(applicationId: string, accept: boolean): Promise<void>
   openDispute(applicationId: string, reason: string): Promise<void>
   submitReview(applicationId: string, stars: number, tags: string[], comment: string): Promise<void>
-  reputations(userIds: string[]): Promise<Record<string, Reputation>>
+  /** reputation on one side: as a worker ('seeker') or as a business ('employer') */
+  reputations(userIds: string[], as: Role): Promise<Record<string, Reputation>>
+  /** give this account its other role (a business needs a name and address) and switch to it */
+  addRole(role: Role, business?: { business_name: string; address: string; city: string }): Promise<Profile>
+  switchRole(role: Role): Promise<Profile>
   receivedReviews(): Promise<ReceivedReview[]>
   myBank(): Promise<BankAccount | null>
   saveBank(b: BankAccount): Promise<void>

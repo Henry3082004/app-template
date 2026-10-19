@@ -82,7 +82,12 @@ nhà tuyển dụng.
 - Số điện thoại + mật khẩu (bản đầu chưa xác minh SMS — xem "Quyết định còn mở").
 - Trong Zalo: đăng nhập bằng Zalo (khi có Zalo App ID).
 - Bản demo: 2 nút "Dùng thử: Người tìm việc" / "Dùng thử: Nhà tuyển dụng".
-- Mỗi tài khoản chọn một vai trò lúc tạo hồ sơ.
+- **Vai trò (từ 19/10/2026):** lần đầu đăng nhập, màn hình "Bạn đến đây để…" với 2 thẻ to "Tìm việc làm thêm" /
+  "Tuyển người cho quán", chọn sẵn theo nút vừa bấm (thường chỉ 1 chạm "Tiếp tục"). Mỗi tài khoản bắt đầu với
+  **một** vai trò; sau này vào Tài khoản → "Tạo thêm hồ sơ tuyển người" (tên quán, địa chỉ) hoặc "Tạo thêm hồ sơ
+  tìm việc" (màn hình "Giúp quán biết về bạn") — cùng tài khoản, chuyển qua lại bằng 1 nút. Uy tín tính **riêng
+  từng vai trò**. Thông tin người tìm việc (ảnh, tuổi, giới thiệu…) chỉ quán được ứng tuyển mới thấy, kể cả khi
+  người đó cũng có quán. Không ứng tuyển vào tin của chính mình.
 
 ## 3. Bố cục và nút bấm
 

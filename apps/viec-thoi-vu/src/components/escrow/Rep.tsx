@@ -62,9 +62,11 @@ export function OwnReputation({ userId, employer }: { userId: string; employer: 
   const [rep, setRep] = useState<Reputation>()
   const [reviews, setReviews] = useState<ReceivedReview[]>([])
   useEffect(() => {
-    api.reputations([userId]).then((m) => setRep(m[userId])).catch(() => undefined)
-    api.receivedReviews().then(setReviews).catch(() => undefined)
-  }, [userId])
+    const side = employer ? 'employer' : 'seeker'
+    api.reputations([userId], side).then((m) => setRep(m[userId])).catch(() => undefined)
+    // reviews about me on this side were written by the other side
+    api.receivedReviews().then((rs) => setReviews(rs.filter((r) => r.reviewer_role !== side))).catch(() => undefined)
+  }, [userId, employer])
   return (
     <div className="card stack">
       <b>{t('repTitle')}</b>

@@ -23,18 +23,19 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
   onBack?: () => void
 }) {
   const { t, locale } = useI18n()
-  const { profile, askAuth, askIntro } = useSession()
+  const { profile, setProfile, askAuth, askIntro } = useSession()
   const [msg, setMsg] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<unknown>(null)
   const [rep, setRep] = useState<Reputation>()
   const left = job.slots - job.filled
   const full = left <= 0 || job.status !== 'open'
-  const isEmployer = profile?.role === 'employer'
+  const own = !!profile && job.employer_id === profile.id
+  const isEmployer = profile?.role === 'employer' || own
 
   useEffect(() => {
     setRep(undefined)
-    api.reputations([job.employer_id]).then((m) => setRep(m[job.employer_id])).catch(() => undefined)
+    api.reputations([job.employer_id], 'employer').then((m) => setRep(m[job.employer_id])).catch(() => undefined)
   }, [job.employer_id])
 
   const send = async () => {
@@ -54,7 +55,7 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
   const onApply = () => {
     tap()
     // a worker who hasn't introduced themselves yet is asked once, then the application goes out either way
-    const go = (p: Profile) => (introNudgeDue(p) ? askIntro({ onDone: () => void send() }) : void send())
+    const go = (p: Profile) => (introNudgeDue(p) ? askIntro({ beforeApply: true, onDone: () => void send() }) : void send())
     if (!profile) return askAuth({ role: 'seeker', onDone: (p) => { if (p.role === 'seeker') go(p) } })
     go(profile)
   }
@@ -78,7 +79,15 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
         {!full && !mine && !isEmployer && (
           <Fld label={t('messageOpt')} htmlFor="msg"><textarea id="msg" className="inp" maxLength={300} value={msg} onChange={(e) => setMsg(e.target.value)} placeholder={t('messagePh')} /></Fld>
         )}
-        {isEmployer && <div className="notice info">{t('employerCantApply')}</div>}
+        {isEmployer && (
+          <div className="notice info stack">
+            {own ? t('ownJob') : t('employerCantApply')}
+            {/* an account that also looks for work switches role with one tap (never for its own job) */}
+            {!own && profile?.roles.includes('seeker') && (
+              <Btn v="ghost" sm onClick={() => api.switchRole('seeker').then(setProfile).catch(setError)}>{t('switchToApply')}</Btn>
+            )}
+          </div>
+        )}
         {error != null && <ErrorBox error={error} where="JobDetail.apply" />}
       </div>
       {!isEmployer && (

@@ -10,6 +10,7 @@ import { useI18n } from '../lib/i18n'
 import { DEMO } from '../lib/seed'
 import { useSession } from '../lib/session'
 import type { Profile, Role } from '../lib/types'
+import { RoleCards } from './RoleCards'
 import { Btn, Dialog, ErrorBox, Fld } from './ui'
 
 /** Sign-up / sign-in, opened only when an action needs an account (apply, post). */
@@ -25,11 +26,13 @@ export function AuthDialog() {
   const [viaZalo, setViaZalo] = useState(IN_ZALO)
   const [zalo, setZalo] = useState<{ ticket: string; phone: string; name: string | null } | null>(null)
   // Every time the dialog opens it starts fresh (no leftover signup ticket / error from last time).
+  // the role a new account starts with: pre-selected from the button pressed, changeable on the sign-up form
+  const [pick, setPick] = useState<Role | null>(null)
   useEffect(() => {
-    if (authRequest) { setViaZalo(IN_ZALO); setZalo(null); setError(null) }
+    if (authRequest) { setViaZalo(IN_ZALO); setZalo(null); setError(null); setPick(null) }
   }, [authRequest])
   if (!authRequest) return null
-  const role: Role = authRequest.role
+  const role: Role = pick ?? authRequest.role
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value })
 
   const run = async (fn: () => Promise<Profile>) => {
@@ -154,6 +157,7 @@ export function AuthDialog() {
         ) : (
           <form className="stack" onSubmit={zaloSignup}>
             <div className="notice ok">{t('zaloPhone')}: <b>+{zalo.phone}</b></div>
+            <Fld label={t('roleQuestion')}><RoleCards value={role} onChange={setPick} /></Fld>
             <Fld label={t('yourName')} htmlFor="a-name"><input id="a-name" className="inp" value={f.full_name} onChange={set('full_name')} autoComplete="name" required maxLength={80} /></Fld>
             {emp && (
               <>
@@ -183,6 +187,7 @@ export function AuthDialog() {
       {mode === 'signup' && <div className="sub" style={{ marginTop: -8 }}>{role === 'employer' ? t('authEmployerSub') : t('authSeekerSub')}</div>}
       {!IN_ZALO && googleBtn}
       <form className="stack" onSubmit={submit}>
+        {mode === 'signup' && <Fld label={t('roleQuestion')}><RoleCards value={role} onChange={setPick} /></Fld>}
         {mode === 'signup' && (
           <Fld label={t('yourName')} htmlFor="a-name"><input id="a-name" className="inp" value={f.full_name} onChange={set('full_name')} autoComplete="name" required maxLength={80} /></Fld>
         )}

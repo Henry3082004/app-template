@@ -7,6 +7,7 @@ import { tap } from '../lib/haptics'
 import { useI18n } from '../lib/i18n'
 import { useSession } from '../lib/session'
 import type { Role } from '../lib/types'
+import { RoleCards } from './RoleCards'
 import { Btn, Dialog, ErrorBox, Fld } from './ui'
 
 /** Shown right after a first Google sign-in: we still need the role, a name and a phone number. */
@@ -54,12 +55,7 @@ export function CompleteProfileDialog() {
       <h2>{t('googleCompleteTitle')}</h2>
       {pending.email && <div className="sub" style={{ marginTop: -8 }}>{t('signedInAs')} {pending.email}</div>}
       <form className="stack" onSubmit={submit}>
-        <Fld label={t('iAm')}>
-          <div className="seg">
-            <button type="button" className={role === 'seeker' ? 'on' : ''} onClick={() => setRole('seeker')}>{t('roleSeeker')}</button>
-            <button type="button" className={role === 'employer' ? 'on' : ''} onClick={() => setRole('employer')}>{t('roleEmployer')}</button>
-          </div>
-        </Fld>
+        <Fld label={t('roleQuestion')}><RoleCards value={role} onChange={setRole} /></Fld>
         <Fld label={t('yourName')} htmlFor="c-name"><input id="c-name" className="inp" value={f.full_name} onChange={set('full_name')} autoComplete="name" required maxLength={80} /></Fld>
         <Fld label={t('phoneIntl')} htmlFor="c-phone" hint={t('phoneIntlHint')}>
           <div className="phonerow">

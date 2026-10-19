@@ -43,7 +43,7 @@ export function WorkerIntroDialog() {
     <Dialog label={t('introTitle')}>
       <img className="wavecorner" src={capy('wave')} alt="" />
       <h2>{t('introTitle')}</h2>
-      <div className="sub" style={{ marginTop: -8 }}>{introRequest ? t('introBeforeApply') : t('introSub')}</div>
+      <div className="sub" style={{ marginTop: -8 }}>{introRequest?.beforeApply ? t('introBeforeApply') : t('introSub')}</div>
       <div className="stack">
         <WorkerFields name={profile.full_name} value={w} onChange={setW} />
         {error != null && <ErrorBox error={error} where="WorkerIntroDialog" />}

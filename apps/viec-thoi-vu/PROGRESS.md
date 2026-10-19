@@ -82,3 +82,9 @@
 - Sau lần đăng nhập đầu: màn hình "Giúp quán biết về bạn" (ảnh – không bắt buộc, năm sinh, việc đã từng làm, giờ rảnh – được bỏ trống), có "Để sau"; bỏ qua thì lần đầu Ứng tuyển nhắc lại một lần rồi gửi đơn tiếp. Sửa ở Tài khoản.
 - Quán thấy ảnh, tuổi, kinh nghiệm, giờ rảnh trên thẻ ứng viên (chỉ quán được ứng tuyển mới đọc được — RLS `profiles_read`).
 - Ảnh: Supabase Storage bucket `avatars`, cắt vuông 320px JPEG trên máy trước khi tải lên. Test: `e2e/worker-profile.spec.ts`, `supabase/tests/60_seeker_profile.sql`.
+
+## 19/10/2026 — Một tài khoản, hai vai trò
+- Lần đầu đăng nhập: "Bạn đến đây để…" (2 thẻ, chọn sẵn theo nút vừa bấm). Sau đó ở Tài khoản → "Tạo thêm hồ sơ tuyển người / tìm việc", có cả hai thì chuyển qua lại bằng 1 nút.
+- DB: `profiles.role` = vai trò đang dùng, `profiles.roles` = vai trò sở hữu; RPC `add_role`, `switch_role`; uy tín theo phía `role_reputations(p_users, p_as)`; đánh giá lấy phía từ ca làm (không theo vai trò đang dùng); không ứng tuyển tin của chính mình.
+- Thông tin người tìm việc chuyển sang bảng riêng `worker_profiles` (chỉ chủ và quán được ứng tuyển đọc được) — để hồ sơ quán công khai không lộ thông tin cá nhân.
+- Test: `supabase/tests/70_dual_role.sql`, `e2e/roles.spec.ts`.

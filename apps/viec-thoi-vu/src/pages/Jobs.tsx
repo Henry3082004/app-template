@@ -52,7 +52,7 @@ export default function Jobs() {
     setJobs(null)
     api.listOpenJobs().then((js) => {
       setJobs(js)
-      api.reputations([...new Set(js.map((j) => j.employer_id))]).then(setReps).catch(() => undefined)
+      api.reputations([...new Set(js.map((j) => j.employer_id))], 'employer').then(setReps).catch(() => undefined)
     }).catch(setError)
   }, [])
   useEffect(load, [load])
@@ -113,7 +113,8 @@ export default function Jobs() {
         : Number(b.j.is_urgent) - Number(a.j.is_urgent) || b.j.created_at.localeCompare(a.j.created_at)))
   }, [jobs, q, filter, area, minPay, coords, distOf])
 
-  if (profile?.role === 'employer') return <Navigate to="/app/tin-cua-toi" replace />
+  // businesses live on "My posts"; one that can also work may still open a shared job link (and switch to apply)
+  if (profile?.role === 'employer' && !(id && profile.roles.includes('seeker'))) return <Navigate to="/app/tin-cua-toi" replace />
 
   const selected = id ? (jobs?.find((j) => j.id === id) ?? single ?? null) : null
   const open = (jid: string) => nav(`/app/viec/${jid}`)
