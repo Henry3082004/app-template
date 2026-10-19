@@ -14,7 +14,8 @@ test('Zalo login: new user, returning user, denied permission, password fallback
   await h.see('Zalo sẽ hỏi bạn có cho phép chia sẻ số điện thoại'); await h.see('Bạn không cần nhập mật khẩu')
   await p.getByRole('button', { name: 'Tiếp tục với Zalo' }).click(); await h.see('Điền nốt để bắt đầu'); await h.see('+84988776655')
   await expect(p.locator('#a-name')).toHaveValue('Người Dùng Zalo')
-  await p.getByRole('button', { name: 'Ứng tuyển ngay' }).click(); await p.waitForTimeout(600)
+  await p.getByRole('button', { name: 'Ứng tuyển ngay' }).click()
+  await h.see('Giúp quán biết về bạn'); await p.getByRole('button', { name: 'Để sau' }).click()
   await tab('Tài khoản'); await h.see('Người Dùng Zalo')
   await signOut()
 

@@ -59,6 +59,12 @@
   nào còn tuyển, không biết gần hay xa.
 - Luồng: `Mở app → danh sách việc (gần nhất trước) → chạm việc → Ứng tuyển → Xong` (**2 lần chạm**;
   lần đầu thêm bước đăng nhập + nhập tên, SĐT ngay trong một bảng trượt lên, rồi tự gửi đơn tiếp).
+- **Hồ sơ cho quán chọn người (từ 19/10/2026):** ngay sau lần đăng nhập đầu tiên hiện **một** màn hình
+  "Giúp quán biết về bạn": ảnh đại diện (không bắt buộc), năm sinh (chọn từ danh sách), việc đã từng làm
+  (chip, có "Chưa làm bao giờ"), giờ rảnh (chip Sáng/Chiều/Tối/Cuối tuần, được bỏ trống). Gần như không gõ
+  chữ, ~15–20 giây. Có nút "Để sau"; nếu bỏ qua, lần đầu bấm Ứng tuyển nhắc lại **một lần** rồi gửi đơn tiếp.
+  Sửa lại được ở Tài khoản. Quán thấy tuổi, ảnh, kinh nghiệm, giờ rảnh trên thẻ ứng viên (chỉ quán mà người đó
+  đã ứng tuyển mới thấy).
 
 ### Nhà tuyển dụng — Đăng tin
 - Hiện đang làm bằng: đăng nhóm Facebook/Zalo, treo biển — vướng ở: chờ tin nhắn, hỏi từng người.

@@ -270,7 +270,7 @@ export const supabaseApi: Api = {
 
   async applicantsFor(jobId) {
     const { data, error } = await sb.from('applications')
-      .select(`id, status, message, created_at, seeker_id, ${ESCROW_COLS}, seeker:profiles!applications_seeker_id_fkey(full_name, bio)`)
+      .select(`id, status, message, created_at, seeker_id, ${ESCROW_COLS}, seeker:profiles!applications_seeker_id_fkey(full_name, bio, birth_year, experience, availability, avatar_path)`)
       .eq('job_id', jobId).neq('status', 'withdrawn').order('created_at', { ascending: true })
     if (error) fail(error)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -282,6 +282,7 @@ export const supabaseApi: Api = {
     return rows.map((r): Applicant => ({
       id: r.id, status: r.status, message: r.message, created_at: r.created_at, seeker_id: r.seeker_id, ...toEscrow(r, done.has(r.id), other.has(r.id)),
       full_name: r.seeker?.full_name ?? '—', bio: r.seeker?.bio ?? null, phone: phones[r.seeker_id] ?? null,
+      birth_year: r.seeker?.birth_year ?? null, experience: r.seeker?.experience ?? [], availability: r.seeker?.availability ?? [], avatar_path: r.seeker?.avatar_path ?? null,
     }))
   },
 
@@ -298,6 +299,13 @@ export const supabaseApi: Api = {
     const { error } = await sb.from('profiles').update(patch).eq('id', id)
     if (error) fail(error)
     return requireProfile(id)
+  },
+
+  async uploadAvatar(photo) {
+    const path = `${await uid()}/${Date.now().toString(36)}.jpg`
+    const { error } = await sb.storage.from('avatars').upload(path, photo, { contentType: 'image/jpeg' })
+    if (error) throw new AppError(/fetch|network/i.test(error.message) ? 'NETWORK' : 'PHOTO_FAILED', error.message)
+    return path
   },
 
   async appConfig() {

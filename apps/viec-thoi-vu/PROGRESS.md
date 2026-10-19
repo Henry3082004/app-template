@@ -77,3 +77,8 @@
 - Sửa lỗi tìm được nhờ test: đổi ngôn ngữ rồi đăng xuất ngay → giao diện bị "đăng nhập lại"; màn hình báo lỗi dùng class CSS không tồn tại.
 - `components/Escrow.tsx` tách thành `components/escrow/`; `supabaseApi.ts` gom xử lý lỗi lặp lại; bỏ 27 câu chữ và 2 style không dùng.
 - Trang Quản trị: thẻ "Sức khoẻ app" + nút "Gửi lỗi thử" (Sentry đã nhận, có monitor gửi email). Google login đã Publish (xác minh tên miền bằng file `public/google15bb4cb2df076218.html` — đừng xoá).
+
+## 19/10/2026 — Hồ sơ người tìm việc cho quán chọn người
+- Sau lần đăng nhập đầu: màn hình "Giúp quán biết về bạn" (ảnh – không bắt buộc, năm sinh, việc đã từng làm, giờ rảnh – được bỏ trống), có "Để sau"; bỏ qua thì lần đầu Ứng tuyển nhắc lại một lần rồi gửi đơn tiếp. Sửa ở Tài khoản.
+- Quán thấy ảnh, tuổi, kinh nghiệm, giờ rảnh trên thẻ ứng viên (chỉ quán được ứng tuyển mới đọc được — RLS `profiles_read`).
+- Ảnh: Supabase Storage bucket `avatars`, cắt vuông 320px JPEG trên máy trước khi tải lên. Test: `e2e/worker-profile.spec.ts`, `supabase/tests/60_seeker_profile.sql`.

@@ -20,8 +20,9 @@ export function Tag({ tone = '', children }: { tone?: '' | 'urgent' | 'ok' | 'p'
   return <span className={'tag ' + tone}>{tone === 'urgent' && <Ic n="zap" size={13} />}{children}</span>
 }
 
-export function Avatar({ name }: { name: string }) {
-  return <span className="avatar" aria-hidden="true">{initials(name)}</span>
+export function Avatar({ name, src, size }: { name: string; src?: string | null; size?: number }) {
+  const st = size ? { width: size, height: size, fontSize: size * 0.36 } : undefined
+  return <span className="avatar" style={st} aria-hidden="true">{src ? <img src={src} alt="" /> : initials(name)}</span>
 }
 
 export function Fld({ label, hint, htmlFor, children }: { label: string; hint?: string; htmlFor?: string; children: ReactNode }) {

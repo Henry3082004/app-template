@@ -28,10 +28,11 @@ const users: Record<string, User> = {}
 function addUser(id: string, digits: string, password: string, role: Role, full_name: string, extra: Partial<Profile> = {}) {
   users[id] = {
     password,
-    profile: { id, role, full_name, bio: null, business_name: null, address: null, city: null, plan: 'free', plan_until: null, locale: 'vi', phone: '+' + digits, ...extra },
+    profile: { id, role, full_name, bio: null, business_name: null, address: null, city: null, plan: 'free', plan_until: null, locale: 'vi', phone: '+' + digits,
+      birth_year: null, experience: [], availability: [], avatar_path: null, ...extra },
   }
 }
-addUser('11111111-1111-4111-8111-000000000001', '84900000001', 'demo-tim-viec', 'seeker', 'Minh Anh (dùng thử)', { bio: 'Sinh viên năm 2, rảnh buổi sáng và cuối tuần.', city: 'TP.HCM' })
+addUser('11111111-1111-4111-8111-000000000001', '84900000001', 'demo-tim-viec', 'seeker', 'Minh Anh (dùng thử)', { bio: 'Sinh viên năm 2, rảnh buổi sáng và cuối tuần.', city: 'TP.HCM', birth_year: 2005, experience: ['service', 'cashier'], availability: ['morning', 'weekend'] })
 addUser('11111111-1111-4111-8111-000000000003', '84900000003', 'quan-tri-thu-1', 'employer', 'Quản trị (dùng thử)', { business_name: 'Quản trị', is_admin: true })
 addUser('11111111-1111-4111-8111-000000000002', '84900000002', 'demo-tuyen-dung', 'employer', 'Chủ quán (dùng thử)', { business_name: 'Quán Cà Phê Dùng Thử', address: '45 Lê Lợi, Q.1', city: 'TP.HCM' })
 Object.entries(seedEmployers).forEach(([id, e], i) => {
@@ -253,7 +254,8 @@ export const mockApi: Api = {
     const list = apps.filter((a) => a.job_id === jobId && a.status !== 'withdrawn' && jobs.find((j) => j.id === jobId)?.employer_id === p.id)
     const out = list.map((a) => {
       const s = users[a.seeker_id]?.profile
-      return { id: a.id, status: a.status, message: a.message, created_at: a.created_at, seeker_id: a.seeker_id, ...escrowOf(a, p.id), full_name: s?.full_name ?? '—', bio: s?.bio ?? null, phone: a.status === 'accepted' ? s?.phone ?? null : null }
+      return { id: a.id, status: a.status, message: a.message, created_at: a.created_at, seeker_id: a.seeker_id, ...escrowOf(a, p.id), full_name: s?.full_name ?? '—', bio: s?.bio ?? null, phone: a.status === 'accepted' ? s?.phone ?? null : null,
+        birth_year: s?.birth_year ?? null, experience: s?.experience ?? [], availability: s?.availability ?? [], avatar_path: s?.avatar_path ?? null }
     })
     list.forEach((a) => { a.seen = true })
     return wait(out)
@@ -277,8 +279,18 @@ export const mockApi: Api = {
 
   async updateProfile(patch) {
     const p = me()
+    if (patch.experience?.includes('none') && patch.experience.length > 1) throw new AppError('UNKNOWN', 'profiles_experience_chk')
     Object.assign(p, patch)
     return wait(p)
+  },
+  async uploadAvatar(photo) {
+    me()
+    return new Promise<string>((ok, fail) => {
+      const r = new FileReader()
+      r.onload = () => ok(String(r.result))
+      r.onerror = () => fail(new AppError('PHOTO_FAILED'))
+      r.readAsDataURL(photo)
+    })
   },
 
   async appConfig() { return wait(CFG) },

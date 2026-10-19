@@ -7,8 +7,21 @@ export type PayStatus = 'none' | 'held' | 'released' | 'refunded' | 'noshow_repo
 export type Attendance = 'ok' | 'late' | 'noshow'
 export type Category = 'service' | 'warehouse' | 'event' | 'farm' | 'retail' | 'other'
 export type Locale = 'vi' | 'en'
+/** Worker profile codes (labels live in i18n: exp_*, avail_*). Same lists as the database checks. */
+export const EXPERIENCE = ['service', 'barista', 'kitchen', 'cashier', 'sales', 'warehouse', 'event', 'none'] as const
+export const AVAILABILITY = ['morning', 'afternoon', 'evening', 'weekend'] as const
+export type Experience = (typeof EXPERIENCE)[number]
+export type Availability = (typeof AVAILABILITY)[number]
 
-export interface Profile {
+/** What a worker tells businesses about themselves (shown on applicant cards). */
+export interface WorkerInfo {
+  birth_year: number | null
+  experience: Experience[]
+  availability: Availability[]
+  avatar_path: string | null
+}
+
+export interface Profile extends WorkerInfo {
   id: string
   role: Role
   full_name: string
@@ -73,7 +86,7 @@ export interface MyJob extends Job {
   newApplicants: number
 }
 
-export interface Applicant extends Escrow {
+export interface Applicant extends Escrow, WorkerInfo {
   id: string
   status: AppStatus
   message: string | null
@@ -164,6 +177,10 @@ export interface ProfileUpdate {
   address?: string | null
   city?: string | null
   locale?: Locale
+  birth_year?: number | null
+  experience?: Experience[]
+  availability?: Availability[]
+  avatar_path?: string | null
 }
 
 export interface Api {
@@ -192,6 +209,8 @@ export interface Api {
   applicantsFor(jobId: string): Promise<Applicant[]>
   decide(applicationId: string, decision: 'accepted' | 'rejected'): Promise<{ phone: string | null }>
   updateProfile(patch: ProfileUpdate): Promise<Profile>
+  /** store a square profile photo; returns the path to save as avatar_path */
+  uploadAvatar(photo: Blob): Promise<string>
   /** payment_mode: off = free (no deposit step) · test = deposit simulated · live = real money (not built yet) */
   appConfig(): Promise<AppConfig>
   quote(applicationId: string, hours?: number): Promise<Quote>

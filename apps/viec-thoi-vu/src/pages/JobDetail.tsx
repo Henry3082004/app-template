@@ -11,7 +11,8 @@ import { tap } from '../lib/haptics'
 import { useI18n } from '../lib/i18n'
 import { report } from '../lib/sentry'
 import { useSession } from '../lib/session'
-import type { AppStatus, Job, Reputation } from '../lib/types'
+import type { AppStatus, Job, Profile, Reputation } from '../lib/types'
+import { introNudgeDue } from '../lib/worker'
 
 /** Job detail: a page on phones, the right-hand column on tablet/desktop. */
 export function JobDetail({ job, distance, mine, onApplied, onBack }: {
@@ -22,7 +23,7 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
   onBack?: () => void
 }) {
   const { t, locale } = useI18n()
-  const { profile, askAuth } = useSession()
+  const { profile, askAuth, askIntro } = useSession()
   const [msg, setMsg] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<unknown>(null)
@@ -52,8 +53,10 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
 
   const onApply = () => {
     tap()
-    if (!profile) return askAuth({ role: 'seeker', onDone: (p) => { if (p.role === 'seeker') void send() } })
-    void send()
+    // a worker who hasn't introduced themselves yet is asked once, then the application goes out either way
+    const go = (p: Profile) => (introNudgeDue(p) ? askIntro({ onDone: () => void send() }) : void send())
+    if (!profile) return askAuth({ role: 'seeker', onDone: (p) => { if (p.role === 'seeker') go(p) } })
+    go(profile)
   }
 
   return (

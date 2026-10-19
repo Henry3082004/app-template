@@ -19,7 +19,13 @@ interface Session {
   authRequest: AuthRequest | null
   askAuth(req: AuthRequest): void
   closeAuth(): void
+  /** "Help businesses know you", asked before an application is sent; onDone runs after Done or Later */
+  introRequest: IntroRequest | null
+  askIntro(req: IntroRequest): void
+  closeIntro(): void
 }
+
+export interface IntroRequest { onDone?: () => void }
 
 const Ctx = createContext<Session>(null as unknown as Session)
 
@@ -28,6 +34,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false)
   const [pending, setPending] = useState<PendingProfile | null>(null)
   const [authRequest, setAuthRequest] = useState<AuthRequest | null>(null)
+  const [introRequest, setIntroRequest] = useState<IntroRequest | null>(null)
   const signOuts = useRef(0)
 
   const setProfile = useCallback((p: Profile | null) => {
@@ -65,7 +72,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     profile, ready, setProfile, updateProfile, pending, refresh, signOut, authRequest,
     askAuth: (r) => setAuthRequest(r),
     closeAuth: () => setAuthRequest(null),
-  }), [profile, ready, setProfile, updateProfile, pending, refresh, signOut, authRequest])
+    introRequest,
+    askIntro: (r) => setIntroRequest(r),
+    closeIntro: () => setIntroRequest(null),
+  }), [profile, ready, setProfile, updateProfile, pending, refresh, signOut, authRequest, introRequest])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

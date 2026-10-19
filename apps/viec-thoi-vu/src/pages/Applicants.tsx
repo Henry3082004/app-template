@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Ic } from '../components/Ic'
 import { EmployerPay, Rep } from '../components/escrow'
 import { Avatar, Btn, Dialog, Empty, ErrorBox, Skel, Tag } from '../components/ui'
+import { WorkerFacts } from '../components/WorkerFields'
 import { api } from '../lib/api'
 import { capy } from '../lib/capy'
 import { dateRange } from '../lib/format'
@@ -9,6 +10,7 @@ import { tap } from '../lib/haptics'
 import { useI18n, type TKey } from '../lib/i18n'
 import { displayPhone, telHref, zaloHref } from '../lib/phone'
 import type { Applicant, MyJob, Reputation } from '../lib/types'
+import { avatarUrl } from '../lib/worker'
 
 /** Applicants of one post: a page on phones, the right-hand column on tablet/desktop. */
 export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: () => void; onChanged(): void }) {
@@ -69,7 +71,7 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
           {list?.map((a) => (
             <div key={a.id} className="card cand">
               <div className="row">
-                <Avatar name={a.full_name} />
+                <Avatar name={a.full_name} src={avatarUrl(a.avatar_path)} size={52} />
                 <div style={{ minWidth: 0, flex: 1 }}>
                   <div className="hrow" style={{ alignItems: 'center' }}>
                     <b>{a.full_name}</b>
@@ -78,6 +80,7 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
                   {a.bio && <div className="sub" style={{ fontSize: 14 }}>{a.bio}</div>}
                 </div>
               </div>
+              <WorkerFacts w={a} />
               <Rep rep={reps[a.seeker_id]} />
               {a.message && <div className="tag" style={{ borderRadius: 12, whiteSpace: 'normal' }}><Ic n="message" size={14} /> “{a.message}”</div>}
               {a.status === 'accepted' && a.phone && (

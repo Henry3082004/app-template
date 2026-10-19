@@ -12,3 +12,6 @@ Dữ liệu: đóng 10 việc mẫu (status = closed) và khóa 8 tài khoản d
 
 18/10/2026: `20261021_perf_admin_stats.sql` áp dụng thành `perf_rls_initplan` (15 `alter policy`), `perf_fk_indexes`, `admin_stats`.
 Cố vấn hiệu năng Supabase hết cảnh báo WARN; chỉ còn INFO "unused index" cho các chỉ mục mới tạo.
+
+19/10/2026: `20261022_seeker_profile.sql` áp dụng thành `seeker_profile_a_columns`, `seeker_profile_b_checks_grants`;
+`20261022_avatars_storage.sql` áp dụng thành `avatars_storage` (bucket `avatars` công khai, ≤300 KB, chỉ chủ thư mục được thêm/xoá ảnh).

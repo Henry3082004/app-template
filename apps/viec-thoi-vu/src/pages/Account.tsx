@@ -4,11 +4,13 @@ import { BankCard, OwnReputation } from '../components/escrow'
 import { useAppConfig } from '../lib/config'
 import { Ic } from '../components/Ic'
 import { Avatar, Btn, Empty, ErrorBox, Fld } from '../components/ui'
+import { WorkerFields, workerInfoOf } from '../components/WorkerFields'
 import { CITIES } from '../lib/geo'
 import { useI18n } from '../lib/i18n'
 import { displayPhone } from '../lib/phone'
 import { useSession } from '../lib/session'
-import type { Locale } from '../lib/types'
+import type { Locale, WorkerInfo } from '../lib/types'
+import { avatarUrl } from '../lib/worker'
 
 export default function Account() {
   const { t, locale, setLocale } = useI18n()
@@ -16,12 +18,14 @@ export default function Account() {
   const { profile, updateProfile, signOut, askAuth } = useSession()
   const cfg = useAppConfig()
   const [f, setF] = useState({ full_name: '', bio: '', business_name: '', address: '', city: '' })
+  const [w, setW] = useState<WorkerInfo | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<unknown>(null)
 
   useEffect(() => {
     if (profile) setF({ full_name: profile.full_name, bio: profile.bio ?? '', business_name: profile.business_name ?? '', address: profile.address ?? '', city: profile.city ?? '' })
+    if (profile) setW(workerInfoOf(profile))
   }, [profile])
 
   const changeLang = (l: Locale) => {
@@ -34,7 +38,7 @@ export default function Account() {
     try {
       const patch = profile?.role === 'employer'
         ? { full_name: f.full_name.trim(), business_name: f.business_name.trim() || null, address: f.address.trim() || null, city: f.city || null }
-        : { full_name: f.full_name.trim(), bio: f.bio.trim() || null, city: f.city || null }
+        : { full_name: f.full_name.trim(), bio: f.bio.trim() || null, city: f.city || null, ...w }
       await updateProfile(patch)
       setSaved(true)
     } catch (e) { setError(e) } finally { setSaving(false) }
@@ -79,7 +83,7 @@ export default function Account() {
       <div className="acct">
         <OwnReputation userId={profile.id} employer={emp} />
         <div className="card stack">
-          <div className="row"><Avatar name={name} /><div style={{ flex: 1, minWidth: 0 }}><b>{name}</b><div className="sub" style={{ fontSize: 14 }}>{displayPhone(profile.phone)}</div></div>{emp && cfg?.billing === 'on' && <span className={profile.plan === 'pro' ? 'tag sun' : 'tag'}>{t(profile.plan === 'pro' ? 'planpro' : 'planfree')}</span>}</div>
+          <div className="row"><Avatar name={name} src={emp ? null : avatarUrl(w?.avatar_path)} /><div style={{ flex: 1, minWidth: 0 }}><b>{name}</b><div className="sub" style={{ fontSize: 14 }}>{displayPhone(profile.phone)}</div></div>{emp && cfg?.billing === 'on' && <span className={profile.plan === 'pro' ? 'tag sun' : 'tag'}>{t(profile.plan === 'pro' ? 'planpro' : 'planfree')}</span>}</div>
           <Fld label={t('yourName')} htmlFor="ac-name"><input id="ac-name" className="inp" value={f.full_name} onChange={(e) => setF({ ...f, full_name: e.target.value })} maxLength={80} /></Fld>
           {emp ? (
             <>
@@ -89,6 +93,7 @@ export default function Account() {
           ) : (
             <Fld label={t('bio')} htmlFor="ac-bio"><textarea id="ac-bio" className="inp" value={f.bio} onChange={(e) => setF({ ...f, bio: e.target.value })} placeholder={t('bioPh')} maxLength={500} /></Fld>
           )}
+          {!emp && w && <><b style={{ marginTop: 8 }}>{t('workerInfo')}</b><WorkerFields name={name} value={w} onChange={setW} /></>}
           <Fld label={t('city')} htmlFor="ac-city">
             <select id="ac-city" className="inp" value={f.city} onChange={(e) => setF({ ...f, city: e.target.value })}>
               <option value="">—</option>{Object.keys(CITIES).map((c) => <option key={c}>{c}</option>)}

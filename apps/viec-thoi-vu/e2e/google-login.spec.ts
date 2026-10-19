@@ -13,7 +13,9 @@ test('Google login: first sign-in completes the profile with a country code, ret
   const country = p.locator('select[aria-label="Quốc gia"]')
   await expect(country).toHaveValue('VN')
   await p.locator('#c-phone').fill('12'); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click(); await h.see('Số điện thoại chưa đúng')
-  await country.selectOption('US'); await p.locator('#c-phone').fill('415 555 0100'); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click(); await p.waitForTimeout(600)
+  await country.selectOption('US'); await p.locator('#c-phone').fill('415 555 0100'); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click()
+  // a new worker is asked about themselves once (covered in worker-profile.spec)
+  await h.see('Giúp quán biết về bạn'); await p.getByRole('button', { name: 'Để sau' }).click()
   await h.go('/app/tai-khoan'); await h.see('Ann Lee')
   await signOut()
 

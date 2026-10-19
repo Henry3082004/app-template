@@ -4,6 +4,7 @@ import { AuthDialog } from './components/AuthDialog'
 import { CompleteProfileDialog } from './components/CompleteProfileDialog'
 import { Shell } from './components/Shell'
 import { Skel } from './components/ui'
+import { WorkerIntroDialog } from './components/WorkerIntroDialog'
 import { I18nProvider } from './lib/i18n'
 import { SessionProvider } from './lib/session'
 import { IN_ZALO } from './lib/zalo'
@@ -54,6 +55,7 @@ function AppRoutes() {
       </Routes>
       <AuthDialog />
       <CompleteProfileDialog />
+      <WorkerIntroDialog />
     </Suspense>
   )
 }
