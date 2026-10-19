@@ -21,3 +21,6 @@ Cố vấn hiệu năng Supabase hết cảnh báo WARN; chỉ còn INFO "unused
 `dual_role_7_admin_stats`, rồi `dual_role_8_move_worker_data` (chuyển dữ liệu + thu quyền, chạy cùng lúc đưa web mới lên).
 Hàm `zalo-login` v4: tạo dòng `worker_profiles` cho người tìm việc mới. Các cột cũ trên `profiles` (bio, birth_year, experience,
 availability, avatar_path) đã để trống và không ai ghi được — xoá hẳn khi tiện (`alter table public.profiles drop column …`).
+
+19/10/2026: `20261024_worker_upsert_grant.sql` áp dụng thành `worker_upsert_grant` — sửa lỗi "permission denied for table
+worker_profiles" khi lưu hồ sơ (upsert của PostgREST ghi cả cột user_id). Test upsert trong `70_dual_role.sql`.

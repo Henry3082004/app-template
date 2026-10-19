@@ -51,4 +51,14 @@ select t_check(not exists (
         (select shifts_done from role_reputations(array[p.id], 'seeker')) + (select shifts_done from role_reputations(array[p.id], 'employer'))
 ), 'worker side + business side = combined shifts');
 select t_check((select sum(shifts_done) from role_reputations((select array_agg(id) from profiles), 'seeker')) > 0, 'there are worker-side shifts to compare');
+
+-- the app saves with an upsert exactly like this (PostgREST sets every column it was sent, user_id included)
+set role authenticated; select set_config('request.jwt.claim.sub', :'W', false);
+insert into worker_profiles (user_id, birth_year, experience) values (:'W', 2001, '{event}')
+  on conflict (user_id) do update set user_id = excluded.user_id, birth_year = excluded.birth_year, experience = excluded.experience;
+select t_check((select birth_year = 2001 and experience = '{event}' from worker_profiles where user_id = :'W'), 'worker saves own details with an upsert');
+-- …but cannot write someone else's row that way
+select t_err($$insert into worker_profiles (user_id, birth_year) values ('11111111-1111-4111-8111-0000000000c2', 1999)
+  on conflict (user_id) do update set user_id = excluded.user_id, birth_year = excluded.birth_year$$, 'row-level security');
+reset role;
 \echo ALL DUAL-ROLE SCENARIOS PASSED
