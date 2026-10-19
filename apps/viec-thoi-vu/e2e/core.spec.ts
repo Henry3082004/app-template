@@ -1,4 +1,4 @@
-import { helpers, test } from './fixtures'
+import { expect, helpers, test } from './fixtures'
 
 test('seeker: browse, apply, see and withdraw the application, account, language, sign out', async ({ page: p }) => {
   const h = helpers(p)
@@ -33,4 +33,6 @@ test('public pages: landing and terms', async ({ page: p }) => {
   const h = helpers(p)
   await p.goto('/dieu-khoan'); await h.see('Điều khoản sử dụng'); await h.noHScroll()
   await h.go('/'); await h.see('nhận việc trong ngày'); await h.noHScroll()
+  // the header spacer once picked up the progress-bar style (class clash on .bar) and showed as a big green pill
+  await expect(p.locator('header.bar .sp')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
 })

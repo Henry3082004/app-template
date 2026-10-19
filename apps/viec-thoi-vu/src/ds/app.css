@@ -256,7 +256,7 @@ textarea.inp{min-height:84px;resize:vertical}
 .tiles b{font-size:22px;line-height:1.1;color:var(--p2);font-variant-numeric:tabular-nums}.tiles span{font-size:12px;color:var(--tx2)}
 .tiles .bad b{color:var(--errfg)}
 .tiles.stats{grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
-.bar{height:8px;border-radius:99px;background:var(--gray-100,#f1e9df);overflow:hidden}.bar span{display:block;height:100%;background:var(--okfg);border-radius:99px}
+.meter{height:8px;border-radius:99px;background:var(--gray-100,#f1e9df);overflow:hidden}.meter span{display:block;height:100%;background:var(--okfg);border-radius:99px}
 .revprompt{display:flex;flex-direction:column;gap:8px}
 .pendrev{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 

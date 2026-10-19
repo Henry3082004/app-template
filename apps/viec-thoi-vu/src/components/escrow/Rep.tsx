@@ -39,7 +39,7 @@ export function Rep({ rep, employer, size = 'md' }: { rep?: Reputation; employer
           <div><b>{rep?.partners ?? 0}</b><span>{t('repStatPartners')}</span></div>
           {!employer && <div className={rep && rep.noshow > 0 ? 'bad' : ''}><b>{rep?.noshow ?? 0}</b><span>{t('repStatNoshow')}</span></div>}
         </div>
-        {onTimePct != null && <div className="bar" aria-hidden="true"><span style={{ width: onTimePct + '%' }} /></div>}
+        {onTimePct != null && <div className="meter" aria-hidden="true"><span style={{ width: onTimePct + '%' }} /></div>}
         <div className="small muted">{t('repWhy')}</div>
       </div>
     )
