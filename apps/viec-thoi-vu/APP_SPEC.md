@@ -139,7 +139,7 @@ nhà tuyển dụng.
   - Giới hạn gói được kiểm tra ở database, không chỉ ẩn nút.
 - **Thanh toán:** PayOS/SePay (VN), Lemon Squeezy (quốc tế) — **chưa kết nối** vì Henry chưa đăng ký
   tài khoản (BAN_APP.md B1, B2). Hiện nút "Nâng cấp" hiện bảng giá và thông báo "sắp mở thanh toán".
-- **Ngôn ngữ:** vi + en, tự chọn theo trình duyệt, đổi được trong Tài khoản.
+- **Ngôn ngữ:** vi + en. Mở lần đầu luôn là tiếng Việt (từ 19/10/2026, không đoán theo trình duyệt); bấm EN thì app nhớ lựa chọn đó.
 - **Landing page:** trang `/` của site; app ở `/app`. **Trang pháp lý:** `/dieu-khoan`, `/bao-mat`,
   `/hoan-tien`.
 - **Nơi đăng bán:** Product Hunt, Google Play (đóng gói Android), Zalo Mini App; tài liệu trong `ban/`.

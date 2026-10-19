@@ -317,7 +317,8 @@ export function detectLocale(): Locale {
     const saved = localStorage.getItem('locale')
     if (saved === 'vi' || saved === 'en') return saved
   } catch { /* storage unavailable */ }
-  return typeof navigator !== 'undefined' && !navigator.language.toLowerCase().startsWith('vi') && navigator.language ? 'en' : 'vi'
+  // Vietnamese first for everyone; English only once someone picks it (the choice is remembered)
+  return 'vi'
 }
 
 interface I18n { locale: Locale; setLocale(l: Locale): void; t(k: TKey, vars?: Record<string, string | number>): string }
