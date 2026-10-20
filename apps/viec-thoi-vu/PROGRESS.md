@@ -88,3 +88,9 @@
 - DB: `profiles.role` = vai trò đang dùng, `profiles.roles` = vai trò sở hữu; RPC `add_role`, `switch_role`; uy tín theo phía `role_reputations(p_users, p_as)`; đánh giá lấy phía từ ca làm (không theo vai trò đang dùng); không ứng tuyển tin của chính mình.
 - Thông tin người tìm việc chuyển sang bảng riêng `worker_profiles` (chỉ chủ và quán được ứng tuyển đọc được) — để hồ sơ quán công khai không lộ thông tin cá nhân.
 - Test: `supabase/tests/70_dual_role.sql`, `e2e/roles.spec.ts`.
+
+## 20/10/2026 — Zalo: domain + OA
+- Đã xác thực URL `https://viec-thoi-vu.vercel.app/` trên Zalo (file `public/zalo_verifier…html` — KHÔNG xoá). Đã tạo OA "Việc làm 30s" và liên kết với Mini App.
+- Webhook OA: để trống, làm SAU khi có quán đầu tiên dùng (hàm nhận sự kiện trên Supabase: theo dõi người quan tâm OA, gắn `user_id_by_app` với tài khoản, gửi tin báo việc mới).
+- Đang chờ Zalo: xác thực doanh nghiệp, duyệt phiên bản Testing (bản cũ), quyền SĐT #100. Duyệt xong → deploy bản mới, gửi duyệt lại, bật `zalo_published`.
+- Việc của Henry: đổi App Secret Zalo (đã lộ trong chat) rồi dán vào Supabase `ZALO_APP_SECRET`; hoàn thiện trang OA (ảnh, mô tả, tin chào); xem gói Supabase; tên miền riêng.
