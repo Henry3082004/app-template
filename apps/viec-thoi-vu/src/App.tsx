@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { AuthDialog } from './components/AuthDialog'
 import { CompleteProfileDialog } from './components/CompleteProfileDialog'
+import { InstallBanner } from './components/InstallBanner'
 import { Shell } from './components/Shell'
 import { Skel } from './components/ui'
 import { WorkerIntroDialog } from './components/WorkerIntroDialog'
@@ -56,6 +57,7 @@ function AppRoutes() {
       <AuthDialog />
       <CompleteProfileDialog />
       <WorkerIntroDialog />
+      <InstallBanner />
     </Suspense>
   )
 }
