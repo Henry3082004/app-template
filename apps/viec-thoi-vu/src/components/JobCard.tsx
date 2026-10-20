@@ -21,12 +21,15 @@ export function JobCard({ job, distance, sel, rep, onOpen }: { job: Job; distanc
       <Pay job={job} />
       {job.business_name && (
         <div className="bizrow">
-          <Avatar square size={30} name={job.business_name} src={avatarUrl(job.business_logo)} />
-          <div className="biz">{job.business_name}{job.business_name.includes(job.city) ? '' : ` · ${job.city}`}{distance != null ? ` · ${fmtKm(distance, locale)}` : ''}</div>
+          <Avatar square size={36} name={job.business_name} src={avatarUrl(job.business_logo)} />
+          <div className="biz">
+            <b>{job.business_name}</b>
+            <span>{job.city}{distance != null ? ` · ${fmtKm(distance, locale)}` : ''}</span>
+          </div>
         </div>
       )}
-      <Rep rep={rep} employer size="sm" />
       <div className="meta">
+        <Rep rep={rep} employer size="sm" />
         <span>{dateRange(job.start_date, job.end_date)}</span>
         <span className={full || left <= 3 ? 'low' : ''}>{full ? t('full') : t('slotsLeft', { n: left })}</span>
       </div>

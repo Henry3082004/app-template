@@ -3,7 +3,9 @@ import type { Locale } from './types'
 
 /**
  * Slides of the banner at the top of the job list. Edit this list to change what people see:
- * `tone` picks the colour (t1–t4 in app.css), `to` is an in-app link (leave out for no button).
+ * `tone` picks the colour (t1–t4 in app.css), `to` is an in-app link (leave out for no button),
+ * `photo` is an optional background picture in public/banners/ (WebP, about 1280×520, under 200 KB) — without one the
+ * slide shows its colour. A dark gradient always sits over the picture so the white text stays readable.
  * Keep claims general and true — no numbers we can't back up.
  */
 export interface BannerSlide {
@@ -11,6 +13,7 @@ export interface BannerSlide {
   tone: 't1' | 't2' | 't3' | 't4'
   pose: CapyPose
   to?: string
+  photo?: string
   copy: Record<Locale, { tag: string; title: string; sub: string; cta?: string }>
 }
 

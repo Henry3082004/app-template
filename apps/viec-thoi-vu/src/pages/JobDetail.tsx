@@ -67,13 +67,17 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
         <div className="card">
           <div className="hrow"><h2 style={{ fontSize: 20 }}>{job.title}</h2>{job.is_urgent && <Tag tone="urgent">{t('urgent')}</Tag>}</div>
           <div style={{ marginTop: 8 }}><Pay job={job} xl /></div>
-          <div style={{ marginTop: 12 }}><Rep rep={rep} employer /></div>
+          {job.business_name && (
+            <div className="shopbox">
+              <Avatar square size={40} name={job.business_name} src={avatarUrl(job.business_logo)} />
+              <div><b>{job.business_name}</b><Rep rep={rep} employer /></div>
+            </div>
+          )}
         </div>
         <div className="card info">
           <div><Ic n="calendar" size={18} /><span><b>{dateRange(job.start_date, job.end_date)}</b>{job.shift_note && <><br />{job.shift_note}</>}</span></div>
           <div><Ic n="pin" size={18} /><span><b>{job.address}, {job.city}</b>{distance != null && <><br />{fmtKm(distance, locale)}</>}</span></div>
           <div><Ic n="users" size={18} /><span>{left > 0 ? t('slotsOf', { left, total: job.slots }) : t('full')}</span></div>
-          {job.business_name && <div><Avatar square size={28} name={job.business_name} src={avatarUrl(job.business_logo)} /><span>{job.business_name}</span></div>}
         </div>
         {job.description && <div className="card"><b>{t('about')}</b><p style={{ marginTop: 6, whiteSpace: 'pre-line' }}>{job.description}</p></div>}
         {!full && !mine && !isEmployer && (

@@ -104,3 +104,10 @@
 - Nút "Cài app" (PWA: Android 1 chạm, iPhone có hướng dẫn; ẩn trong Zalo/app đã cài; "Để sau" ẩn 7 ngày).
 - Banner chạy ngang đầu danh sách việc (đổi 3 giây, dừng khi chạm/rê chuột, vuốt được). Nội dung ở `src/lib/banners.ts` — nội dung đang là mẫu, Henry quyết định sau.
 - Test: `e2e/install.spec.ts`, `e2e/banners.spec.ts`, `e2e/admin.spec.ts` (tab mẫu), `e2e/core.spec.ts` (link `/`).
+
+## 20/10/2026 — Giao diện mới theo Claude Design
+- Màu caramel–kem–sage (`src/ds/tokens/colors.css`), bóng nhẹ, nút bo 14, chip cao 44 (chọn = nền cam), ô nhập nền kem.
+- Font tự host qua @fontsource: Nunito 800/900 (tiêu đề, giá, logo) + Be Vietnam Pro 400/500/600 (nội dung), chỉ bộ chữ Việt + Latin.
+- Trang việc làm cùng một bố cục ở mọi cỡ màn hình: banner → thẻ tìm kiếm nổi (ô tìm, Khu vực, Lương, ngành) → lưới thẻ việc; từ 1024px có thêm khung chi tiết dính bên phải. Điện thoại/tablet dọc mở việc thành trang riêng.
+- Thẻ việc: tên, giá, logo + tên quán + thành phố, hàng dưới (uy tín · ngày · số chỗ). Trang việc: hộp quán màu sage, các dòng thông tin có kẻ, nút "Ứng tuyển ngay" nổi.
+- Banner: hỗ trợ ảnh nền (`photo` trong `src/lib/banners.ts`, file trong `public/banners/`, có lớp phủ tối cho chữ), capybara trong vòng tròn kem. CHƯA có ảnh thật (máy làm việc không tải được Unsplash/Pexels) — đang dùng nền màu.

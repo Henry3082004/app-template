@@ -8,7 +8,7 @@ import { Ic } from './Ic'
 const EVERY_MS = 3000
 
 /** Slides across the top of the job list: moves on by itself every 3 s, stops while touched/hovered, swipe or tap the dots to browse. */
-export function Banners({ hero }: { hero?: boolean }) {
+export function Banners() {
   const { locale, t } = useI18n()
   const track = useRef<HTMLDivElement>(null)
   const [cur, setCur] = useState(0)
@@ -35,7 +35,7 @@ export function Banners({ hero }: { hero?: boolean }) {
 
   return (
     <section
-      className={hero ? 'banners jhero' : 'banners'}
+      className="banners"
       aria-roledescription="carousel"
       aria-label={t('bannersLabel')}
       onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}
@@ -46,12 +46,15 @@ export function Banners({ hero }: { hero?: boolean }) {
         {BANNERS.map((b, i) => {
           const c = b.copy[locale]
           return (
-            <div key={b.id} className={`bn ${b.tone}`} role="group" aria-roledescription="slide" aria-label={`${i + 1} / ${BANNERS.length}`} aria-hidden={i !== cur}>
+            <div
+              key={b.id} className={`bn ${b.tone}${b.photo ? ' photo' : ''}`} style={b.photo ? { backgroundImage: `url(${b.photo})` } : undefined}
+              role="group" aria-roledescription="slide" aria-label={`${i + 1} / ${BANNERS.length}`} aria-hidden={i !== cur}
+            >
               <span className="bn-tag">{c.tag}</span>
               <b className="bn-title">{c.title}</b>
               <span className="bn-sub">{c.sub}</span>
               {b.to && c.cta && <Link className="bn-cta" to={b.to} tabIndex={i === cur ? 0 : -1}>{c.cta} <Ic n="arrow" size={14} /></Link>}
-              <img src={capy(b.pose)} alt="" />
+              <span className="bn-capy"><img src={capy(b.pose)} alt="" /></span>
             </div>
           )
         })}

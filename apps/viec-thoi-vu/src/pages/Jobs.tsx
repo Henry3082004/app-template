@@ -32,7 +32,6 @@ export default function Jobs() {
   const nav = useNavigate()
   const { id } = useParams()
   const bp = useBp()
-  const wide = bp !== 'm'
   const big = bp === 'l' || bp === 'd' // landscape tablet / desktop: banner on top, search card, grid + sticky detail
   const { profile, ready, askAuth } = useSession()
   const [params, setParams] = useSearchParams()
@@ -128,7 +127,7 @@ export default function Jobs() {
       job={selected}
       distance={distOf(selected)}
       mine={mine[selected.id] ?? null}
-      onBack={wide ? undefined : () => nav('/app')}
+      onBack={big ? undefined : () => nav('/app')}
       onApplied={() => { setDone(true); loadMine(); load() }}
     />
   )
@@ -143,8 +142,8 @@ export default function Jobs() {
     </Dialog>
   )
 
-  // Phone + a job selected → detail only.
-  if (!wide && id) {
+  // Phone / portrait tablet with a job open → the job page on its own.
+  if (!big && id) {
     return (
       <>
         <div className="pcol">
@@ -170,10 +169,10 @@ export default function Jobs() {
   const body = error != null
     ? <ErrorBox error={error} where="Jobs.list" onRetry={load} />
     : jobs === null
-      ? <><div className="center" style={{ marginBottom: 12 }}><img className="capy sm" src={capy('bath')} alt="" style={{ margin: '0 auto' }} /><div className="sub">{t('capyLoading')}</div></div><Skel n={wide ? 4 : 3} /></>
+      ? <><div className="center" style={{ marginBottom: 12 }}><img className="capy sm" src={capy('bath')} alt="" style={{ margin: '0 auto' }} /><div className="sub">{t('capyLoading')}</div></div><Skel n={big ? 4 : 3} /></>
       : shown.length === 0
         ? <Empty pose="empty" title={t('emptyTitle')} sub={t('emptySub')}><Btn v="ghost" sm onClick={clear}>{t('clearFilters')}</Btn></Empty>
-        : <div className={'cards' + (big ? ' wide' : '')}>{shown.map(({ j, d }) => <JobCard key={j.id} job={j} distance={d} rep={reps[j.employer_id]} sel={wide && j.id === id} onOpen={() => open(j.id)} />)}</div>
+        : <div className={'cards' + (big ? ' wide' : '')}>{shown.map(({ j, d }) => <JobCard key={j.id} job={j} distance={d} rep={reps[j.employer_id]} sel={big && j.id === id} onOpen={() => open(j.id)} />)}</div>
 
   const selects = (
     <>
@@ -190,67 +189,42 @@ export default function Jobs() {
     </>
   )
 
-  // Landscape tablet / desktop: one centred page — banner, floating search card, then job grid next to a sticky detail card.
-  if (big) {
-    return (
-      <>
-        <div className="jobspage">
-          <div className="jwrap">
-            <Banners hero />
-            <section className="searchcard" aria-label={t('navJobs')}>
-              <div className="srow">
-                <div className="searchbox">
-                  <span className="si"><Ic n="search" size={18} /></span>
-                  <input ref={searchRef} className="inp" type="search" placeholder={t('searchPh')} aria-label={t('searchPh')} value={q} onChange={(e) => setQ(e.target.value)} />
-                  <span className="kbd" aria-hidden="true">/</span>
-                </div>
-                {selects}
+  // One page at every size: banner, a search card floating over its lower edge, then the jobs.
+  // Landscape tablet / desktop also keep the open job in a sticky card next to the grid.
+  return (
+    <>
+      <div className="jobspage">
+        <div className="jwrap">
+          <Banners />
+          <section className="searchcard" role="search">
+            <div className="srow">
+              <div className="searchbox">
+                <span className="si"><Ic n="search" size={18} /></span>
+                <input ref={searchRef} className="inp" type="search" placeholder={t('searchPh')} aria-label={t('searchPh')} value={q} onChange={(e) => setQ(e.target.value)} />
+                <span className="kbd" aria-hidden="true">/</span>
               </div>
-              <div className="chiprow wrap">{chips}</div>
+              {selects}
+            </div>
+            <div className="chiprow">{chips}</div>
+          </section>
+          <div className="jbody">
+            <section className="jlist">
+              <div className="jhead">
+                <h1 className="ptitle">{t('navJobs')}</h1>
+                {!big && !profile && <Btn v="ghost" sm onClick={() => askAuth({ role: 'employer', onDone: (p) => nav(p.role === 'employer' ? '/app/dang-tin' : '/app') })}>{t('iNeedStaff')}</Btn>}
+                {sortLine}
+              </div>
+              {loc === 'denied' && <div className="notice warn">{t('locDenied')}</div>}
+              {body}
+              <LegalLinks />
             </section>
-            <div className="jbody">
-              <section className="jlist">
-                <div className="jhead"><h1 className="ptitle">{t('navJobs')}</h1>{sortLine}</div>
-                {loc === 'denied' && <div className="notice warn">{t('locDenied')}</div>}
-                {body}
-                <LegalLinks />
-              </section>
+            {big && (
               <aside className="jdetail" aria-label={t('about')}>
                 {selected ? detail : <Empty pose="wave" title={t('pickJob')} sub={t('pickJobSub')} />}
               </aside>
-            </div>
+            )}
           </div>
         </div>
-        {successDialog}
-      </>
-    )
-  }
-
-  return (
-    <>
-      <div className="split">
-        <section className="listcol">
-          <Banners />
-          <div className="listhead">
-            <div className="hrow" style={{ alignItems: 'center' }}>
-              <h1 className="ptitle">{t('navJobs')}</h1>
-              {!profile && <Btn v="ghost" sm onClick={() => askAuth({ role: 'employer', onDone: (p) => nav(p.role === 'employer' ? '/app/dang-tin' : '/app') })}>{t('iNeedStaff')}</Btn>}
-            </div>
-            <div className="searchbox">
-              <span className="si"><Ic n="search" size={18} /></span>
-              <input ref={searchRef} className="inp" type="search" placeholder={t('searchPh')} aria-label={t('searchPh')} value={q} onChange={(e) => setQ(e.target.value)} />
-              <span className="kbd" aria-hidden="true">/</span>
-            </div>
-            <div className="chiprow">{chips}</div>
-            {sortLine}
-            {loc === 'denied' && <div className="notice warn">{t('locDenied')}</div>}
-          </div>
-          {body}
-          <LegalLinks />
-        </section>
-        <section className="detailcol">
-          {selected ? detail : <Empty pose="wave" title={t('pickJob')} sub={t('pickJobSub')} />}
-        </section>
       </div>
       {successDialog}
     </>
