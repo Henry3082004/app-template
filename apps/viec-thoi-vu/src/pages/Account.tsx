@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { BankCard, OwnReputation } from '../components/escrow'
 import { useAppConfig } from '../lib/config'
+import { LegalLinks } from '../components/LegalLinks'
+import { LogoPicker } from '../components/LogoPicker'
 import { Ic } from '../components/Ic'
 import { RolesCard } from '../components/RolesCard'
 import { Avatar, Btn, Empty, ErrorBox, Fld } from '../components/ui'
@@ -84,10 +86,11 @@ export default function Account() {
       <div className="acct">
         <OwnReputation userId={profile.id} employer={emp} />
         <div className="card stack">
-          <div className="row"><Avatar name={name} src={emp ? null : avatarUrl(w?.avatar_path)} /><div style={{ flex: 1, minWidth: 0 }}><b>{name}</b><div className="sub" style={{ fontSize: 14 }}>{displayPhone(profile.phone)}</div></div>{emp && cfg?.billing === 'on' && <span className={profile.plan === 'pro' ? 'tag sun' : 'tag'}>{t(profile.plan === 'pro' ? 'planpro' : 'planfree')}</span>}</div>
+          <div className="row"><Avatar square={emp} name={name} src={avatarUrl(emp ? profile.logo_path : w?.avatar_path)} /><div style={{ flex: 1, minWidth: 0 }}><b>{name}</b><div className="sub" style={{ fontSize: 14 }}>{displayPhone(profile.phone)}</div></div>{emp && cfg?.billing === 'on' && <span className={profile.plan === 'pro' ? 'tag sun' : 'tag'}>{t(profile.plan === 'pro' ? 'planpro' : 'planfree')}</span>}</div>
           <Fld label={t('yourName')} htmlFor="ac-name"><input id="ac-name" className="inp" value={f.full_name} onChange={(e) => setF({ ...f, full_name: e.target.value })} maxLength={80} /></Fld>
           {emp ? (
             <>
+              <LogoPicker name={name} path={profile.logo_path} />
               <Fld label={t('businessName')} htmlFor="ac-biz"><input id="ac-biz" className="inp" value={f.business_name} onChange={(e) => setF({ ...f, business_name: e.target.value })} maxLength={120} /></Fld>
               <Fld label={t('address')} htmlFor="ac-addr"><input id="ac-addr" className="inp" value={f.address} onChange={(e) => setF({ ...f, address: e.target.value })} maxLength={200} /></Fld>
             </>
@@ -107,7 +110,7 @@ export default function Account() {
         {!emp && cfg && cfg.payment_mode !== 'off' && <BankCard />}
         {lang}
       </div>
-      <p className="small mt24"><Link to="/dieu-khoan">{t('legal')}</Link></p>
+      <LegalLinks />
       <div style={{ marginTop: 40 }}>
         <Btn v="text" onClick={out}>{t('signOut')}</Btn>
         <div className="sub" style={{ fontSize: 13 }}>{t('byeSub')}</div>

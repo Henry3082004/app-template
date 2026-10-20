@@ -47,7 +47,7 @@ export function LandingBar() {
   return (
     <header className="bar">
       <Link to="/" className="logo"><img src={LOGO} alt="" />{t('appName')}</Link>
-      <nav><a href="/#loi-ich">{c.nav[0]}</a>{cfg?.billing === 'on' && <a href="/#bang-gia">{c.nav[1]}</a>}<a href="/#hoi-dap">{c.nav[2]}</a></nav>
+      <nav><a href="/gioi-thieu#loi-ich">{c.nav[0]}</a>{cfg?.billing === 'on' && <a href="/gioi-thieu#bang-gia">{c.nav[1]}</a>}<a href="/gioi-thieu#hoi-dap">{c.nav[2]}</a></nav>
       <span className="sp" />
       <div className="lang">
         <button type="button" className={locale === 'vi' ? 'on' : ''} onClick={() => setLocale('vi')}>VI</button>

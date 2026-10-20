@@ -32,7 +32,13 @@ test('employer (paid plans on): post, free-plan limit, accept applicant, phone s
 test('public pages: landing and terms', async ({ page: p }) => {
   const h = helpers(p)
   await p.goto('/dieu-khoan'); await h.see('Điều khoản sử dụng'); await h.noHScroll()
-  await h.go('/'); await h.see('nhận việc trong ngày'); await h.noHScroll()
+  await h.go('/gioi-thieu'); await h.see('nhận việc trong ngày'); await h.noHScroll()
   // the header spacer once picked up the progress-bar style (class clash on .bar) and showed as a big green pill
   await expect(p.locator('header.bar .sp')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
+})
+
+test('opening the plain link goes straight to the job list (intro page lives at /gioi-thieu)', async ({ page: p }) => {
+  const h = helpers(p)
+  await p.goto('/'); await h.see('Phụ bếp ca tối'); expect(new URL(p.url()).pathname).toBe('/app')
+  await p.goto('/?tuyen=1'); await h.see('Đăng nhập') // share links keep their query
 })

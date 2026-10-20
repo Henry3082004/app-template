@@ -236,7 +236,7 @@ export const mockApi: Api = {
     if (!p.roles.includes('employer')) throw new AppError('FORBIDDEN')
     if (input.is_urgent && !isPro(p)) throw new AppError('URGENT_REQUIRES_PRO')
     if (!isPro(p) && jobs.filter((j) => j.employer_id === p.id && j.status === 'open').length >= 2) throw new AppError('FREE_PLAN_LIMIT')
-    const job: Job = { ...input, id: nid(), employer_id: p.id, business_name: p.business_name || p.full_name, filled: 0, status: 'open', created_at: now() }
+    const job: Job = { ...input, id: nid(), employer_id: p.id, business_name: p.business_name || p.full_name, business_logo: p.logo_path ?? null, filled: 0, status: 'open', created_at: now() }
     jobs.unshift(job)
     return wait(job)
   },
@@ -451,8 +451,8 @@ export const mockApi: Api = {
   async adminSamples() {
     admin()
     return wait<AdminSamples>({
-      shops: [{ id: 's1', name: 'Quán Cơm Tấm Bà Tư', owner: 'Chị Tư', address: '12 Nguyễn Trãi, Q.1', city: 'TP.HCM', jobs: 1 }],
-      workers: [{ id: 'w1', name: 'Nguyễn Thị Lan', city: 'TP.HCM', birth_year: 1999, experience: ['service'], availability: ['evening'], applications: 2 }],
+      shops: [{ id: 's1', name: 'Quán Cơm Tấm Bà Tư', owner: 'Chị Tư', address: '12 Nguyễn Trãi, Q.1', city: 'TP.HCM', logo_path: '/sample/shop-01.png', jobs: 1 }],
+      workers: [{ id: 'w1', name: 'Nguyễn Thị Lan', city: 'TP.HCM', birth_year: 1999, avatar_path: '/sample/worker-01.png', experience: ['service'], availability: ['evening'], applications: 2 }],
     })
   },
   async adminStats() {

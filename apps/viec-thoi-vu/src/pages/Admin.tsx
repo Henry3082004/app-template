@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Ic } from '../components/Ic'
-import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
+import { Avatar, Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { WorkerFacts } from '../components/WorkerFields'
 import { api } from '../lib/api'
 import { dateRange, money } from '../lib/format'
@@ -8,6 +8,7 @@ import { useI18n, type TKey } from '../lib/i18n'
 import { displayPhone, telHref } from '../lib/phone'
 import { sendTestError } from '../lib/sentry'
 import { useSession } from '../lib/session'
+import { avatarUrl } from '../lib/worker'
 import type { AdminDispute, AdminFlag, AdminPayout, AdminSamples, AdminStats, Availability, Experience } from '../lib/types'
 
 type Tab = 'disputes' | 'payouts' | 'flags' | 'samples'
@@ -112,7 +113,7 @@ function SamplesTab({ s }: { s: AdminSamples | null }) {
       <h2 style={{ fontSize: 17 }}>{t('samplesShops')} ({s.shops.length})</h2>
       <div className="g2">{s.shops.map((p) => (
         <article key={p.id} className="card stack">
-          <h3 style={{ fontSize: 16 }}>{p.name}</h3>
+          <div className="row"><Avatar square size={44} name={p.name ?? p.owner} src={avatarUrl(p.logo_path)} /><h3 style={{ fontSize: 16 }}>{p.name}</h3></div>
           <div className="small muted">{p.owner} · {[p.address, p.city].filter(Boolean).join(', ')}</div>
           <div><Tag tone="p">{t('samplesJobsN', { n: p.jobs })}</Tag></div>
         </article>
@@ -120,7 +121,7 @@ function SamplesTab({ s }: { s: AdminSamples | null }) {
       <h2 style={{ fontSize: 17 }}>{t('samplesWorkers')} ({s.workers.length})</h2>
       <div className="g2">{s.workers.map((w) => (
         <article key={w.id} className="card stack">
-          <h3 style={{ fontSize: 16 }}>{w.name}</h3>
+          <div className="row"><Avatar size={44} name={w.name} src={avatarUrl(w.avatar_path)} /><h3 style={{ fontSize: 16 }}>{w.name}</h3></div>
           <div className="small muted">{w.city}</div>
           <WorkerFacts w={{ birth_year: w.birth_year, experience: (w.experience ?? []) as Experience[], availability: (w.availability ?? []) as Availability[], avatar_path: null }} />
           <div><Tag tone="p">{t('samplesAppsN', { n: w.applications })}</Tag></div>

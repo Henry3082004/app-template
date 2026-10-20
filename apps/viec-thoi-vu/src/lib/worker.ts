@@ -5,7 +5,7 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
 /** Public URL of a stored profile photo (the mock keeps photos as data: URLs). */
 export function avatarUrl(path: string | null | undefined): string | null {
   if (!path) return null
-  if (path.startsWith('data:')) return path
+  if (path.startsWith('data:') || path.startsWith('/')) return path // mock photos and the bundled sample pictures
   return `${SUPABASE_URL}/storage/v1/object/public/avatars/${path}`
 }
 

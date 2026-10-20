@@ -3,7 +3,7 @@ import { PORTS, expect, helpers, test, url } from './fixtures'
 // The configuration production runs today: no payments, no paid plans.
 test('free mode: no pricing, no deposit, phone shown on accept, shift confirmed without money', async ({ page: p }) => {
   const h = helpers(p)
-  await p.goto(url(PORTS.free, '/')); await h.see('Có mất phí không?'); await h.notSee('149.000đ')
+  await p.goto(url(PORTS.free, '/gioi-thieu')); await h.see('Có mất phí không?'); await h.notSee('149.000đ')
   await h.go('/app'); await h.see('Phụ bếp ca tối')
   await h.asEmployer()
   await h.go('/app/tin-cua-toi'); await h.see('Pha chế ca sáng'); await h.notSee('Gói Miễn phí')

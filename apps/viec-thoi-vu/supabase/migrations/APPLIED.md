@@ -30,3 +30,7 @@ worker_profiles" khi lưu hồ sơ (upsert của PostgREST ghi cả cột user_i
 file migration): quán `33333333-3333-4333-8333-0000000000NN`, nhân viên `44444444-4444-4444-8444-0000000000NN`, email
 `mau.quanN@` / `mau.nvN@phone.viecthoivu.app`, tài khoản bị khoá đăng nhập (banned_until +100 năm). 8 tài khoản dùng thử cũ cũng được gắn `is_sample`.
 Xoá hết mẫu: `delete from auth.users where id in (select id from public.profiles where is_sample)` (tin và đơn tự xoá theo).
+
+20/10/2026: `20261026_shop_logo.sql` áp dụng thành `shop_logo_column`, `shop_logo_worker_sample_avatar`, `shop_logo_admin_samples_images`.
+Ảnh logo 10 quán mẫu / ảnh đại diện 10 nhân viên mẫu nằm trong `public/sample/*.png` (vẽ bằng SVG, không phải ảnh thật);
+đã gán bằng SQL một lần: `update profiles set logo_path = '/sample/shop-NN.png' …`, `update worker_profiles set avatar_path = '/sample/worker-NN.png' …`.

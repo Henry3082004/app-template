@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Ic } from '../components/Ic'
+import { Banners } from '../components/Banners'
 import { JobCard } from '../components/JobCard'
+import { LegalLinks } from '../components/LegalLinks'
 import { Btn, Chip, Dialog, Empty, ErrorBox, Fld, Skel } from '../components/ui'
 import { api } from '../lib/api'
 import { capy } from '../lib/capy'
@@ -182,6 +184,7 @@ export default function Jobs() {
           </Fld>
         </aside>
         <section className="listcol">
+          <Banners />
           <div className="listhead">
             <div className="hrow" style={{ alignItems: 'center' }}>
               <h1 className="ptitle">{t('navJobs')}</h1>
@@ -202,6 +205,7 @@ export default function Jobs() {
             {loc === 'denied' && <div className="notice warn">{t('locDenied')}</div>}
           </div>
           {body}
+          <LegalLinks />
         </section>
         <section className="detailcol">
           {selected ? detail : <Empty pose="wave" title={t('pickJob')} sub={t('pickJobSub')} />}

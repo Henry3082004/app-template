@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Ic } from '../components/Ic'
 import { Rep } from '../components/escrow'
 import { Pay } from '../components/JobCard'
-import { Btn, ErrorBox, Fld, Tag } from '../components/ui'
+import { Avatar, Btn, ErrorBox, Fld, Tag } from '../components/ui'
 import { api } from '../lib/api'
 import { errorCode } from '../lib/errors'
 import { dateRange } from '../lib/format'
@@ -12,7 +12,7 @@ import { useI18n } from '../lib/i18n'
 import { report } from '../lib/sentry'
 import { useSession } from '../lib/session'
 import type { AppStatus, Job, Profile, Reputation } from '../lib/types'
-import { introNudgeDue } from '../lib/worker'
+import { avatarUrl, introNudgeDue } from '../lib/worker'
 
 /** Job detail: a page on phones, the right-hand column on tablet/desktop. */
 export function JobDetail({ job, distance, mine, onApplied, onBack }: {
@@ -73,7 +73,7 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
           <div><Ic n="calendar" size={18} /><span><b>{dateRange(job.start_date, job.end_date)}</b>{job.shift_note && <><br />{job.shift_note}</>}</span></div>
           <div><Ic n="pin" size={18} /><span><b>{job.address}, {job.city}</b>{distance != null && <><br />{fmtKm(distance, locale)}</>}</span></div>
           <div><Ic n="users" size={18} /><span>{left > 0 ? t('slotsOf', { left, total: job.slots }) : t('full')}</span></div>
-          {job.business_name && <div><Ic n="store" size={18} /><span>{job.business_name}</span></div>}
+          {job.business_name && <div><Avatar square size={28} name={job.business_name} src={avatarUrl(job.business_logo)} /><span>{job.business_name}</span></div>}
         </div>
         {job.description && <div className="card"><b>{t('about')}</b><p style={{ marginTop: 6, whiteSpace: 'pre-line' }}>{job.description}</p></div>}
         {!full && !mine && !isEmployer && (

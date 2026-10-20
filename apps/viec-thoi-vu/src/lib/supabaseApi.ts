@@ -10,7 +10,7 @@ const KEY = import.meta.env.VITE_SUPABASE_KEY as string
 
 const sb = createClient(URL, KEY, { auth: { persistSession: true, autoRefreshToken: true } })
 
-const JOB_COLS = '*, employer:profiles!jobs_employer_id_fkey(business_name, full_name)'
+const JOB_COLS = '*, employer:profiles!jobs_employer_id_fkey(business_name, full_name, logo_path)'
 const KNOWN = ['FREE_PLAN_LIMIT', 'URGENT_REQUIRES_PRO', 'JOB_NOT_OPEN', 'SLOTS_BELOW_FILLED', 'FORBIDDEN',
   'ALREADY_DECIDED', 'JOB_FULL', 'NOT_FOUND', 'CANNOT_WITHDRAW', 'NOT_FUNDED', 'TOO_EARLY', 'ALREADY_FUNDED', 'ALREADY_SETTLED',
   'NOT_ACCEPTED', 'JOB_ENDED', 'PAYMENT_NOT_AVAILABLE', 'CANNOT_DISPUTE', 'NOT_COMPLETED', 'ALREADY_REVIEWED', 'REVIEW_WINDOW_CLOSED',
@@ -37,7 +37,7 @@ const num = (v: unknown): number | null => (v == null ? null : Number(v))
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toJob(r: any): Job {
   const { employer, ...rest } = r
-  return { ...rest, pay_amount: Number(r.pay_amount), business_name: employer?.business_name || employer?.full_name || null }
+  return { ...rest, pay_amount: Number(r.pay_amount), business_name: employer?.business_name || employer?.full_name || null, business_logo: employer?.logo_path ?? null }
 }
 
 async function uid(): Promise<string> {

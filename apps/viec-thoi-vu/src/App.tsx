@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react'
-import { BrowserRouter, MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AuthDialog } from './components/AuthDialog'
 import { CompleteProfileDialog } from './components/CompleteProfileDialog'
 import { InstallBanner } from './components/InstallBanner'
@@ -43,16 +43,23 @@ function AppPages() {
   )
 }
 
+/** The link opens the app itself (the intro page lives at /gioi-thieu); share links like ?tuyen=1 keep working. */
+function HomeRedirect() {
+  const { search } = useLocation()
+  return <Navigate to={{ pathname: '/app', search }} replace />
+}
+
 function AppRoutes() {
   return (
     <Suspense fallback={<div className="pg"><Skel n={2} /></div>}>
       <Routes>
-        <Route path="/" element={IN_ZALO ? <AppPages /> : <Landing />} />
+        <Route path="/" element={<HomeRedirect />} />
+        <Route path="/gioi-thieu" element={<Landing />} />
         <Route path="/app/*" element={<AppPages />} />
         <Route path="/dieu-khoan" element={<Legal kind="terms" />} />
         <Route path="/bao-mat" element={<Legal kind="privacy" />} />
         <Route path="/hoan-tien" element={<Legal kind="refund" />} />
-        <Route path="*" element={<Landing />} />
+        <Route path="*" element={<HomeRedirect />} />
       </Routes>
       <AuthDialog />
       <CompleteProfileDialog />

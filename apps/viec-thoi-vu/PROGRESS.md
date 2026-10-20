@@ -95,3 +95,12 @@
 - Đang chờ Zalo: xác thực doanh nghiệp, duyệt phiên bản Testing (bản cũ), quyền SĐT #100. Duyệt xong → deploy bản mới, gửi duyệt lại, bật `zalo_published`.
 - Việc của Henry: đổi App Secret Zalo (đã lộ trong chat) rồi dán vào Supabase `ZALO_APP_SECRET`; hoàn thiện trang OA (ảnh, mô tả, tin chào); xem gói Supabase; tên miền riêng.
 - 20/10/2026: Zalo "Đăng nhập Zalo" (tab Web) đã cấu hình: Home URL `https://viec-thoi-vu.vercel.app`, Callback URL `https://viec-thoi-vu.vercel.app/app`. Tab iOS/Android để trống (không dùng). Chưa viết code đăng nhập Zalo trên web (cần quyết cách nối tài khoản vì Zalo web thường không trả SĐT).
+
+## 20/10/2026 — Logo, dữ liệu mẫu, trang chủ, banner
+- Logo mới = đúng con capybara của app trên nền cam (`public/icon-*.png`, `favicon.svg`, `capy/logo*.png`, `og.png`; cache `?v=3`, `sw.js` `vtv-v4`).
+- Dữ liệu mẫu chỉ admin thấy: cờ `profiles.is_sample` / `jobs.is_sample` (RLS ẩn với người thường, `admin_stats` bỏ qua), tab Admin → "Dữ liệu mẫu" (`admin_samples()`). 10 quán + 10 nhân viên + 10 tin + đơn; ảnh/logo vẽ SVG ở `public/sample/`. Cách xoá: xem `supabase/migrations/APPLIED.md`.
+- Logo quán: `profiles.logo_path` (Tài khoản → thêm logo/ảnh quán), hiện trên thẻ việc + trang chi tiết.
+- Mở link `/` vào thẳng danh sách việc (`/app`); trang giới thiệu chuyển sang `/gioi-thieu` (Google/Zalo cần trang chủ có link điều khoản). Footer "Giới thiệu · Điều khoản · Bảo mật" trong app. VIỆC CỦA HENRY: Google Cloud → màn hình đồng ý → "Trang chủ ứng dụng" đổi thành `https://viec-thoi-vu.vercel.app/gioi-thieu`.
+- Nút "Cài app" (PWA: Android 1 chạm, iPhone có hướng dẫn; ẩn trong Zalo/app đã cài; "Để sau" ẩn 7 ngày).
+- Banner chạy ngang đầu danh sách việc (đổi 3 giây, dừng khi chạm/rê chuột, vuốt được). Nội dung ở `src/lib/banners.ts` — nội dung đang là mẫu, Henry quyết định sau.
+- Test: `e2e/install.spec.ts`, `e2e/banners.spec.ts`, `e2e/admin.spec.ts` (tab mẫu), `e2e/core.spec.ts` (link `/`).

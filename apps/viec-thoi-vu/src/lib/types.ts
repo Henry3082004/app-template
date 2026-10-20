@@ -37,6 +37,8 @@ export interface Profile extends WorkerInfo {
   locale: Locale
   phone: string | null
   is_admin?: boolean
+  /** a business's logo/photo (storage path) */
+  logo_path?: string | null
 }
 
 export interface Job {
@@ -60,6 +62,8 @@ export interface Job {
   status: JobStatus
   created_at: string
   business_name: string | null
+  /** the shop's logo (storage path), if it has one */
+  business_logo?: string | null
 }
 
 /** Escrow / shift state shared by both sides of an accepted application. */
@@ -135,8 +139,8 @@ export interface AdminStats {
 
 /** Sample shops and workers (profiles.is_sample): only admins can see them. */
 export interface AdminSamples {
-  shops: { id: string; name: string | null; owner: string; address: string | null; city: string | null; jobs: number }[]
-  workers: { id: string; name: string; city: string | null; birth_year: number | null; experience: string[] | null; availability: string[] | null; applications: number }[]
+  shops: { id: string; name: string | null; owner: string; address: string | null; city: string | null; logo_path: string | null; jobs: number }[]
+  workers: { id: string; name: string; city: string | null; birth_year: number | null; avatar_path: string | null; experience: string[] | null; availability: string[] | null; applications: number }[]
 }
 
 export interface AppConfig { payment_mode: 'off' | 'test' | 'live'; billing: 'on' | 'off'; google_login?: 'on' | 'off'; zalo_web_login?: 'on' | 'off'; zalo_published?: 'on' | 'off' }
@@ -180,6 +184,7 @@ export interface JobInput {
 export type ZaloLoginResult = { profile: Profile } | { ticket: string; phone: string }
 
 export interface ProfileUpdate {
+  logo_path?: string | null
   full_name?: string
   bio?: string | null
   business_name?: string | null
