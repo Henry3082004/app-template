@@ -4,7 +4,7 @@ import { Ic } from '../components/Ic'
 import { Banners } from '../components/Banners'
 import { JobCard } from '../components/JobCard'
 import { LegalLinks } from '../components/LegalLinks'
-import { Btn, Chip, Dialog, Empty, ErrorBox, Fld, Skel } from '../components/ui'
+import { Btn, Chip, Dialog, Empty, ErrorBox, Skel } from '../components/ui'
 import { api } from '../lib/api'
 import { capy } from '../lib/capy'
 import { km, locate, type Coords } from '../lib/geo'
@@ -33,6 +33,7 @@ export default function Jobs() {
   const { id } = useParams()
   const bp = useBp()
   const wide = bp !== 'm'
+  const big = bp === 'l' || bp === 'd' // landscape tablet / desktop: banner on top, search card, grid + sticky detail
   const { profile, ready, askAuth } = useSession()
   const [params, setParams] = useSearchParams()
   const [jobs, setJobs] = useState<Job[] | null>(null)
@@ -156,6 +157,14 @@ export default function Jobs() {
     )
   }
 
+  const sortLine = (
+    <div className="sortline">
+      {jobs && <span>{t('capyFound', { n: shown.length })}</span>}
+      {coords
+        ? <span>{t('nearYou')}</span>
+        : <button type="button" className="back" style={{ minHeight: 0, padding: 0, fontSize: 14 }} onClick={findMe} disabled={loc === 'busy'}>{loc === 'busy' ? t('locating') : <><Ic n="pin" size={14} /> {t('useLocation')}</>}</button>}
+    </div>
+  )
   const chips = FILTERS.map((f) => <Chip key={f.id} on={filter === f.id} onClick={() => setFilter(f.id)}>{f.id === 'urgent' && <Ic n="zap" size={14} />}{t(f.key)}</Chip>)
 
   const body = error != null
@@ -164,44 +173,76 @@ export default function Jobs() {
       ? <><div className="center" style={{ marginBottom: 12 }}><img className="capy sm" src={capy('bath')} alt="" style={{ margin: '0 auto' }} /><div className="sub">{t('capyLoading')}</div></div><Skel n={wide ? 4 : 3} /></>
       : shown.length === 0
         ? <Empty pose="empty" title={t('emptyTitle')} sub={t('emptySub')}><Btn v="ghost" sm onClick={clear}>{t('clearFilters')}</Btn></Empty>
-        : <div className={'cards' + (bp === 'd' ? ' auto' : '')}>{shown.map(({ j, d }) => <JobCard key={j.id} job={j} distance={d} rep={reps[j.employer_id]} sel={wide && j.id === id} onOpen={() => open(j.id)} />)}</div>
+        : <div className={'cards' + (big ? ' wide' : '')}>{shown.map(({ j, d }) => <JobCard key={j.id} job={j} distance={d} rep={reps[j.employer_id]} sel={wide && j.id === id} onOpen={() => open(j.id)} />)}</div>
+
+  const selects = (
+    <>
+      <label className="sel"><span>{t('area')}</span>
+        <select id="f-area" className="inp" value={area} onChange={(e) => setArea(e.target.value)}>
+          <option value="">{t('allAreas')}</option>{AREAS.map((a) => <option key={a}>{a}</option>)}
+        </select>
+      </label>
+      <label className="sel"><span>{t('minPay')}</span>
+        <select id="f-pay" className="inp" value={minPay} onChange={(e) => setMinPay(e.target.value)}>
+          {PAY_OPTS.map((o) => <option key={o.v} value={o.v}>{o.label || t('noLimit')}</option>)}
+        </select>
+      </label>
+    </>
+  )
+
+  // Landscape tablet / desktop: one centred page — banner, floating search card, then job grid next to a sticky detail card.
+  if (big) {
+    return (
+      <>
+        <div className="jobspage">
+          <div className="jwrap">
+            <Banners hero />
+            <section className="searchcard" aria-label={t('navJobs')}>
+              <div className="srow">
+                <div className="searchbox">
+                  <span className="si"><Ic n="search" size={18} /></span>
+                  <input ref={searchRef} className="inp" type="search" placeholder={t('searchPh')} aria-label={t('searchPh')} value={q} onChange={(e) => setQ(e.target.value)} />
+                  <span className="kbd" aria-hidden="true">/</span>
+                </div>
+                {selects}
+              </div>
+              <div className="chiprow wrap">{chips}</div>
+            </section>
+            <div className="jbody">
+              <section className="jlist">
+                <div className="jhead"><h1 className="ptitle">{t('navJobs')}</h1>{sortLine}</div>
+                {loc === 'denied' && <div className="notice warn">{t('locDenied')}</div>}
+                {body}
+                <LegalLinks />
+              </section>
+              <aside className="jdetail" aria-label={t('about')}>
+                {selected ? detail : <Empty pose="wave" title={t('pickJob')} sub={t('pickJobSub')} />}
+              </aside>
+            </div>
+          </div>
+        </div>
+        {successDialog}
+      </>
+    )
+  }
 
   return (
     <>
       <div className="split">
-        <aside className="filters">
-          <b>{t('catLabel')}</b>
-          <div className="chipcol">{chips}</div>
-          <Fld label={t('area')} htmlFor="f-area">
-            <select id="f-area" className="inp" value={area} onChange={(e) => setArea(e.target.value)}>
-              <option value="">{t('allAreas')}</option>{AREAS.map((a) => <option key={a}>{a}</option>)}
-            </select>
-          </Fld>
-          <Fld label={t('minPay')} htmlFor="f-pay">
-            <select id="f-pay" className="inp" value={minPay} onChange={(e) => setMinPay(e.target.value)}>
-              {PAY_OPTS.map((o) => <option key={o.v} value={o.v}>{o.label || t('noLimit')}</option>)}
-            </select>
-          </Fld>
-        </aside>
         <section className="listcol">
           <Banners />
           <div className="listhead">
             <div className="hrow" style={{ alignItems: 'center' }}>
               <h1 className="ptitle">{t('navJobs')}</h1>
-              {bp !== 'd' && !profile && <Btn v="ghost" sm onClick={() => askAuth({ role: 'employer', onDone: (p) => nav(p.role === 'employer' ? '/app/dang-tin' : '/app') })}>{t('iNeedStaff')}</Btn>}
+              {!profile && <Btn v="ghost" sm onClick={() => askAuth({ role: 'employer', onDone: (p) => nav(p.role === 'employer' ? '/app/dang-tin' : '/app') })}>{t('iNeedStaff')}</Btn>}
             </div>
             <div className="searchbox">
               <span className="si"><Ic n="search" size={18} /></span>
               <input ref={searchRef} className="inp" type="search" placeholder={t('searchPh')} aria-label={t('searchPh')} value={q} onChange={(e) => setQ(e.target.value)} />
               <span className="kbd" aria-hidden="true">/</span>
             </div>
-            {bp !== 'l' && bp !== 'd' && <div className="chiprow">{chips}</div>}
-            <div className="sortline">
-              {jobs && <span>{t('capyFound', { n: shown.length })}</span>}
-              {coords
-                ? <span>{t('nearYou')}</span>
-                : <button type="button" className="back" style={{ minHeight: 0, padding: 0, fontSize: 14 }} onClick={findMe} disabled={loc === 'busy'}>{loc === 'busy' ? t('locating') : <><Ic n="pin" size={14} /> {t('useLocation')}</>}</button>}
-            </div>
+            <div className="chiprow">{chips}</div>
+            {sortLine}
             {loc === 'denied' && <div className="notice warn">{t('locDenied')}</div>}
           </div>
           {body}

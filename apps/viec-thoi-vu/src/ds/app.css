@@ -29,7 +29,7 @@ h1,h2,h3,p{margin:0}
 .top .right{display:flex;align-items:center;gap:12px}
 .lang{display:flex;background:var(--bg);border-radius:999px;padding:3px}.lang button{border:0;background:none;border-radius:999px;padding:4px 10px;font-size:13px;color:var(--tx2)}.lang button.on{background:#fff;color:var(--tx);font-weight:600;box-shadow:var(--sh)}
 @media(min-width:600px){.app{grid-template-columns:96px minmax(0,1fr);grid-template-rows:100vh;grid-template-rows:100dvh}.bnav{display:none}.rail{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px;background:#fff;border-right:1px solid var(--line)}.main{overflow:hidden}}
-@media(min-width:1280px){.app{grid-template-columns:minmax(0,1fr);grid-template-rows:64px minmax(0,1fr)}.rail{display:none}.top{display:flex}}
+@media(min-width:1024px){.app{grid-template-columns:minmax(0,1fr);grid-template-rows:64px minmax(0,1fr)}.rail{display:none}.top{display:flex}}
 
 /* ---------- Buttons ---------- */
 .btn{border:0;border-radius:999px;min-height:48px;padding:0 24px;font-weight:600;font-size:16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .15s,transform .1s,box-shadow .15s;white-space:nowrap;text-decoration:none;-webkit-tap-highlight-color:transparent}
@@ -90,7 +90,7 @@ textarea.inp{min-height:84px;resize:vertical}
 
 /* ---------- Master / detail ---------- */
 .split{display:block}
-.filters,.detailcol{display:none}
+.detailcol{display:none}
 .listcol{padding:16px}
 .listhead{display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
 .chiprow{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px}
@@ -137,8 +137,6 @@ textarea.inp{min-height:84px;resize:vertical}
 }
 @media(min-width:1024px){
 .split{grid-template-columns:220px 340px minmax(0,1fr)}
-.filters{display:flex;flex-direction:column;gap:14px;padding:20px 16px;overflow-y:auto;border-right:1px solid var(--line);background:#fff}
-.filters .chipcol{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
 .split.two{grid-template-columns:minmax(340px,380px) minmax(0,1fr)}
 }
 @media(min-width:1280px){
@@ -280,7 +278,7 @@ textarea.inp{min-height:84px;resize:vertical}
 .avatar.sq{border-radius:24%}
 .bizrow{display:flex;align-items:center;gap:8px;min-width:0}.bizrow .biz{min-width:0;flex:1}
 
-.banners{position:relative;margin-bottom:14px}
+.banners{display:block;position:relative;margin-bottom:14px}
 .bn-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:20px;-webkit-overflow-scrolling:touch}
 .bn-track::-webkit-scrollbar{display:none}
 .bn{flex:0 0 100%;scroll-snap-align:center;position:relative;overflow:hidden;min-height:140px;padding:16px 112px 16px 18px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;color:#fff}
@@ -298,3 +296,46 @@ textarea.inp{min-height:84px;resize:vertical}
 .bn-arrow.prev{left:8px}.bn-arrow.next{right:8px}
 @media(min-width:600px){.bn-arrow{display:grid}.bn{min-height:150px;padding-right:150px}.bn img{height:128px}.bn-title{font-size:20px}.bn-sub{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.bn-track{scroll-behavior:auto}}
+
+/* ---------- Wide screens (landscape tablet, desktop): centred page like a website ---------- */
+.jobspage{height:100%;overflow-y:auto;background:var(--bg)}
+.jwrap{max-width:1240px;margin:0 auto;padding:24px 32px 48px}
+.searchcard{position:relative;z-index:3;margin:-52px 36px 0;background:#fff;border-radius:24px;box-shadow:0 14px 44px rgba(60,40,20,.13);padding:20px 22px;display:flex;flex-direction:column;gap:14px}
+.srow{display:grid;grid-template-columns:minmax(0,1fr) 190px 190px;gap:12px;align-items:end}
+.srow .searchbox .inp{height:52px;font-size:16px}
+.sel{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--tx2)}
+.sel .inp{height:52px;font-size:15px;font-weight:500;color:var(--tx)}
+.searchcard .chiprow{margin:0;padding:0}
+.jbody{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:28px;margin-top:30px;align-items:start}
+.jhead{display:flex;align-items:baseline;justify-content:space-between;gap:6px 20px;flex-wrap:wrap;margin-bottom:16px}
+.jhead .sortline{flex-direction:row;align-items:center;gap:4px 16px}
+.cards.wide{grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.jdetail{position:sticky;top:16px;height:calc(100dvh - 96px);max-height:780px;display:flex;flex-direction:column;overflow:hidden;background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--sh)}
+.jdetail .dscroll{overflow-y:auto;flex:1;padding:22px;background:var(--bg)}
+.jdetail .cta{align-items:stretch;padding:14px 22px;box-shadow:none}
+.jdetail .empty{margin:auto;padding:24px}
+.banners.jhero{margin:0}
+.banners.jhero .bn-track{border-radius:28px}
+.banners.jhero .bn{min-height:280px;padding:40px 84px 78px 84px;gap:10px}
+.banners.jhero .bn-tag{font-size:13px;padding:4px 14px}
+.banners.jhero .bn-title{font-size:36px;line-height:1.14;max-width:540px}
+.banners.jhero .bn-sub{font-size:17px;line-height:1.5;max-width:500px}
+.banners.jhero .bn-cta{margin-top:8px;font-size:15px;padding:10px 22px;min-height:46px}
+.banners.jhero .bn img{height:230px;right:84px;bottom:44px}
+.banners.jhero .bn-arrow{display:grid;width:46px;height:46px;margin-top:-23px}
+.banners.jhero .bn-arrow.prev{left:20px}.banners.jhero .bn-arrow.next{right:20px}
+.banners.jhero .bn-dots{position:absolute;left:78px;bottom:62px;margin:0;justify-content:flex-start}
+.banners.jhero .bn-dots i{background:rgba(255,255,255,.55)}.banners.jhero .bn-dots .on i{background:#fff}
+@media(min-width:1024px) and (max-width:1199px){
+.jwrap{padding:20px 24px 40px}
+.jbody{grid-template-columns:minmax(0,1fr) 340px;gap:20px}
+.srow{grid-template-columns:minmax(0,1fr) 150px 150px}
+.banners.jhero .bn{min-height:250px;padding:34px 72px 76px}
+.banners.jhero .bn-title{font-size:32px}
+.banners.jhero .bn img{height:190px;right:64px}
+.searchcard{margin:-52px 24px 0}
+}
+.jlist{min-width:0}
+.top nav a,.top .logo{white-space:nowrap}
+@media(min-width:1024px) and (max-width:1199px){.top{gap:12px;padding:0 20px}.top nav a{padding:10px 12px}.top .right{gap:8px}}
+@media(min-width:1024px){.page-scroll>.pg{max-width:1240px;margin-left:auto;margin-right:auto}.acct{max-width:none}}

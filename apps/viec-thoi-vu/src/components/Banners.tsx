@@ -8,7 +8,7 @@ import { Ic } from './Ic'
 const EVERY_MS = 3000
 
 /** Slides across the top of the job list: moves on by itself every 3 s, stops while touched/hovered, swipe or tap the dots to browse. */
-export function Banners() {
+export function Banners({ hero }: { hero?: boolean }) {
   const { locale, t } = useI18n()
   const track = useRef<HTMLDivElement>(null)
   const [cur, setCur] = useState(0)
@@ -35,7 +35,7 @@ export function Banners() {
 
   return (
     <section
-      className="banners"
+      className={hero ? 'banners jhero' : 'banners'}
       aria-roledescription="carousel"
       aria-label={t('bannersLabel')}
       onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}
