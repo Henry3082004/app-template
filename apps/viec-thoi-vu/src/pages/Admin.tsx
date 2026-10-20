@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Ic } from '../components/Ic'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
+import { WorkerFacts } from '../components/WorkerFields'
 import { api } from '../lib/api'
 import { dateRange, money } from '../lib/format'
 import { useI18n, type TKey } from '../lib/i18n'
 import { displayPhone, telHref } from '../lib/phone'
 import { sendTestError } from '../lib/sentry'
 import { useSession } from '../lib/session'
-import type { AdminDispute, AdminFlag, AdminPayout, AdminStats } from '../lib/types'
+import type { AdminDispute, AdminFlag, AdminPayout, AdminSamples, AdminStats, Availability, Experience } from '../lib/types'
 
-type Tab = 'disputes' | 'payouts' | 'flags'
+type Tab = 'disputes' | 'payouts' | 'flags' | 'samples'
 
 function DisputeCard({ d, onDone }: { d: AdminDispute; onDone(): void }) {
   const { t, locale } = useI18n()
@@ -102,6 +103,33 @@ function HealthCard({ s }: { s: AdminStats | null }) {
   )
 }
 
+function SamplesTab({ s }: { s: AdminSamples | null }) {
+  const { t } = useI18n()
+  if (!s) return <Skel n={2} />
+  return (
+    <div className="stack">
+      <p className="small muted">{t('samplesHint')}</p>
+      <h2 style={{ fontSize: 17 }}>{t('samplesShops')} ({s.shops.length})</h2>
+      <div className="g2">{s.shops.map((p) => (
+        <article key={p.id} className="card stack">
+          <h3 style={{ fontSize: 16 }}>{p.name}</h3>
+          <div className="small muted">{p.owner} · {[p.address, p.city].filter(Boolean).join(', ')}</div>
+          <div><Tag tone="p">{t('samplesJobsN', { n: p.jobs })}</Tag></div>
+        </article>
+      ))}</div>
+      <h2 style={{ fontSize: 17 }}>{t('samplesWorkers')} ({s.workers.length})</h2>
+      <div className="g2">{s.workers.map((w) => (
+        <article key={w.id} className="card stack">
+          <h3 style={{ fontSize: 16 }}>{w.name}</h3>
+          <div className="small muted">{w.city}</div>
+          <WorkerFacts w={{ birth_year: w.birth_year, experience: (w.experience ?? []) as Experience[], availability: (w.availability ?? []) as Availability[], avatar_path: null }} />
+          <div><Tag tone="p">{t('samplesAppsN', { n: w.applications })}</Tag></div>
+        </article>
+      ))}</div>
+    </div>
+  )
+}
+
 function SentryCheck() {
   const { t } = useI18n()
   const [state, setState] = useState<'idle' | 'busy' | 'sent' | 'off'>('idle')
@@ -128,6 +156,7 @@ export default function Admin() {
   const [payouts, setPayouts] = useState<AdminPayout[] | null>(null)
   const [flags, setFlags] = useState<AdminFlag[] | null>(null)
   const [stats, setStats] = useState<AdminStats | null>(null)
+  const [samples, setSamples] = useState<AdminSamples | null>(null)
   const [error, setError] = useState<unknown>(null)
 
   const load = () => {
@@ -136,6 +165,7 @@ export default function Admin() {
     api.adminPayouts().then(setPayouts).catch(setError)
     api.adminFlags().then(setFlags).catch(setError)
     api.adminStats().then(setStats).catch(setError)
+    api.adminSamples().then(setSamples).catch(setError)
   }
   useEffect(() => { if (profile?.is_admin) load() }, [profile?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -151,6 +181,7 @@ export default function Admin() {
         <button type="button" className={tab === 'disputes' ? 'on' : ''} onClick={() => setTab('disputes')}>{t('adminTabDisputes')}{disputes?.length ? ` (${disputes.length})` : ''}</button>
         <button type="button" className={tab === 'payouts' ? 'on' : ''} onClick={() => setTab('payouts')}>{t('adminTabPayouts')}{pendingN ? ` (${pendingN})` : ''}</button>
         <button type="button" className={tab === 'flags' ? 'on' : ''} onClick={() => setTab('flags')}>{t('adminTabFlags')}{flags?.length ? ` (${flags.length})` : ''}</button>
+        <button type="button" className={tab === 'samples' ? 'on' : ''} onClick={() => setTab('samples')}>{t('adminTabSamples')}</button>
       </div>
       {error != null && <ErrorBox error={error} where="Admin.load" onRetry={load} />}
       {tab === 'disputes' && (
@@ -183,6 +214,7 @@ export default function Admin() {
           ))}</div>
         </>
       )}
+      {tab === 'samples' && <SamplesTab s={samples} />}
       <SentryCheck />
     </div></div>
   )

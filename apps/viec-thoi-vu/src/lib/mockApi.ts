@@ -2,7 +2,7 @@ import { normalizePhone } from './phone'
 import { seedEmployers, seedJobs } from './seed'
 import { addDays, today } from './format'
 import {
-  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminStats, type Api, type AppConfig, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
+  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
 } from './types'
 
 // In-memory backend for local UI testing (VITE_MOCK=1). Enforces the same rules as the database.
@@ -447,6 +447,13 @@ export const mockApi: Api = {
       pairs[k].n += 1; pairs[k].total += a.escrow_amount ?? 0
     })
     return wait(Object.values(pairs).filter((x) => x.n >= 3).map((x): AdminFlag => ({ kind: 'repeat_pair', employer_name: users[x.e]?.profile.business_name ?? '—', seeker_name: users[x.s]?.profile.full_name ?? '—', shifts: x.n, total: x.total, last_at: now() })))
+  },
+  async adminSamples() {
+    admin()
+    return wait<AdminSamples>({
+      shops: [{ id: 's1', name: 'Quán Cơm Tấm Bà Tư', owner: 'Chị Tư', address: '12 Nguyễn Trãi, Q.1', city: 'TP.HCM', jobs: 1 }],
+      workers: [{ id: 'w1', name: 'Nguyễn Thị Lan', city: 'TP.HCM', birth_year: 1999, experience: ['service'], availability: ['evening'], applications: 2 }],
+    })
   },
   async adminStats() {
     admin()

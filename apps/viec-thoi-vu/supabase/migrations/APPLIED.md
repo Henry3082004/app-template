@@ -24,3 +24,9 @@ availability, avatar_path) đã để trống và không ai ghi được — xo�
 
 19/10/2026: `20261024_worker_upsert_grant.sql` áp dụng thành `worker_upsert_grant` — sửa lỗi "permission denied for table
 worker_profiles" khi lưu hồ sơ (upsert của PostgREST ghi cả cột user_id). Test upsert trong `70_dual_role.sql`.
+
+20/10/2026: `20261025_sample_data.sql` áp dụng thành `sample_flag_columns`, `sample_flag_policies`, `sample_flag_admin_stats`,
+`sample_flag_admin_samples_rpc`. Dữ liệu mẫu (10 quán, 10 nhân viên, 10 tin, đơn ứng tuyển) được chèn bằng SQL một lần (không nằm trong
+file migration): quán `33333333-3333-4333-8333-0000000000NN`, nhân viên `44444444-4444-4444-8444-0000000000NN`, email
+`mau.quanN@` / `mau.nvN@phone.viecthoivu.app`, tài khoản bị khoá đăng nhập (banned_until +100 năm). 8 tài khoản dùng thử cũ cũng được gắn `is_sample`.
+Xoá hết mẫu: `delete from auth.users where id in (select id from public.profiles where is_sample)` (tin và đơn tự xoá theo).

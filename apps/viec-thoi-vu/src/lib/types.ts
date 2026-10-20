@@ -133,6 +133,12 @@ export interface AdminStats {
   accepted_total: number; shifts_done: number; reviews_total: number; open_disputes: number
 }
 
+/** Sample shops and workers (profiles.is_sample): only admins can see them. */
+export interface AdminSamples {
+  shops: { id: string; name: string | null; owner: string; address: string | null; city: string | null; jobs: number }[]
+  workers: { id: string; name: string; city: string | null; birth_year: number | null; experience: string[] | null; availability: string[] | null; applications: number }[]
+}
+
 export interface AppConfig { payment_mode: 'off' | 'test' | 'live'; billing: 'on' | 'off'; google_login?: 'on' | 'off'; zalo_web_login?: 'on' | 'off'; zalo_published?: 'on' | 'off' }
 
 export interface CompleteProfileInput { role: Role; full_name: string; phone: string; locale: Locale; business_name?: string; address?: string; city?: string; bio?: string }
@@ -237,6 +243,7 @@ export interface Api {
   markPayoutPaid(payoutId: string, reference: string): Promise<void>
   adminFlags(): Promise<AdminFlag[]>
   adminStats(): Promise<AdminStats>
+  adminSamples(): Promise<AdminSamples>
   /** finished shifts (last 30 days) I still have to review */
   pendingReviews(): Promise<number>
   /** settle overdue shifts for the signed-in user (also done hourly on the server) */

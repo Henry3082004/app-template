@@ -43,3 +43,12 @@ test('admin page: health tiles match the data, Sentry check reports it is off in
   await h.noHScroll()
   await p.getByRole('button', { name: 'Gửi lỗi thử' }).click(); await h.see('Bản này chưa bật Sentry')
 })
+
+test('admin sees the sample shops and workers; other users cannot open the admin page', async ({ page: p }) => {
+  const h = helpers(p)
+  await p.goto('/app'); await h.see('Phụ bếp ca tối')
+  await h.asAdmin(); await h.go('/app/quan-tri')
+  await p.getByRole('button', { name: 'Dữ liệu mẫu' }).click()
+  await h.see('Chỉ admin thấy'); await h.see('Quán Cơm Tấm Bà Tư'); await h.see('Nguyễn Thị Lan'); await h.noHScroll()
+  await h.signOut(); await h.asSeeker(); await h.go('/app/quan-tri'); await h.see('chỉ dành cho quản trị viên'); await h.notSee('Quán Cơm Tấm Bà Tư')
+})
