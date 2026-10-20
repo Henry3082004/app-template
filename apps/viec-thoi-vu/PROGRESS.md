@@ -94,3 +94,4 @@
 - Webhook OA: để trống, làm SAU khi có quán đầu tiên dùng (hàm nhận sự kiện trên Supabase: theo dõi người quan tâm OA, gắn `user_id_by_app` với tài khoản, gửi tin báo việc mới).
 - Đang chờ Zalo: xác thực doanh nghiệp, duyệt phiên bản Testing (bản cũ), quyền SĐT #100. Duyệt xong → deploy bản mới, gửi duyệt lại, bật `zalo_published`.
 - Việc của Henry: đổi App Secret Zalo (đã lộ trong chat) rồi dán vào Supabase `ZALO_APP_SECRET`; hoàn thiện trang OA (ảnh, mô tả, tin chào); xem gói Supabase; tên miền riêng.
+- 20/10/2026: Zalo "Đăng nhập Zalo" (tab Web) đã cấu hình: Home URL `https://viec-thoi-vu.vercel.app`, Callback URL `https://viec-thoi-vu.vercel.app/app`. Tab iOS/Android để trống (không dùng). Chưa viết code đăng nhập Zalo trên web (cần quyết cách nối tài khoản vì Zalo web thường không trả SĐT).
