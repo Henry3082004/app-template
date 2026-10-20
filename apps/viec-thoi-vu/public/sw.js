@@ -1,5 +1,5 @@
 // Minimal offline shell: network-first for pages, cache-first for built assets. API calls are never cached.
-const CACHE = 'vtv-v2'
+const CACHE = 'vtv-v3'
 self.addEventListener('install', (e) => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['/app']))) })
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()))
