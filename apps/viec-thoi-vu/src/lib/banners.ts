@@ -40,7 +40,7 @@ export const BANNERS: BannerSlide[] = [
     },
   },
   {
-    id: 'trust', tone: 't4', pose: 'search',
+    id: 'trust', tone: 't4', pose: 'bath',
     copy: {
       vi: { tag: 'Uy tín', title: 'Làm xong ca, hai bên đánh giá nhau', sub: 'Đi làm đúng giờ, uy tín của bạn tăng dần và lần sau dễ được chọn hơn.' },
       en: { tag: 'Trust', title: 'After each shift, both sides review each other', sub: 'Show up on time and your reputation grows, so you get picked more often.' },

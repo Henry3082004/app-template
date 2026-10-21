@@ -34,3 +34,6 @@ Xoá hết mẫu: `delete from auth.users where id in (select id from public.pro
 20/10/2026: `20261026_shop_logo.sql` áp dụng thành `shop_logo_column`, `shop_logo_worker_sample_avatar`, `shop_logo_admin_samples_images`.
 Ảnh logo 10 quán mẫu / ảnh đại diện 10 nhân viên mẫu nằm trong `public/sample/*.png` (vẽ bằng SVG, không phải ảnh thật);
 đã gán bằng SQL một lần: `update profiles set logo_path = '/sample/shop-NN.png' …`, `update worker_profiles set avatar_path = '/sample/worker-NN.png' …`.
+
+21/10/2026: `20261027_quick_quiz.sql` áp dụng thành `quick_quiz_1_table`, `quick_quiz_2_clean`, `quick_quiz_3_save_read`.
+Test: `supabase/tests/80_quiz.sql`.

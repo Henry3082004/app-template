@@ -11,13 +11,14 @@ export function Pay({ job, xl }: { job: Job; xl?: boolean }) {
   return <div className={xl ? 'pay xl' : 'pay'}>{money(job.pay_amount, locale)} <small>/ {t(payUnitKey(job.pay_unit))}</small></div>
 }
 
-export function JobCard({ job, distance, sel, rep, onOpen }: { job: Job; distance?: number | null; sel?: boolean; rep?: Reputation; onOpen(): void }) {
+export function JobCard({ job, distance, sel, rep, fit, onOpen }: { job: Job; distance?: number | null; sel?: boolean; rep?: Reputation; fit?: boolean; onOpen(): void }) {
   const { t, locale } = useI18n()
   const left = job.slots - job.filled
   const full = left <= 0 || job.status !== 'open'
   return (
     <button type="button" className={'card job' + (sel ? ' sel' : '') + (full ? ' full' : '')} onClick={onOpen}>
       <div className="hrow"><h3>{job.title}</h3>{job.is_urgent && <Tag tone="urgent">{t('urgent')}</Tag>}</div>
+      {fit && <div><Tag tone="ok">{t('fitTag')}</Tag></div>}
       <Pay job={job} />
       {job.business_name && (
         <div className="bizrow">

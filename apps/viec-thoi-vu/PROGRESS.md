@@ -111,3 +111,11 @@
 - Trang việc làm cùng một bố cục ở mọi cỡ màn hình: banner → thẻ tìm kiếm nổi (ô tìm, Khu vực, Lương, ngành) → lưới thẻ việc; từ 1024px có thêm khung chi tiết dính bên phải. Điện thoại/tablet dọc mở việc thành trang riêng.
 - Thẻ việc: tên, giá, logo + tên quán + thành phố, hàng dưới (uy tín · ngày · số chỗ). Trang việc: hộp quán màu sage, các dòng thông tin có kẻ, nút "Ứng tuyển ngay" nổi.
 - Banner: hỗ trợ ảnh nền (`photo` trong `src/lib/banners.ts`, file trong `public/banners/`, có lớp phủ tối cho chữ), capybara trong vòng tròn kem. CHƯA có ảnh thật (máy làm việc không tải được Unsplash/Pexels) — đang dùng nền màu.
+
+## 21/10/2026 — Capy hỏi nhanh
+- Lần đầu mở app (chưa đăng nhập cũng được): Capy hỏi 5 câu chạm-là-xong — đến để làm gì, khu vực, loại việc, giờ rảnh, việc đã làm. Quán thì chỉ hỏi câu 1 rồi mời đăng tin.
+- Mỗi câu chỉ hỏi 1 lần ("Bỏ qua"/"Để sau" cũng tính là xong). Thêm câu mới sau này (`src/lib/quiz.ts` + `private.clean_quiz`) → chỉ câu mới được hỏi.
+- Lưu theo thiết bị (`localStorage vtv-quiz` + bảng `quiz_answers` qua `save_quiz`), đăng nhập thì gộp vào tài khoản (`my_quiz`). Không ai đọc trực tiếp được bảng.
+- Dùng câu trả lời: việc hợp (cùng thành phố + loại việc) lên đầu và có nhãn "Hợp với bạn"; màn "Giúp quán biết về bạn" điền sẵn việc đã làm + giờ rảnh.
+- Admin: Tài khoản → cuối trang "Làm thử bộ câu hỏi" (hỏi lại toàn bộ, làm bao nhiêu lần cũng được).
+- Test: `supabase/tests/80_quiz.sql`, `e2e/quiz.spec.ts` (các test khác mặc định coi như đã trả lời — `quizSeen` trong fixtures).

@@ -36,8 +36,13 @@ export function helpers(p: Page) {
 }
 
 /** Every test fails if the page logs an error/warning or throws; Google Fonts are blocked like in the sandbox. */
-export const test = base.extend<{ problems: string[] }>({
-  problems: [async ({ page }, use) => {
+// Most tests start as someone who already answered "Capy hỏi nhanh"; the quiz tests turn this off.
+const QUIZ_DONE = JSON.stringify({ device: 'aaaaaaaa-e2e0-4000-8000-000000000000', answers: { goal: null, city: null, cats: null, time: null, exp: null }, synced: null })
+
+export const test = base.extend<{ problems: string[]; quizSeen: boolean }>({
+  quizSeen: [true, { option: true }],
+  problems: [async ({ page, quizSeen }, use) => {
+    if (quizSeen) await page.context().addInitScript((v) => { if (!localStorage.getItem('vtv-quiz')) localStorage.setItem('vtv-quiz', v) }, QUIZ_DONE)
     const problems: string[] = []
     const watch = (p: Page) => {
       p.on('console', (m) => { if (['error', 'warning'].includes(m.type()) && !/Failed to load resource/.test(m.text())) problems.push(m.text()) })

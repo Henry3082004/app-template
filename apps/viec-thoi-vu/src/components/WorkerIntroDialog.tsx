@@ -4,6 +4,7 @@ import { tap } from '../lib/haptics'
 import { useI18n } from '../lib/i18n'
 import { useSession } from '../lib/session'
 import type { WorkerInfo } from '../lib/types'
+import { readQuiz } from '../lib/quiz'
 import { introDue, markIntroNudged, markIntroSkipped } from '../lib/worker'
 import { Btn, Dialog, ErrorBox } from './ui'
 import { WorkerFields, workerInfoOf } from './WorkerFields'
@@ -22,7 +23,12 @@ export function WorkerIntroDialog() {
 
   const auto = !introRequest && !authRequest && !pending && dismissed !== profile?.id && introDue(profile)
   const open = !!profile && profile.role === 'seeker' && (!!introRequest || auto)
-  useEffect(() => { if (open && profile) setW(workerInfoOf(profile)) }, [open, profile?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!open || !profile) return
+    // what they already told Capy is filled in for them
+    const w0 = workerInfoOf(profile), a = readQuiz().answers
+    setW({ ...w0, experience: w0.experience.length ? w0.experience : a.exp ?? [], availability: w0.availability.length ? w0.availability : a.time ?? [] })
+  }, [open, profile?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!open || !profile || !w) return null
   const close = () => {

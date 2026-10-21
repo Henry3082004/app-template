@@ -1,3 +1,4 @@
+import type { QuizAnswers } from './quiz'
 import { createClient, type PostgrestError } from '@supabase/supabase-js'
 import { normalizePhone, phoneEmail } from './phone'
 import {
@@ -414,6 +415,14 @@ export const supabaseApi: Api = {
 
   async adminStats() {
     return (await rpc('admin_stats')) as AdminStats
+  },
+
+  async saveQuiz(device, answers) {
+    await rpc('save_quiz', { p_device: device, p_answers: answers })
+  },
+
+  async myQuiz() {
+    return ((await rpc('my_quiz')) ?? {}) as QuizAnswers
   },
 
   async adminSamples() {

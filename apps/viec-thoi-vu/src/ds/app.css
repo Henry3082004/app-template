@@ -371,3 +371,19 @@ textarea.inp{min-height:84px;resize:vertical}
 .shopbox{display:flex;gap:12px;align-items:center;background:var(--okbg);border-radius:16px;padding:12px;margin-top:12px}
 .shopbox>div{display:flex;flex-direction:column;gap:2px;min-width:0}.shopbox b{font-size:15px}
 .shopbox .avatar{background:#fff}
+
+/* ---------- Capy hỏi nhanh ---------- */
+.quiz{display:flex;flex-direction:column;gap:16px}
+.quiz.done{align-items:center;text-align:center;gap:12px}.quiz.done .btn{width:100%}
+.qtop{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:8px}
+.qback{border:0;background:var(--bg);border-radius:50%;width:44px;height:44px;display:grid;place-items:center;color:var(--p2);cursor:pointer}
+.qskip{border:0;background:none;color:var(--tx2);font-weight:600;min-height:44px;padding:0 6px;cursor:pointer}
+.qsteps{display:flex;gap:6px;justify-content:center}.qsteps i{width:22px;height:6px;border-radius:3px;background:var(--gray-200);transition:background .2s}.qsteps i.on{background:var(--p)}
+.qcapy{display:flex;align-items:flex-end;gap:10px}.qcapy img{width:84px;height:auto;flex:none}
+.qbubble{position:relative;flex:1;background:var(--pbg);border-radius:20px 20px 20px 6px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.qbubble b{font:800 20px/1.3 var(--font-head);color:var(--tx)}.qhello{font-size:13px;color:var(--p2);font-weight:600}.qhint{font-size:13px;color:var(--tx2)}
+.qopts{display:grid;gap:10px}.qopts.two{grid-template-columns:1fr 1fr}
+.qopt{position:relative;min-height:56px;border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:10px 34px 10px 16px;text-align:left;font-weight:600;font-size:15px;color:var(--tx);transition:.15s;cursor:pointer}
+.qopt:hover{border-color:var(--brand-300)}.qopt:active{transform:scale(.98)}
+.qopt.on{border:2px solid var(--p);background:var(--pbg);color:var(--p2)}
+.qcheck{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:var(--p);color:#fff;font-size:13px;display:grid;place-items:center}

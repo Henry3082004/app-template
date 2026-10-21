@@ -21,4 +21,5 @@ run() {
 for f in 00_local_base_schema.sql ../migrations/20261016_escrow_reputation.sql ../migrations/20261017_admin_payouts.sql \
   ../migrations/20261018_reputation_integrity.sql 10_scenarios.sql 20_integrity.sql ../migrations/20261018_free_mode.sql 30_free_mode.sql \
   ../migrations/20261019_multi_login.sql ../migrations/20261020_admin_email_zalo_published.sql 40_multi_login.sql \
-  ../migrations/20261021_perf_admin_stats.sql 50_perf_admin_stats.sql ../migrations/20261022_seeker_profile.sql 60_seeker_profile.sql ../migrations/20261023_dual_role.sql ../migrations/20261024_worker_upsert_grant.sql 70_dual_role.sql; do run "$f"; done
+  ../migrations/20261021_perf_admin_stats.sql 50_perf_admin_stats.sql ../migrations/20261022_seeker_profile.sql 60_seeker_profile.sql ../migrations/20261023_dual_role.sql ../migrations/20261024_worker_upsert_grant.sql 70_dual_role.sql \
+  ../migrations/20261027_quick_quiz.sql 80_quiz.sql; do run "$f"; done

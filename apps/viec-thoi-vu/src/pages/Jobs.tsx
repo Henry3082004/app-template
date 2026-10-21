@@ -9,6 +9,7 @@ import { api } from '../lib/api'
 import { capy } from '../lib/capy'
 import { km, locate, type Coords } from '../lib/geo'
 import { useI18n, type TKey } from '../lib/i18n'
+import { fitScore, isFit, useQuizAnswers } from '../lib/quiz'
 import { useSession } from '../lib/session'
 import type { AppStatus, Category, Job, PayUnit, Reputation } from '../lib/types'
 import { useBp } from '../lib/useBp'
@@ -48,6 +49,7 @@ export default function Jobs() {
   const [done, setDone] = useState(false)
   const [single, setSingle] = useState<Job | null | undefined>(undefined)
   const searchRef = useRef<HTMLInputElement>(null)
+  const quiz = useQuizAnswers()
 
   const load = useCallback(() => {
     setError(null)
@@ -112,8 +114,8 @@ export default function Jobs() {
       .map((j) => ({ j, d: distOf(j) }))
       .sort((a, b) => (coords
         ? (a.d ?? 1e9) - (b.d ?? 1e9)
-        : Number(b.j.is_urgent) - Number(a.j.is_urgent) || b.j.created_at.localeCompare(a.j.created_at)))
-  }, [jobs, q, filter, area, minPay, coords, distOf])
+        : fitScore(b.j, quiz) - fitScore(a.j, quiz) || Number(b.j.is_urgent) - Number(a.j.is_urgent) || b.j.created_at.localeCompare(a.j.created_at)))
+  }, [jobs, q, filter, area, minPay, coords, distOf, quiz])
 
   // businesses live on "My posts"; one that can also work may still open a shared job link (and switch to apply)
   if (profile?.role === 'employer' && !(id && profile.roles.includes('seeker'))) return <Navigate to="/app/tin-cua-toi" replace />
@@ -172,7 +174,7 @@ export default function Jobs() {
       ? <><div className="center" style={{ marginBottom: 12 }}><img className="capy sm" src={capy('bath')} alt="" style={{ margin: '0 auto' }} /><div className="sub">{t('capyLoading')}</div></div><Skel n={big ? 4 : 3} /></>
       : shown.length === 0
         ? <Empty pose="empty" title={t('emptyTitle')} sub={t('emptySub')}><Btn v="ghost" sm onClick={clear}>{t('clearFilters')}</Btn></Empty>
-        : <div className={'cards' + (big ? ' wide' : '')}>{shown.map(({ j, d }) => <JobCard key={j.id} job={j} distance={d} rep={reps[j.employer_id]} sel={big && j.id === id} onOpen={() => open(j.id)} />)}</div>
+        : <div className={'cards' + (big ? ' wide' : '')}>{shown.map(({ j, d }) => <JobCard key={j.id} job={j} distance={d} rep={reps[j.employer_id]} fit={isFit(j, quiz)} sel={big && j.id === id} onOpen={() => open(j.id)} />)}</div>
 
   const selects = (
     <>

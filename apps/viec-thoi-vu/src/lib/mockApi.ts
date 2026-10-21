@@ -1,3 +1,4 @@
+import type { QuizAnswers } from './quiz'
 import { normalizePhone } from './phone'
 import { seedEmployers, seedJobs } from './seed'
 import { addDays, today } from './format'
@@ -48,6 +49,7 @@ const banks: Record<string, BankAccount> = {}
 const resolutions: Record<string, string> = {}
 
 let current: string | null = null
+const quizzes: Record<string, QuizAnswers> = {}
 try { current = sessionStorage.getItem('mock-uid') } catch { /* storage unavailable */ }
 const setCurrent = (id: string | null) => {
   current = id
@@ -447,6 +449,14 @@ export const mockApi: Api = {
       pairs[k].n += 1; pairs[k].total += a.escrow_amount ?? 0
     })
     return wait(Object.values(pairs).filter((x) => x.n >= 3).map((x): AdminFlag => ({ kind: 'repeat_pair', employer_name: users[x.e]?.profile.business_name ?? '—', seeker_name: users[x.s]?.profile.full_name ?? '—', shifts: x.n, total: x.total, last_at: now() })))
+  },
+  async saveQuiz(device, answers) {
+    const key = current ?? device
+    quizzes[key] = { ...quizzes[key], ...(current ? quizzes[device] : {}), ...answers }
+    return wait(undefined)
+  },
+  async myQuiz() {
+    return wait(current ? { ...quizzes[current] } : {})
   },
   async adminSamples() {
     admin()

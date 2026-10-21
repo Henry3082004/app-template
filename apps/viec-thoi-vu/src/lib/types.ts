@@ -1,3 +1,4 @@
+import type { QuizAnswers } from './quiz'
 export type Role = 'seeker' | 'employer'
 export type Plan = 'free' | 'pro'
 export type PayUnit = 'hour' | 'day' | 'shift' | 'job'
@@ -249,6 +250,9 @@ export interface Api {
   adminFlags(): Promise<AdminFlag[]>
   adminStats(): Promise<AdminStats>
   adminSamples(): Promise<AdminSamples>
+  /** "Capy hỏi nhanh": answers kept per device, folded into the account once signed in */
+  saveQuiz(device: string, answers: QuizAnswers): Promise<void>
+  myQuiz(): Promise<QuizAnswers>
   /** finished shifts (last 30 days) I still have to review */
   pendingReviews(): Promise<number>
   /** settle overdue shifts for the signed-in user (also done hourly on the server) */

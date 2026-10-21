@@ -3,6 +3,7 @@ import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useLocation } fro
 import { AuthDialog } from './components/AuthDialog'
 import { CompleteProfileDialog } from './components/CompleteProfileDialog'
 import { InstallBanner } from './components/InstallBanner'
+import { QuickQuiz } from './components/QuickQuiz'
 import { Shell } from './components/Shell'
 import { Skel } from './components/ui'
 import { WorkerIntroDialog } from './components/WorkerIntroDialog'
@@ -64,6 +65,7 @@ function AppRoutes() {
       <AuthDialog />
       <CompleteProfileDialog />
       <WorkerIntroDialog />
+      <QuickQuiz />
       <InstallBanner />
     </Suspense>
   )

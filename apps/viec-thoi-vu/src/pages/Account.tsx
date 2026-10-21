@@ -18,7 +18,7 @@ import { avatarUrl } from '../lib/worker'
 export default function Account() {
   const { t, locale, setLocale } = useI18n()
   const nav = useNavigate()
-  const { profile, updateProfile, signOut, askAuth } = useSession()
+  const { profile, updateProfile, signOut, askAuth, askQuiz } = useSession()
   const cfg = useAppConfig()
   const [f, setF] = useState({ full_name: '', bio: '', business_name: '', address: '', city: '' })
   const [w, setW] = useState<WorkerInfo | null>(null)
@@ -115,6 +115,13 @@ export default function Account() {
         <Btn v="text" onClick={out}>{t('signOut')}</Btn>
         <div className="sub" style={{ fontSize: 13 }}>{t('byeSub')}</div>
       </div>
+      {profile.is_admin && (
+        <div className="card stack mt24">
+          <b>{t('quizAdminTitle')}</b>
+          <div className="sub" style={{ fontSize: 14 }}>{t('quizAdminHint')}</div>
+          <Btn v="ghost" onClick={() => askQuiz({ all: true })}>{t('quizAdminBtn')}</Btn>
+        </div>
+      )}
     </div></div>
   )
 }

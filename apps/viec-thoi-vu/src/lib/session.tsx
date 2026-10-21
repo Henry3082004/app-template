@@ -23,7 +23,13 @@ interface Session {
   introRequest: IntroRequest | null
   askIntro(req: IntroRequest): void
   closeIntro(): void
+  /** open "Capy hỏi nhanh" on demand (the admin's practice run asks every question again) */
+  quizRequest: QuizRequest | null
+  askQuiz(req: QuizRequest): void
+  closeQuiz(): void
 }
+
+export interface QuizRequest { all?: boolean }
 
 export interface IntroRequest { onDone?: () => void; /** asked right before an application goes out */ beforeApply?: boolean }
 
@@ -35,6 +41,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [pending, setPending] = useState<PendingProfile | null>(null)
   const [authRequest, setAuthRequest] = useState<AuthRequest | null>(null)
   const [introRequest, setIntroRequest] = useState<IntroRequest | null>(null)
+  const [quizRequest, setQuizRequest] = useState<QuizRequest | null>(null)
   const signOuts = useRef(0)
 
   const setProfile = useCallback((p: Profile | null) => {
@@ -75,7 +82,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     introRequest,
     askIntro: (r) => setIntroRequest(r),
     closeIntro: () => setIntroRequest(null),
-  }), [profile, ready, setProfile, updateProfile, pending, refresh, signOut, authRequest, introRequest])
+    quizRequest,
+    askQuiz: (r) => setQuizRequest(r),
+    closeQuiz: () => setQuizRequest(null),
+  }), [profile, ready, setProfile, updateProfile, pending, refresh, signOut, authRequest, introRequest, quizRequest])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
