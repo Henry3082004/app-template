@@ -14,7 +14,7 @@ test('worker contests a no-show → admin settles the dispute and marks the payo
   await h.asSeeker(); await h.see('Quán báo bạn không đến')
   await p.getByRole('button', { name: 'Không đúng, tôi có đến' }).click(); await h.see('Tiền đang được tạm giữ')
 
-  await h.go('/app/tai-khoan'); await h.see('Tài khoản nhận tiền')
+  await h.go('/app/tai-khoan'); await h.section('Tài khoản nhận tiền')
   const bank = p.locator('.card', { hasText: 'Tài khoản nhận tiền' })
   await bank.getByLabel('Ngân hàng').fill('Vietcombank'); await bank.getByLabel('Số tài khoản').fill('12ab'); await bank.getByLabel('Tên chủ tài khoản').fill('Nguyen Minh Anh')
   await bank.getByRole('button', { name: 'Lưu' }).click(); await h.see('Thông tin ngân hàng chưa đúng')

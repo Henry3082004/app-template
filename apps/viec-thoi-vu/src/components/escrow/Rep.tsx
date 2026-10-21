@@ -57,23 +57,32 @@ export function Rep({ rep, employer, size = 'md' }: { rep?: Reputation; employer
 }
 
 /** Account page card: my own reputation + reviews others left about me. */
-export function OwnReputation({ userId, employer }: { userId: string; employer: boolean }) {
-  const { t, locale } = useI18n()
+/** My reputation on the side I'm using now: the stat tiles at the top of Account. */
+export function OwnRepTiles({ userId, employer }: { userId: string; employer: boolean }) {
+  const { t } = useI18n()
   const [rep, setRep] = useState<Reputation>()
+  useEffect(() => {
+    api.reputations([userId], employer ? 'employer' : 'seeker').then((m) => setRep(m[userId])).catch(() => undefined)
+  }, [userId, employer])
+  return (
+    <>
+      <Rep rep={rep} employer={employer} size="lg" />
+      {rep && rep.top_tags.length > 0 && <div className="chiprow wrap">{rep.top_tags.map((k) => <span key={k} className="tag">{t(`tag_${k}` as TKey)}</span>)}</div>}
+    </>
+  )
+}
+
+/** What the other side wrote about me (reviews about me on this side were written by the other side). */
+export function MyReviews({ employer }: { employer: boolean }) {
+  const { t, locale } = useI18n()
   const [reviews, setReviews] = useState<ReceivedReview[]>([])
   useEffect(() => {
     const side = employer ? 'employer' : 'seeker'
-    api.reputations([userId], side).then((m) => setRep(m[userId])).catch(() => undefined)
-    // reviews about me on this side were written by the other side
     api.receivedReviews().then((rs) => setReviews(rs.filter((r) => r.reviewer_role !== side))).catch(() => undefined)
-  }, [userId, employer])
+  }, [employer])
+  if (reviews.length === 0) return <div className="sub" style={{ fontSize: 14 }}>{t('noReviewsYet')}</div>
   return (
-    <div className="card stack">
-      <b>{t('repTitle')}</b>
-      <Rep rep={rep} employer={employer} size="lg" />
-      {rep && rep.top_tags.length > 0 && <div className="chiprow wrap">{rep.top_tags.map((k) => <span key={k} className="tag">{t(`tag_${k}` as TKey)}</span>)}</div>}
-      <b style={{ fontSize: 15 }}>{t('myReviewsTitle')}</b>
-      {reviews.length === 0 && <div className="sub" style={{ fontSize: 14 }}>{t('noReviewsYet')}</div>}
+    <div>
       {reviews.map((r) => (
         <div key={r.id} className="revitem">
           <div className="stars-n">{Array.from({ length: r.stars }, (_, i) => <Ic key={i} n="star" size={14} />)} <span className="muted small">{new Date(r.created_at).toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-GB')}</span></div>

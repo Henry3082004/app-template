@@ -40,6 +40,8 @@ export interface Profile extends WorkerInfo {
   is_admin?: boolean
   /** a business's logo/photo (storage path) */
   logo_path?: string | null
+  /** how the account signs in; Zalo hands over a phone number Zalo has verified */
+  auth_provider?: 'password' | 'zalo' | 'google'
 }
 
 export interface Job {

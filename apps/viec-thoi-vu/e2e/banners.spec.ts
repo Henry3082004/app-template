@@ -32,7 +32,7 @@ test('hovering stops the banner; its call-to-action opens the right page', async
 test('a shop can add its logo, shown on the Account page', async ({ page: p }) => {
   const h = helpers(p)
   await p.goto('/app'); await h.see('Phụ bếp ca tối')
-  await h.asEmployer(); await h.go('/app/tai-khoan'); await h.see('Thêm logo / ảnh quán')
+  await h.asEmployer(); await h.go('/app/tai-khoan'); await h.section('Thông tin cá nhân'); await h.see('Thêm logo / ảnh quán')
   const photo = await p.screenshot({ clip: { x: 0, y: 0, width: 60, height: 40 } })
   await p.locator('.photopick input[type=file]').setInputFiles({ name: 'logo.png', mimeType: 'image/png', buffer: photo })
   await h.see('Đổi logo / ảnh quán'); await expect(p.locator('.photopick .avatar.sq img')).toHaveCount(1)

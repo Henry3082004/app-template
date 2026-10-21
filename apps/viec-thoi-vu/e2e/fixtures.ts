@@ -32,7 +32,12 @@ export function helpers(p: Page) {
     if (startToday) await p.getByLabel('Bắt đầu').fill(new Date().toISOString().slice(0, 10))
     await p.getByRole('button', { name: 'Đăng tin', exact: true }).last().click(); await see('Đã đăng tin!')
   }
-  return { see, notSee, go, noHScroll, signOut, asEmployer, asSeeker, asAdmin, openApplicants, postJob }
+  /** Account page rows open in place: open one (no-op if it is open already) */
+  const section = async (title: string) => {
+    const row = p.locator('details.arow', { has: p.locator('summary', { hasText: title }) })
+    if (await row.getAttribute('open') === null) await row.locator('summary').click()
+  }
+  return { see, notSee, go, noHScroll, signOut, asEmployer, asSeeker, asAdmin, openApplicants, postJob, section }
 }
 
 /** Every test fails if the page logs an error/warning or throws; Google Fonts are blocked like in the sandbox. */

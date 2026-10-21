@@ -33,7 +33,8 @@ export default function Jobs() {
   const nav = useNavigate()
   const { id } = useParams()
   const bp = useBp()
-  const big = bp === 'l' || bp === 'd' // landscape tablet / desktop: banner on top, search card, grid + sticky detail
+  const desk = bp === 'l' || bp === 'd' // landscape tablet / desktop: menu on the left, greeting card, jobs as rows
+  const big = bp === 'd' // wide enough to keep the open job in a sticky card next to the list
   const { profile, ready, askAuth } = useSession()
   const [params, setParams] = useSearchParams()
   const [jobs, setJobs] = useState<Job[] | null>(null)
@@ -174,7 +175,7 @@ export default function Jobs() {
       ? <><div className="center" style={{ marginBottom: 12 }}><img className="capy sm" src={capy('bath')} alt="" style={{ margin: '0 auto' }} /><div className="sub">{t('capyLoading')}</div></div><Skel n={big ? 4 : 3} /></>
       : shown.length === 0
         ? <Empty pose="empty" title={t('emptyTitle')} sub={t('emptySub')}><Btn v="ghost" sm onClick={clear}>{t('clearFilters')}</Btn></Empty>
-        : <div className={'cards' + (big ? ' wide' : '')}>{shown.map(({ j, d }) => <JobCard key={j.id} job={j} distance={d} rep={reps[j.employer_id]} fit={isFit(j, quiz)} sel={big && j.id === id} onOpen={() => open(j.id)} />)}</div>
+        : <div className={'cards' + (desk ? ' wide' : '')}>{shown.map(({ j, d }) => <JobCard key={j.id} job={j} distance={d} rep={reps[j.employer_id]} fit={isFit(j, quiz)} sel={big && j.id === id} onOpen={() => open(j.id)} />)}</div>
 
   const selects = (
     <>
@@ -192,11 +193,31 @@ export default function Jobs() {
   )
 
   // One page at every size: banner, a search card floating over its lower edge, then the jobs.
-  // Landscape tablet / desktop also keep the open job in a sticky card next to the grid.
+  // Desktop (≥1280px) also keeps the open job in a sticky card next to the list.
   return (
     <>
       <div className="jobspage">
         <div className="jwrap">
+          {desk && (
+            <section className="card hellocard">
+              <div className="hello"><span>{t('hello')}</span><b>{profile ? profile.full_name : t('helloGuest')}</b></div>
+              {profile ? (
+                <>
+                  <div className="sumtiles">
+                    <div><b>{Object.values(mine).filter((s) => s === 'pending').length}</b><span>{t('sumPending')}</span></div>
+                    <div><b>{Object.values(mine).filter((s) => s === 'accepted').length}</b><span>{t('sumAccepted')}</span></div>
+                    <div><b>{jobs?.length ?? '–'}</b><span>{t('sumOpen')}</span></div>
+                  </div>
+                  <div className="acts"><Btn onClick={() => nav('/app/da-ung-tuyen')}>{t('seeApplied')}</Btn><Btn v="ghost" onClick={() => nav('/app/tai-khoan')}>{t('navAccount')}</Btn></div>
+                </>
+              ) : (
+                <>
+                  <div className="sub">{t('sumGuest')}</div>
+                  <div className="acts"><Btn onClick={() => askAuth({ role: 'seeker' })}>{t('signIn')}</Btn></div>
+                </>
+              )}
+            </section>
+          )}
           <Banners />
           <section className="searchcard" role="search">
             <div className="srow">
@@ -212,8 +233,8 @@ export default function Jobs() {
           <div className="jbody">
             <section className="jlist">
               <div className="jhead">
-                <h1 className="ptitle">{t('navJobs')}</h1>
-                {!big && !profile && <Btn v="ghost" sm onClick={() => askAuth({ role: 'employer', onDone: (p) => nav(p.role === 'employer' ? '/app/dang-tin' : '/app') })}>{t('iNeedStaff')}</Btn>}
+                <h1 className="ptitle">{t(desk ? 'jobsForYou' : 'navJobs')}</h1>
+                {!desk && !profile && <Btn v="ghost" sm onClick={() => askAuth({ role: 'employer', onDone: (p) => nav(p.role === 'employer' ? '/app/dang-tin' : '/app') })}>{t('iNeedStaff')}</Btn>}
                 {sortLine}
               </div>
               {loc === 'denied' && <div className="notice warn">{t('locDenied')}</div>}

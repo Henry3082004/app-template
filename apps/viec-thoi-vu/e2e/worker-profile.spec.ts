@@ -33,7 +33,7 @@ test('worker intro after first sign-in → business sees photo, age, past work a
   // applying now goes straight through (no second question)
   await h.go('/app'); await p.locator('button.job', { hasText: 'Pha chế ca sáng' }).first().click()
   await p.getByRole('button', { name: 'Ứng tuyển ngay' }).first().click(); await h.see('Đã gửi đơn!')
-  await h.go('/app/tai-khoan'); await h.see('Thông tin cho quán'); await expect(p.getByLabel('Năm sinh')).toHaveValue('2004')
+  await h.go('/app/tai-khoan'); await h.section('Thông tin cá nhân'); await h.see('Thông tin cho quán'); await expect(p.getByLabel('Năm sinh')).toHaveValue('2004')
   await h.signOut()
 
   await h.asEmployer(); await h.openApplicants('Pha chế ca sáng')

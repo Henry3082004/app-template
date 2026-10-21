@@ -18,7 +18,7 @@ export function JobCard({ job, distance, sel, rep, fit, onOpen }: { job: Job; di
   return (
     <button type="button" className={'card job' + (sel ? ' sel' : '') + (full ? ' full' : '')} onClick={onOpen}>
       <div className="hrow"><h3>{job.title}</h3>{job.is_urgent && <Tag tone="urgent">{t('urgent')}</Tag>}</div>
-      {fit && <div><Tag tone="ok">{t('fitTag')}</Tag></div>}
+      {fit && <div className="fitrow"><Tag tone="ok">{t('fitTag')}</Tag></div>}
       <Pay job={job} />
       {job.business_name && (
         <div className="bizrow">
