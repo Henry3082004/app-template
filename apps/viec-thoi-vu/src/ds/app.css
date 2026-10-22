@@ -446,3 +446,38 @@ textarea.inp{min-height:84px;resize:vertical}
 .viewbar span{flex:1;min-width:0}
 .viewbar button{border:0;border-radius:999px;background:#fff;color:var(--tx);font-weight:600;font-size:13px;min-height:36px;padding:0 14px;cursor:pointer}
 @media(min-width:600px){.viewbar{left:50%;right:auto;transform:translateX(-50%);bottom:20px;width:max-content;max-width:calc(100vw - 32px)}}
+
+/* ---------- Worker tabs: Trang chủ · Chấm công · Thu nhập ---------- */
+.seg a{border:0;background:none;border-radius:999px;padding:8px 16px;color:var(--tx2);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;min-height:40px}
+.seg a.on{background:#fff;color:var(--tx);box-shadow:var(--sh)}.seg a:hover{text-decoration:none;color:var(--tx)}
+.seg.pills{margin:0 auto 16px;max-width:100%}.seg.pills button{min-height:40px;font-weight:600}
+.homepg,.shiftspg,.incomepg{display:flex;flex-direction:column;gap:16px}
+.homepg{max-width:880px}
+.homepg>.hello{margin-bottom:-4px}.homepg .hello span{font-size:13px;color:var(--tx2)}.homepg .hello b{font:800 24px/1.25 var(--font-head)}
+.sechead{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.sechead h2{font:800 18px var(--font-head)}h2.sechead{justify-content:flex-start;gap:8px;font:800 18px var(--font-head)}
+.sechead a{font-size:14px;font-weight:600;text-decoration:none;color:var(--p2)}.count{background:var(--pbg);color:var(--p2);border-radius:999px;padding:1px 9px;font:600 13px var(--font-sans)}
+.wallet{display:flex;flex-direction:column;gap:6px;padding:18px 20px}
+.wtop{display:flex;align-items:center;justify-content:space-between;color:var(--tx2);font-size:14px}
+.wamt{font:900 30px/1.15 var(--font-head);color:var(--tx);font-variant-numeric:tabular-nums}
+.wnote{font-size:13px;color:var(--tx2);line-height:1.45}
+.wacts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.wbtn{min-height:48px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--tx);font-weight:600;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;cursor:pointer}
+.wbtn:hover{text-decoration:none;background:var(--bg)}
+.wbtn.dark{background:var(--tx);border-color:var(--tx);color:#fff}.wbtn.dark:disabled{opacity:.55;cursor:not-allowed}
+.wbtn small{background:rgba(255,255,255,.22);border-radius:999px;padding:1px 8px;font-size:11px;font-weight:600}
+.walletdark{background:var(--tx);color:#fff;display:flex;flex-direction:column;gap:8px;padding:20px;box-shadow:var(--shadow-md)}
+.walletdark .wtop,.walletdark .wnote{color:rgba(255,255,255,.75)}.walletdark .wamt{color:#fff;font-size:34px}
+.walletdark .wbtn.dark{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.2)}
+.minirow{display:flex;flex-direction:column;gap:2px;text-align:left;width:100%;font:inherit;cursor:pointer;border:2px solid transparent}.minirow:hover{box-shadow:var(--shadow-md)}.minirow b{font-size:16px}
+.shiftcard{display:flex;flex-direction:column;gap:10px}.shiftcard h3{font-size:17px;cursor:pointer}
+.shiftmeta{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--tx2)}.shiftmeta span{display:flex;align-items:center;gap:6px}
+.shiftfoot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--gray-100);padding-top:10px;min-height:48px}
+.txlist{padding:4px 20px}.tx{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--gray-100)}.tx:last-child{border-bottom:0}
+.tx>div:first-child{display:flex;flex-direction:column;min-width:0}.tx b{font-size:15px}
+.txr{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}.txr .pay{font-size:17px}
+.arow>summary>.pay{font-size:17px;flex:none}
+@media(min-width:1024px){.homepg,.shiftspg,.incomepg{gap:20px}.incomepg{max-width:880px}}
+
+.incomepg .tiles>div,.homepg .sumtiles>div{background:#fff;box-shadow:var(--sh)}
+.homepg .sumtiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media(min-width:1024px){.incomepg>.ptitle,.shiftspg>.ptitle{display:none}}

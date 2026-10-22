@@ -7,7 +7,7 @@ test('Zalo login: new user, returning user, denied permission, password fallback
   const tab = (label: string) => p.locator('nav a', { hasText: label }).locator('visible=true').first().click()
   const setPhone = (v: string) => p.evaluate((x) => sessionStorage.setItem('mock-zalo-phone', x), v)
   const openLogin = async () => { await tab('Đã ứng tuyển'); await p.getByRole('button', { name: 'Đăng nhập' }).first().click() }
-  const signOut = async () => { await tab('Tài khoản'); await p.getByRole('button', { name: 'Đăng xuất' }).click(); await p.waitForTimeout(400) }
+  const signOut = async () => { await tab('Hồ sơ'); await p.getByRole('button', { name: 'Đăng xuất' }).click(); await p.waitForTimeout(400) }
 
   await p.goto('/app?zalo=1'); await h.see('Phụ bếp ca tối')
   await openLogin()
@@ -16,7 +16,7 @@ test('Zalo login: new user, returning user, denied permission, password fallback
   await expect(p.locator('#a-name')).toHaveValue('Người Dùng Zalo')
   await p.getByRole('button', { name: 'Ứng tuyển ngay' }).click()
   await h.see('Giúp quán biết về bạn'); await p.getByRole('button', { name: 'Để sau' }).click()
-  await tab('Tài khoản'); await h.see('Người Dùng Zalo')
+  await tab('Hồ sơ'); await h.see('Người Dùng Zalo')
   await signOut()
 
   await openLogin(); await p.getByRole('button', { name: 'Tiếp tục với Zalo' }).click(); await h.see('Chưa ứng tuyển')
@@ -30,7 +30,7 @@ test('Zalo login: new user, returning user, denied permission, password fallback
 
   await setPhone('0900000001')
   await openLogin(); await p.getByRole('button', { name: 'Tiếp tục với Zalo' }).click()
-  await tab('Tài khoản'); await h.see('Minh Anh')
+  await tab('Hồ sơ'); await h.see('Minh Anh')
   await signOut()
 
   await setPhone('0977123456')
@@ -38,5 +38,5 @@ test('Zalo login: new user, returning user, denied permission, password fallback
   await h.see('Đăng nhập bằng Zalo'); await p.getByRole('button', { name: 'Tiếp tục với Zalo' }).click(); await h.see('Tên cơ sở')
   await p.locator('#a-name').fill('Chị Hoa'); await p.locator('#a-biz').fill('Quán Hoa Cúc'); await p.locator('#a-addr').fill('12 Lê Lợi')
   await p.getByRole('button', { name: /Lưu và đăng tin/ }).click(); await p.waitForTimeout(600)
-  await tab('Tài khoản'); await h.see('Quán Hoa Cúc')
+  await tab('Hồ sơ'); await h.see('Quán Hoa Cúc')
 })

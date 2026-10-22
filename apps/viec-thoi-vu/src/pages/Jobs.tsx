@@ -131,7 +131,7 @@ export default function Jobs() {
       job={selected}
       distance={distOf(selected)}
       mine={mine[selected.id] ?? null}
-      onBack={big ? undefined : () => nav('/app')}
+      onBack={big ? undefined : () => nav('/app/viec-lam')}
       onApplied={() => { setDone(true); loadMine(); load() }}
     />
   )
@@ -141,7 +141,7 @@ export default function Jobs() {
       <img className="capy hop" src={capy('cheer')} alt="" />
       <h2>{t('appliedTitle')}</h2>
       <div className="sub">{t('appliedText')}</div>
-      <Btn block onClick={() => { setDone(false); nav('/app') }}>{t('moreJobs')}</Btn>
+      <Btn block onClick={() => { setDone(false); nav('/app/viec-lam') }}>{t('moreJobs')}</Btn>
       <Btn v="text" onClick={() => { setDone(false); nav('/app/da-ung-tuyen') }}>{t('seeApplied')}</Btn>
     </Dialog>
   )
@@ -153,7 +153,7 @@ export default function Jobs() {
         <div className="pcol">
           {selected ? detail
             : jobs === null || single === undefined ? <div className="pg"><Skel n={2} /></div>
-            : <div className="pg"><Empty pose="empty" title={t('notFound')}><Btn v="ghost" sm onClick={() => nav('/app')}>{t('backJobs')}</Btn></Empty></div>}
+            : <div className="pg"><Empty pose="empty" title={t('notFound')}><Btn v="ghost" sm onClick={() => nav('/app/viec-lam')}>{t('backJobs')}</Btn></Empty></div>}
         </div>
         {successDialog}
       </>
@@ -199,24 +199,11 @@ export default function Jobs() {
     <>
       <div className="jobspage">
         <div className="jwrap">
-          {desk && (
+          {desk && !profile && (
             <section className="card hellocard">
-              <div className="hello"><span>{t('hello')}</span><b>{profile ? profile.full_name : t('helloGuest')}</b></div>
-              {profile ? (
-                <>
-                  <div className="sumtiles">
-                    <div><b>{Object.values(mine).filter((s) => s === 'pending').length}</b><span>{t('sumPending')}</span></div>
-                    <div><b>{Object.values(mine).filter((s) => s === 'accepted').length}</b><span>{t('sumAccepted')}</span></div>
-                    <div><b>{jobs?.length ?? '–'}</b><span>{t('sumOpen')}</span></div>
-                  </div>
-                  <div className="acts"><Btn onClick={() => nav('/app/da-ung-tuyen')}>{t('seeApplied')}</Btn><Btn v="ghost" onClick={() => nav('/app/tai-khoan')}>{t('navAccount')}</Btn></div>
-                </>
-              ) : (
-                <>
-                  <div className="sub">{t('sumGuest')}</div>
-                  <div className="acts"><Btn onClick={() => askAuth({ role: 'seeker' })}>{t('signIn')}</Btn></div>
-                </>
-              )}
+              <div className="hello"><span>{t('hello')}</span><b>{t('helloGuest')}</b></div>
+              <div className="sub">{t('sumGuest')}</div>
+              <div className="acts"><Btn onClick={() => askAuth({ role: 'seeker' })}>{t('signIn')}</Btn></div>
             </section>
           )}
           <Banners />

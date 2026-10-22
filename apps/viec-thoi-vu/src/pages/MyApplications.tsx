@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PendingReviews, SeekerPay } from '../components/escrow'
 import { Ic } from '../components/Ic'
+import { ShiftTabs } from '../components/ShiftTabs'
 import { Pay } from '../components/JobCard'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { api } from '../lib/api'
@@ -47,11 +48,12 @@ export default function MyApplications() {
   return (
     <div className="page-scroll"><div className="pg wide">
       <h1 className="ptitle" style={{ marginBottom: 16 }}>{t('appliedTitlePage')}</h1>
+      <ShiftTabs />
       <PendingReviews refresh={list} />
       {error != null && <ErrorBox error={error} where="MyApplications.load" onRetry={load} />}
       {actErr != null && <div style={{ marginBottom: 12 }}><ErrorBox error={actErr} where="MyApplications.withdraw" /></div>}
       {!list && !error && <Skel n={2} />}
-      {list && list.length === 0 && <Empty pose="empty" title={t('emptyApplied')}><Btn onClick={() => nav('/app')}>{t('findJobs')}</Btn></Empty>}
+      {list && list.length === 0 && <Empty pose="empty" title={t('emptyApplied')}><Btn onClick={() => nav('/app/viec-lam')}>{t('findJobs')}</Btn></Empty>}
       <div className="g2">
         {list?.map((a) => (
           <article className="card stack" key={a.id}>

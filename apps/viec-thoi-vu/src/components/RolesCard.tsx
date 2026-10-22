@@ -9,7 +9,7 @@ import type { Role } from '../lib/types'
 import { Ic } from './Ic'
 import { Btn, Dialog, ErrorBox, Fld } from './ui'
 
-const HOME: Record<Role, string> = { seeker: '/app', employer: '/app/tin-cua-toi' }
+const HOME: Record<Role, string> = { seeker: '/app', employer: '/app/tin-cua-toi' } // a worker lands on Trang chủ
 
 /**
  * Account → Roles. One role: offer to add the other (same account, separate reputation).

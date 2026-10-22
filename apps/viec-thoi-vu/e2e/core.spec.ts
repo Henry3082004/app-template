@@ -8,7 +8,7 @@ test('seeker: browse, apply, see and withdraw the application, account, language
   await p.getByRole('button', { name: 'Dùng thử: Người tìm việc' }).click(); await h.see('Đã gửi đơn!')
   await p.getByRole('button', { name: 'Xem đơn đã gửi' }).click(); await h.see('Đang chờ'); await h.noHScroll()
   await p.getByRole('button', { name: 'Rút đơn' }).first().click(); await h.see('Đã rút')
-  await h.go('/app/tai-khoan'); await h.see('Minh Anh'); await h.section('Ngôn ngữ')
+  await h.go('/app/tai-khoan'); await h.see('Minh Anh'); await h.section('Cài đặt & Bảo mật')
   await p.getByRole('button', { name: 'English' }).first().click(); await h.see('Language')
   await p.getByRole('button', { name: 'Tiếng Việt' }).first().click()
   await p.getByRole('button', { name: 'Đăng xuất' }).click(); await h.see('Tôi cần tuyển người')

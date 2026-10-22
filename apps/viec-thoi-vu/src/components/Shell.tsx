@@ -8,7 +8,9 @@ import { Avatar, Btn } from './ui'
 
 /** Title shown in the desktop top bar for the page at `path`. */
 function pageTitle(path: string): TKey {
-  if (path.startsWith('/app/da-ung-tuyen')) return 'navApplied'
+  if (path.startsWith('/app/da-ung-tuyen') || path.startsWith('/app/cham-cong')) return 'navShifts'
+  if (path.startsWith('/app/thu-nhap')) return 'navIncome'
+  if (path === '/app' || path === '/app/') return 'navHome'
   if (path.startsWith('/app/tai-khoan')) return 'navAccount'
   if (path.startsWith('/app/dang-tin')) return 'postTitle'
   if (path.startsWith('/app/tin')) return 'navMyJobs'
@@ -31,11 +33,19 @@ export function Shell({ children }: { children: ReactNode }) {
         { to: '/app/tin-cua-toi', ico: 'store', label: t('navMyJobs'), match: ['/app/tin', '/app/dang-tin'] },
         { to: '/app/tai-khoan', ico: 'user', label: t('navAccount'), match: ['/app/bang-gia'] },
       ]
-    : [
-        { to: '/app', ico: 'briefcase', label: t('navJobs'), end: true, match: ['/app/viec'] },
-        { to: '/app/da-ung-tuyen', ico: 'clipboard', label: t('navApplied') },
-        { to: '/app/tai-khoan', ico: 'user', label: t('navAccount'), match: ['/app/bang-gia'] },
-      ]
+    : profile
+      ? [
+          { to: '/app', ico: 'home', label: t('navHome'), end: true },
+          { to: '/app/viec-lam', ico: 'briefcase', label: t('navJobs'), match: ['/app/viec'] },
+          { to: '/app/cham-cong', ico: 'clipboard', label: t('navShifts'), match: ['/app/da-ung-tuyen'] },
+          { to: '/app/thu-nhap', ico: 'wallet', label: t('navIncome') },
+          { to: '/app/tai-khoan', ico: 'user', label: t('navAccount'), match: ['/app/bang-gia'] },
+        ]
+      : [
+          { to: '/app', ico: 'briefcase', label: t('navJobs'), end: true, match: ['/app/viec'] },
+          { to: '/app/da-ung-tuyen', ico: 'clipboard', label: t('navApplied') },
+          { to: '/app/tai-khoan', ico: 'user', label: t('navAccount'), match: ['/app/bang-gia'] },
+        ]
   if (profile?.is_admin) items.push({ to: '/app/quan-tri', ico: 'sparkles', label: t('navAdmin') })
   const isOn = (i: Item) => (i.end ? pathname === i.to : pathname.startsWith(i.to)) || !!i.match?.some((m) => pathname.startsWith(m))
 

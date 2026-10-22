@@ -9,7 +9,7 @@ import { RolesCard } from '../components/RolesCard'
 import { Avatar, Btn, Empty, ErrorBox, Fld } from '../components/ui'
 import { WorkerFields, workerInfoOf } from '../components/WorkerFields'
 import { CITIES } from '../lib/geo'
-import { useI18n } from '../lib/i18n'
+import { useI18n, type TKey } from '../lib/i18n'
 import { displayPhone } from '../lib/phone'
 import { useSession } from '../lib/session'
 import type { Locale, WorkerInfo } from '../lib/types'
@@ -122,11 +122,27 @@ export default function Account() {
         <OwnRepTiles userId={profile.id} employer={emp} />
       </section>
       <Sect title={t('secInfo')} sub={t(emp ? 'secInfoEmployer' : 'secInfoSeeker')}>{form}</Sect>
+      <Sect title={t('secVerify')} sub={t('secVerifySub')}>
+        <div className="stack">
+          <div className={'notice ' + (profile.auth_provider === 'zalo' ? 'ok' : 'warn')}>{t(profile.auth_provider === 'zalo' ? 'verifyPhoneOk' : 'verifyPhoneNo')}</div>
+          <div className="sub" style={{ fontSize: 14 }}>{t('verifyId')}</div>
+        </div>
+      </Sect>
       <Sect title={t('myReviewsTitle')} sub={t('secReviewsSub')}><MyReviews employer={emp} /></Sect>
       <Sect title={t('rolesTitle')} sub={t('secRolesSub')}><RolesCard /></Sect>
-      {!emp && cfg && cfg.payment_mode !== 'off' && <Sect title={t('bankTitle')} sub={t('secBankSub')}><BankCard /></Sect>}
-      <Sect title={t('language')} sub={locale === 'vi' ? 'Tiếng Việt' : 'English'}>{lang}</Sect>
-      <Sect title={t('secHelp')} sub={t('secHelpSub')}><LegalLinks /></Sect>
+      {!emp && <Sect title={t('bankTitle')} sub={t('secBankSub')}><BankCard /></Sect>}
+      <Sect title={t('secSettings')} sub={t('secSettingsSub')}>
+        <div className="stack">
+          {lang}
+          <div className="sub" style={{ fontSize: 14 }}>{t('signInVia', { x: t(profile.auth_provider === 'zalo' ? 'viaZalo' : profile.auth_provider === 'google' ? 'viaGoogle' : 'viaPassword') })}</div>
+        </div>
+      </Sect>
+      <Sect title={t('secHelpGuide')} sub={t('secHelpGuideSub')}>
+        <div className="stack">
+          {(['faq1', 'faq2', 'faq3'] as const).map((k) => <div key={k}><b>{t(`${k}q` as TKey)}</b><div className="sub" style={{ fontSize: 14 }}>{t(`${k}a` as TKey)}</div></div>)}
+          <LegalLinks />
+        </div>
+      </Sect>
       {profile.is_admin && (
         <section className="card devtools">
           <b><Ic n="sparkles" size={18} /> {t('devTools')}</b>
