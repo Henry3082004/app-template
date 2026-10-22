@@ -131,7 +131,7 @@ export default function Jobs() {
       job={selected}
       distance={distOf(selected)}
       mine={mine[selected.id] ?? null}
-      onBack={big ? undefined : () => nav('/app/viec-lam')}
+      onBack={big ? undefined : () => nav('/app')}
       onApplied={() => { setDone(true); loadMine(); load() }}
     />
   )
@@ -141,7 +141,7 @@ export default function Jobs() {
       <img className="capy hop" src={capy('cheer')} alt="" />
       <h2>{t('appliedTitle')}</h2>
       <div className="sub">{t('appliedText')}</div>
-      <Btn block onClick={() => { setDone(false); nav('/app/viec-lam') }}>{t('moreJobs')}</Btn>
+      <Btn block onClick={() => { setDone(false); nav('/app') }}>{t('moreJobs')}</Btn>
       <Btn v="text" onClick={() => { setDone(false); nav('/app/da-ung-tuyen') }}>{t('seeApplied')}</Btn>
     </Dialog>
   )
@@ -153,7 +153,7 @@ export default function Jobs() {
         <div className="pcol">
           {selected ? detail
             : jobs === null || single === undefined ? <div className="pg"><Skel n={2} /></div>
-            : <div className="pg"><Empty pose="empty" title={t('notFound')}><Btn v="ghost" sm onClick={() => nav('/app/viec-lam')}>{t('backJobs')}</Btn></Empty></div>}
+            : <div className="pg"><Empty pose="empty" title={t('notFound')}><Btn v="ghost" sm onClick={() => nav('/app')}>{t('backJobs')}</Btn></Empty></div>}
         </div>
         {successDialog}
       </>

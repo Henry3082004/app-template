@@ -162,9 +162,8 @@ nhà tuyển dụng.
 - [ ] Tên miền riêng.
 
 ## Người tìm việc: 5 tab (22/10/2026)
-Menu của người tìm việc (đã đăng nhập): **Trang chủ · Việc làm · Chấm công · Thu nhập · Hồ sơ**. Khách chưa đăng nhập vẫn mở thẳng danh sách việc (`/app`). Phía quán giữ nguyên (Tin của tôi · Hồ sơ).
-- **Trang chủ** (`/app`): lời chào, thẻ "Thu nhập tháng này" (nút Rút tiền khóa "Sắp có" + nút Thu nhập), 3 số (ca sắp tới, đơn đang chờ, việc đang tuyển), "Ca sắp tới", "Việc làm cho bạn" (5 việc, "Xem tất cả").
-- **Việc làm** (`/app/viec-lam`, `/app/viec/:id`): trang duyệt việc như cũ (banner, tìm kiếm, danh sách, chi tiết).
+Menu của người tìm việc (đã đăng nhập): **Việc làm · Chấm công · Thu nhập · Hồ sơ** (không có tab Trang chủ). Khách chưa đăng nhập vẫn mở thẳng danh sách việc (`/app`). Phía quán giữ nguyên (Tin của tôi · Hồ sơ).
+- **Việc làm** (`/app`, `/app/viec/:id`): trang duyệt việc như cũ (banner, tìm kiếm, danh sách, chi tiết).
 - **Chấm công** (`/app/cham-cong`): DANH SÁCH ca đã được nhận — Hôm nay / Sắp tới / Đã xong (không có nút bấm giờ vào–ra ca; quán vẫn xác nhận ca như hiện nay). Tab kèm theo "Đơn ứng tuyển" = trang `/app/da-ung-tuyen` cũ.
 - **Thu nhập** (`/app/thu-nhap`): thẻ tối "Số dư hiện tại" (tiền công đã về app mà chưa chuyển; luôn 0đ khi app miễn phí) + nút Rút tiền khóa "Sắp có"; 3 số (tháng này, tổng, số ca); tab **Giao dịch** (mỗi ca đã xong + số tiền) và **Bảng kê lương** (theo tháng, mở ra thấy từng ca).
   - Nguồn số liệu: các đơn `pay_status = released` của mình (`escrow_amount`, `platform_fee`, `funding_mode`, `payout`) — KHÔNG cần bảng mới. Khi app miễn phí (`funding_mode = off`) quán trả tiền mặt trực tiếp và số tiền là **ước tính** (giá công bố × 8 giờ/ngày) → ghi rõ "ước tính".

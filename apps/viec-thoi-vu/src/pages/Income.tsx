@@ -53,7 +53,7 @@ export default function Income() {
         <button type="button" role="tab" aria-selected={tab === 'statement'} className={tab === 'statement' ? 'on' : ''} onClick={() => setTab('statement')}>{t('statementTab')}</button>
       </div>
       {!s && !error && <Skel n={2} />}
-      {s && s.rows.length === 0 && <Empty pose="empty" title={t('noTx')} sub={t('noTxSub')}><Btn onClick={() => nav('/app/viec-lam')}>{t('findJobs')}</Btn></Empty>}
+      {s && s.rows.length === 0 && <Empty pose="empty" title={t('noTx')} sub={t('noTxSub')}><Btn onClick={() => nav('/app')}>{t('findJobs')}</Btn></Empty>}
       {s && tab === 'tx' && s.rows.length > 0 && (
         <div className="card txlist">
           {s.rows.map((e) => {

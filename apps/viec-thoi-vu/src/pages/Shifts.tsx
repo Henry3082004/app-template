@@ -61,7 +61,7 @@ export default function Shifts() {
       <ShiftTabs />
       {error != null && <ErrorBox error={error} where="Shifts.load" onRetry={reload} />}
       {!list && !error && <Skel n={2} />}
-      {list && shifts.length === 0 && <Empty pose="empty" title={t('noShifts')} sub={t('noShiftsSub')}><Btn onClick={() => nav('/app/viec-lam')}>{t('findJobs')}</Btn></Empty>}
+      {list && shifts.length === 0 && <Empty pose="empty" title={t('noShifts')} sub={t('noShiftsSub')}><Btn onClick={() => nav('/app')}>{t('findJobs')}</Btn></Empty>}
       {(['today', 'soon', 'done'] as ShiftWhen[]).map((w) => {
         const rows = shifts.filter((s) => s.when === w)
         return rows.length === 0 ? null : (

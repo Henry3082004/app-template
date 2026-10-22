@@ -53,7 +53,7 @@ export default function MyApplications() {
       {error != null && <ErrorBox error={error} where="MyApplications.load" onRetry={load} />}
       {actErr != null && <div style={{ marginBottom: 12 }}><ErrorBox error={actErr} where="MyApplications.withdraw" /></div>}
       {!list && !error && <Skel n={2} />}
-      {list && list.length === 0 && <Empty pose="empty" title={t('emptyApplied')}><Btn onClick={() => nav('/app/viec-lam')}>{t('findJobs')}</Btn></Empty>}
+      {list && list.length === 0 && <Empty pose="empty" title={t('emptyApplied')}><Btn onClick={() => nav('/app')}>{t('findJobs')}</Btn></Empty>}
       <div className="g2">
         {list?.map((a) => (
           <article className="card stack" key={a.id}>

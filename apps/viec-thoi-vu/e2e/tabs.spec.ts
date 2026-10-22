@@ -2,24 +2,23 @@ import { PORTS, expect, helpers, test, url } from './fixtures'
 
 const nav = (p: import('@playwright/test').Page, label: string) => p.locator('nav a', { hasText: label }).locator('visible=true').first()
 
-test('worker menu: Trang chủ · Việc làm · Chấm công · Thu nhập · Hồ sơ, with empty states and a locked Rút tiền', async ({ page: p }) => {
+test('worker menu: Việc làm · Chấm công · Thu nhập · Hồ sơ, with empty states and a locked Rút tiền', async ({ page: p }) => {
   const h = helpers(p)
   await p.goto('/app'); await h.see('Phụ bếp ca tối')
   await expect(p.locator('nav a', { hasText: 'Thu nhập' })).toHaveCount(0) // visitors keep the short menu
   await h.asSeeker()
-  for (const label of ['Trang chủ', 'Việc làm', 'Chấm công', 'Thu nhập', 'Hồ sơ']) await expect(nav(p, label)).toBeVisible()
-  // Trang chủ
-  await nav(p, 'Trang chủ').click(); await h.see('Xin chào'); await h.see('Thu nhập tháng này'); await h.see('Việc làm cho bạn'); await h.noHScroll()
-  const cash = p.getByRole('button', { name: /Rút tiền/ }).first()
-  await expect(cash).toBeDisabled(); await expect(cash).toContainText('Sắp có')
-  // Việc làm = the full browse page
+  for (const label of ['Việc làm', 'Chấm công', 'Thu nhập', 'Hồ sơ']) await expect(nav(p, label)).toBeVisible()
+  await expect(p.locator('nav a', { hasText: 'Trang chủ' })).toHaveCount(0)
+  // Việc làm is where a worker lands: banner, search and the jobs
   await nav(p, 'Việc làm').click(); await h.see('Phụ bếp ca tối'); await expect(p.getByLabel('Tìm việc, cơ sở, khu vực…')).toBeVisible()
   // Chấm công: nothing accepted yet, applications are one tab away
   await nav(p, 'Chấm công').click(); await h.see('Chưa có ca nào'); await h.noHScroll()
   await p.getByRole('link', { name: 'Đơn ứng tuyển' }).click(); await h.see('Đang chờ')
   await p.getByRole('link', { name: 'Ca làm' }).click(); await h.see('Chưa có ca nào')
   // Thu nhập
-  await nav(p, 'Thu nhập').click(); await h.see('Số dư hiện tại'); await h.see('Chưa phát sinh giao dịch'); await h.noHScroll()
+  await nav(p, 'Thu nhập').click(); await h.see('Số dư hiện tại'); await h.see('Thu nhập tháng này'); await h.see('Chưa phát sinh giao dịch'); await h.noHScroll()
+  const cash = p.getByRole('button', { name: /Rút tiền/ }).first()
+  await expect(cash).toBeDisabled(); await expect(cash).toContainText('Sắp có')
   await p.getByRole('tab', { name: 'Bảng kê lương' }).click()
   // Hồ sơ: the new rows
   await nav(p, 'Hồ sơ').click(); await h.see('Xác thực tài khoản'); await h.see('Cài đặt & Bảo mật'); await h.see('Hỗ trợ & HDSD'); await h.see('Tài khoản nhận tiền')

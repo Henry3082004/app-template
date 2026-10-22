@@ -10,7 +10,6 @@ import { Avatar, Btn } from './ui'
 function pageTitle(path: string): TKey {
   if (path.startsWith('/app/da-ung-tuyen') || path.startsWith('/app/cham-cong')) return 'navShifts'
   if (path.startsWith('/app/thu-nhap')) return 'navIncome'
-  if (path === '/app' || path === '/app/') return 'navHome'
   if (path.startsWith('/app/tai-khoan')) return 'navAccount'
   if (path.startsWith('/app/dang-tin')) return 'postTitle'
   if (path.startsWith('/app/tin')) return 'navMyJobs'
@@ -35,8 +34,7 @@ export function Shell({ children }: { children: ReactNode }) {
       ]
     : profile
       ? [
-          { to: '/app', ico: 'home', label: t('navHome'), end: true },
-          { to: '/app/viec-lam', ico: 'briefcase', label: t('navJobs'), match: ['/app/viec'] },
+          { to: '/app', ico: 'briefcase', label: t('navJobs'), end: true, match: ['/app/viec'] },
           { to: '/app/cham-cong', ico: 'clipboard', label: t('navShifts'), match: ['/app/da-ung-tuyen'] },
           { to: '/app/thu-nhap', ico: 'wallet', label: t('navIncome') },
           { to: '/app/tai-khoan', ico: 'user', label: t('navAccount'), match: ['/app/bang-gia'] },

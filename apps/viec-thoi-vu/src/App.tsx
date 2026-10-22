@@ -9,12 +9,11 @@ import { Shell } from './components/Shell'
 import { Skel } from './components/ui'
 import { WorkerIntroDialog } from './components/WorkerIntroDialog'
 import { I18nProvider } from './lib/i18n'
-import { SessionProvider, useSession } from './lib/session'
+import { SessionProvider } from './lib/session'
 import { IN_ZALO } from './lib/zalo'
 import Admin from './pages/Admin'
 import Account from './pages/Account'
 import EmployerJobs from './pages/EmployerJobs'
-import Home from './pages/Home'
 import Income from './pages/Income'
 import Jobs from './pages/Jobs'
 import MyApplications from './pages/MyApplications'
@@ -25,12 +24,6 @@ import Pricing from './pages/Pricing'
 const Landing = lazy(() => import('./pages/Landing'))
 const Legal = lazy(() => import('./pages/Legal'))
 
-/** Workers land on their home; visitors and shops go straight to the jobs (shops are redirected on from there). */
-function HomeOrJobs() {
-  const { profile } = useSession()
-  return profile?.role === 'seeker' ? <Home /> : <Jobs />
-}
-
 /** Everything under /app lives in the responsive shell (bottom bar · side rail · top bar). */
 function AppPages() {
   const { pathname } = useLocation()
@@ -39,8 +32,8 @@ function AppPages() {
   return (
     <Shell>
       <Routes>
-        <Route index element={<HomeOrJobs />} />
-        <Route path="viec-lam" element={<Jobs />} />
+        <Route index element={<Jobs />} />
+        <Route path="viec-lam" element={<Navigate to="/app" replace />} />
         <Route path="viec/:id" element={<Jobs />} />
         <Route path="cham-cong" element={<Shifts />} />
         <Route path="thu-nhap" element={<Income />} />

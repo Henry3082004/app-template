@@ -129,8 +129,8 @@
 - Tài khoản admin → Tài khoản → "Công cụ admin": nút "Chuyển sang bản người dùng thường" (lưu trên máy này): ẩn menu Quản trị, công cụ admin, tin mẫu; có nút nổi "Về quản trị" ở dưới màn hình. Test: `e2e/admin.spec.ts`.
 
 ## 22/10/2026 — 5 tab người tìm việc (theo mẫu Portal)
-- Menu người tìm việc đã đăng nhập: Trang chủ · Việc làm · Chấm công · Thu nhập · Hồ sơ (khách: Việc làm · Đã ứng tuyển · Hồ sơ; quán: Tin của tôi · Hồ sơ). "Tài khoản" đổi tên thành "Hồ sơ".
-- Trang chủ `/app`; Việc làm `/app/viec-lam`; Chấm công `/app/cham-cong` (danh sách ca Hôm nay/Sắp tới/Đã xong + tab "Đơn ứng tuyển" = `/app/da-ung-tuyen`, KHÔNG có nút bấm giờ); Thu nhập `/app/thu-nhap` (thẻ tối "Số dư hiện tại", Rút tiền khóa "Sắp có", Giao dịch, Bảng kê lương theo tháng).
+- Menu người tìm việc đã đăng nhập: Việc làm · Chấm công · Thu nhập · Hồ sơ (khách: Việc làm · Đã ứng tuyển · Hồ sơ; quán: Tin của tôi · Hồ sơ). "Tài khoản" đổi tên thành "Hồ sơ". (Có làm tab Trang chủ rồi bỏ theo yêu cầu của Henry — Rút tiền + Thu nhập nằm hết trong tab Thu nhập.)
+- Việc làm `/app` (`/app/viec-lam` chuyển về `/app`); Chấm công `/app/cham-cong` (danh sách ca Hôm nay/Sắp tới/Đã xong + tab "Đơn ứng tuyển" = `/app/da-ung-tuyen`, KHÔNG có nút bấm giờ); Thu nhập `/app/thu-nhap` (thẻ tối "Số dư hiện tại", Rút tiền khóa "Sắp có", Giao dịch, Bảng kê lương theo tháng).
 - Thu nhập tính từ các đơn đã `released` (`src/lib/earnings.ts`), không thêm bảng DB. App miễn phí → số tiền là ƯỚC TÍNH (giá công bố × 8 giờ/ngày) và ghi rõ; số dư = tiền đã về app chưa chuyển (0đ khi miễn phí).
 - Hồ sơ thêm: Xác thực tài khoản, Cài đặt & Bảo mật (ngôn ngữ + cách đăng nhập), Hỗ trợ & HDSD (hỏi đáp), Tài khoản nhận tiền luôn hiện cho người tìm việc.
 - Test: `e2e/tabs.spec.ts`. Chưa làm: tab Chấm công/Chi phí cho phía quán; luồng rút tiền thật.

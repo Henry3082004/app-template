@@ -27,7 +27,7 @@ test('deposit → worker sees phone → shift confirmed → both review → repu
   await p.getByRole('button', { name: 'Đánh giá', exact: true }).click(); await h.see('Đánh giá quán')
   await p.getByRole('radio', { name: '4' }).click(); await p.getByRole('button', { name: 'Thân thiện' }).click(); await p.getByRole('button', { name: 'Gửi đánh giá' }).click(); await h.see('Đã đánh giá')
   await h.go('/app/tai-khoan'); await h.section('Đánh giá về bạn'); await h.see('Làm tốt, đúng giờ'); await h.see('Ca hoàn thành'); await h.see('100%'); await h.noHScroll()
-  await h.go('/app/viec-lam'); await expect(p.locator('button.job', { hasText: 'Pha chế ca sáng' }).first().getByText('1 ca xong')).toBeVisible()
+  await h.go('/app'); await expect(p.locator('button.job', { hasText: 'Pha chế ca sáng' }).first().getByText('1 ca xong')).toBeVisible()
   await p.locator('button.job', { hasText: 'Pha chế ca sáng' }).first().click(); await h.see('Quán Cà Phê Dùng Thử'); await h.see('4.0')
 })
 

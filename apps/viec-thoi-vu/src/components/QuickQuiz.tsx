@@ -100,7 +100,7 @@ export function QuickQuiz() {
           <div className="sub">{t(employer ? 'quizDoneEmployer' : 'quizDoneSeeker')}</div>
           {employer
             ? <><Btn block onClick={post}>{t('quizPostJob')}</Btn><Btn v="text" block onClick={close}>{t('quizSeeJobs')}</Btn></>
-            : <Btn block onClick={() => { close(); nav('/app/viec-lam') }}>{t('quizSeeFit')}</Btn>}
+            : <Btn block onClick={() => { close(); nav('/app') }}>{t('quizSeeFit')}</Btn>}
         </div>
       </Dialog>
     )
