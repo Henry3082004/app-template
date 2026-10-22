@@ -18,7 +18,7 @@ import { avatarUrl } from '../lib/worker'
 export default function Account() {
   const { t, locale, setLocale } = useI18n()
   const nav = useNavigate()
-  const { profile, updateProfile, signOut, askAuth, askQuiz } = useSession()
+  const { profile, updateProfile, signOut, askAuth, askQuiz, setViewAsUser } = useSession()
   const cfg = useAppConfig()
   const [f, setF] = useState({ full_name: '', bio: '', business_name: '', address: '', city: '' })
   const [w, setW] = useState<WorkerInfo | null>(null)
@@ -135,6 +135,9 @@ export default function Account() {
           <div className="sub" style={{ fontSize: 13 }}>{t('quizAdminHint')}</div>
           <Btn v="ghost" block onClick={() => askQuiz({ all: true })}>{t('quizAdminBtn')}</Btn>
           <Btn v="ghost" block onClick={() => nav('/app/quan-tri')}>{t('openAdmin')}</Btn>
+          <div className="lab">{t('viewAsTitle')}</div>
+          <div className="sub" style={{ fontSize: 13 }}>{t('viewAsHint')}</div>
+          <Btn block onClick={() => { setViewAsUser(true); nav('/app') }}>{t('viewAsBtn')}</Btn>
         </section>
       )}
       <Btn v="danger" block className="signout" onClick={out}><Ic n="logout" size={18} /> {t('signOut')}</Btn>

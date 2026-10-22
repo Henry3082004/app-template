@@ -27,6 +27,9 @@ interface Session {
   quizRequest: QuizRequest | null
   askQuiz(req: QuizRequest): void
   closeQuiz(): void
+  /** admins only: see the app exactly as a normal user does (no admin menu, tools or sample data); remembered on this device */
+  viewAsUser: boolean
+  setViewAsUser(on: boolean): void
 }
 
 export interface QuizRequest { all?: boolean }
@@ -35,6 +38,9 @@ export interface IntroRequest { onDone?: () => void; /** asked right before an a
 
 const Ctx = createContext<Session>(null as unknown as Session)
 
+const VIEW_KEY = 'vtv-view-as-user'
+const readView = () => { try { return localStorage.getItem(VIEW_KEY) === '1' } catch { return false } }
+
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [profile, setProfileState] = useState<Profile | null>(null)
   const [ready, setReady] = useState(false)
@@ -42,6 +48,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [authRequest, setAuthRequest] = useState<AuthRequest | null>(null)
   const [introRequest, setIntroRequest] = useState<IntroRequest | null>(null)
   const [quizRequest, setQuizRequest] = useState<QuizRequest | null>(null)
+  const [viewAsUser, setViewAsUserState] = useState(readView)
   const signOuts = useRef(0)
 
   const setProfile = useCallback((p: Profile | null) => {
@@ -61,6 +68,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => { refresh().finally(() => setReady(true)) }, [refresh])
 
+  const setViewAsUser = useCallback((on: boolean) => {
+    setViewAsUserState(on)
+    try { if (on) localStorage.setItem(VIEW_KEY, '1'); else localStorage.removeItem(VIEW_KEY) } catch { /* only for this visit */ }
+  }, [])
+  // the same account, minus its admin powers, while an admin is checking what everyone else sees
+  const shown = useMemo(() => (profile && viewAsUser && profile.is_admin ? { ...profile, is_admin: false } : profile), [profile, viewAsUser])
+
   const updateProfile = useCallback(async (patch: ProfileUpdate) => {
     const before = signOuts.current
     const p = await api.updateProfile(patch)
@@ -76,7 +90,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [setProfile])
 
   const value = useMemo<Session>(() => ({
-    profile, ready, setProfile, updateProfile, pending, refresh, signOut, authRequest,
+    profile: shown, ready, setProfile, updateProfile, pending, refresh, signOut, authRequest,
     askAuth: (r) => setAuthRequest(r),
     closeAuth: () => setAuthRequest(null),
     introRequest,
@@ -85,7 +99,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     quizRequest,
     askQuiz: (r) => setQuizRequest(r),
     closeQuiz: () => setQuizRequest(null),
-  }), [profile, ready, setProfile, updateProfile, pending, refresh, signOut, authRequest, introRequest, quizRequest])
+    viewAsUser: viewAsUser && !!profile?.is_admin,
+    setViewAsUser,
+  }), [profile, shown, viewAsUser, setViewAsUser, ready, setProfile, updateProfile, pending, refresh, signOut, authRequest, introRequest, quizRequest])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

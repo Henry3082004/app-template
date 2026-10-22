@@ -441,3 +441,8 @@ textarea.inp{min-height:84px;resize:vertical}
 .btn.signout{background:var(--danger-fg);color:#fff;margin-top:8px}.btn.signout:hover{background:#8a2718;color:#fff}
 @media(min-width:1024px){.page-scroll>.pg.acctpage{max-width:960px}}
 @media(min-width:1024px){.acctpage>.ptitle{display:none}}
+
+.viewbar{position:fixed;z-index:45;left:12px;right:12px;bottom:calc(78px + var(--safe-bottom));display:flex;align-items:center;gap:8px;background:var(--tx);color:#fff;border-radius:999px;padding:6px 6px 6px 14px;font-size:13px;box-shadow:var(--shadow-lg)}
+.viewbar span{flex:1;min-width:0}
+.viewbar button{border:0;border-radius:999px;background:#fff;color:var(--tx);font-weight:600;font-size:13px;min-height:36px;padding:0 14px;cursor:pointer}
+@media(min-width:600px){.viewbar{left:50%;right:auto;transform:translateX(-50%);bottom:20px;width:max-content;max-width:calc(100vw - 32px)}}

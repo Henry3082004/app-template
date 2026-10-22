@@ -4,6 +4,7 @@ import { AuthDialog } from './components/AuthDialog'
 import { CompleteProfileDialog } from './components/CompleteProfileDialog'
 import { InstallBanner } from './components/InstallBanner'
 import { QuickQuiz } from './components/QuickQuiz'
+import { ViewAsBar } from './components/ViewAsBar'
 import { Shell } from './components/Shell'
 import { Skel } from './components/ui'
 import { WorkerIntroDialog } from './components/WorkerIntroDialog'
@@ -67,6 +68,7 @@ function AppRoutes() {
       <WorkerIntroDialog />
       <QuickQuiz />
       <InstallBanner />
+      <ViewAsBar />
     </Suspense>
   )
 }

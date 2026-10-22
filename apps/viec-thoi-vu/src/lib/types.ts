@@ -67,6 +67,8 @@ export interface Job {
   business_name: string | null
   /** the shop's logo (storage path), if it has one */
   business_logo?: string | null
+  /** sample job: only admins can see it */
+  is_sample?: boolean
 }
 
 /** Escrow / shift state shared by both sides of an accepted application. */

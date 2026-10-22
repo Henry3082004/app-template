@@ -124,3 +124,6 @@
 - Từ 1024px: menu bên trái (logo, "Menu chính", các mục, thẻ người đang đăng nhập ở cuối), thanh trên có tên trang + "Hôm nay, <thứ, ngày>" + VI/EN.
 - Trang việc làm trên máy tính: thẻ "Xin chào <tên>" + số đơn đang chờ / được nhận / việc đang tuyển, rồi banner, thẻ tìm kiếm, "Việc làm cho bạn" dạng hàng (giá ở bên phải). Từ 1280px còn có khung chi tiết dính bên phải; 1024–1279 mở việc thành trang riêng.
 - Trang Tài khoản (mọi cỡ): thẻ đầu (ảnh, tên, SĐT + nhãn "đã/chưa xác thực" — Zalo = đã xác thực, chỉ số uy tín), các hàng bấm để mở (Thông tin cá nhân, Đánh giá về bạn, Vai trò, Tài khoản nhận tiền, Ngôn ngữ, Hỗ trợ & điều khoản), khung "Công cụ admin & kiểm thử" (chỉ admin: làm thử bộ câu hỏi, mở Quản trị), nút Đăng xuất đỏ.
+
+## 22/10/2026 — Admin xem như người dùng thường
+- Tài khoản admin → Tài khoản → "Công cụ admin": nút "Chuyển sang bản người dùng thường" (lưu trên máy này): ẩn menu Quản trị, công cụ admin, tin mẫu; có nút nổi "Về quản trị" ở dưới màn hình. Test: `e2e/admin.spec.ts`.

@@ -35,7 +35,7 @@ export default function Jobs() {
   const bp = useBp()
   const desk = bp === 'l' || bp === 'd' // landscape tablet / desktop: menu on the left, greeting card, jobs as rows
   const big = bp === 'd' // wide enough to keep the open job in a sticky card next to the list
-  const { profile, ready, askAuth } = useSession()
+  const { profile, ready, askAuth, viewAsUser } = useSession()
   const [params, setParams] = useSearchParams()
   const [jobs, setJobs] = useState<Job[] | null>(null)
   const [reps, setReps] = useState<Record<string, Reputation>>({})
@@ -107,6 +107,7 @@ export default function Jobs() {
     const needle = strip(q.trim())
     const [mu, ma] = minPay ? minPay.split(':') : ['', '']
     const list = jobs.filter((j) =>
+      !(viewAsUser && j.is_sample) && // admins see the sample jobs; the normal view does not
       (filter === 'all' || (filter === 'urgent' ? j.is_urgent : j.category === filter)) &&
       (!area || j.city === area) &&
       (!minPay || (j.pay_unit === (mu as PayUnit) && j.pay_amount >= Number(ma))) &&
@@ -116,7 +117,7 @@ export default function Jobs() {
       .sort((a, b) => (coords
         ? (a.d ?? 1e9) - (b.d ?? 1e9)
         : fitScore(b.j, quiz) - fitScore(a.j, quiz) || Number(b.j.is_urgent) - Number(a.j.is_urgent) || b.j.created_at.localeCompare(a.j.created_at)))
-  }, [jobs, q, filter, area, minPay, coords, distOf, quiz])
+  }, [jobs, q, filter, area, minPay, coords, distOf, quiz, viewAsUser])
 
   // businesses live on "My posts"; one that can also work may still open a shared job link (and switch to apply)
   if (profile?.role === 'employer' && !(id && profile.roles.includes('seeker'))) return <Navigate to="/app/tin-cua-toi" replace />
