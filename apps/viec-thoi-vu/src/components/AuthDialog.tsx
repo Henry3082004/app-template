@@ -152,7 +152,8 @@ export function AuthDialog() {
             <div className="sub" style={{ marginTop: -8 }}>{t('zaloWhy')}</div>
             {error != null && <ErrorBox error={error} where="AuthDialog.zalo" />}
             <Btn block onClick={zaloContinue} disabled={busy}>{busy ? '…' : t('zaloContinue')}</Btn>
-            <Btn v="text" block onClick={() => { setViaZalo(false); setError(null) }}>{t('zaloOther')}</Btn>
+            {/* the real server has no phone+password sign-up, so the fallback only exists in the mock/demo builds */}
+            {ALLOW_PASSWORD && <Btn v="text" block onClick={() => { setViaZalo(false); setError(null) }}>{t('zaloOther')}</Btn>}
           </>
         ) : (
           <form className="stack" onSubmit={zaloSignup}>
