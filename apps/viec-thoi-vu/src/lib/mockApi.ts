@@ -69,6 +69,7 @@ const revealed = (appId: string) => {
   return !!a && (reviews.filter((r) => r.application_id === appId).length >= 2 || (!!a.released_at && Date.now() - a.released_at > 7 * 864e5))
 }
 const escrowOf = (a: App, viewer: string): Escrow => ({
+  paid_cash_at: a.paid_cash_at ?? null,
   pay_status: a.pay_status, escrow_amount: a.escrow_amount, platform_fee: a.platform_fee, attendance: a.attendance, funding_mode: a.funding_mode,
   reviewed: reviews.some((r) => r.application_id === a.id && r.reviewer_id === viewer),
   other_reviewed: reviews.some((r) => r.application_id === a.id && r.reviewer_id !== viewer),
@@ -262,6 +263,23 @@ export const mockApi: Api = {
     })
     list.forEach((a) => { a.seen = true })
     return wait(out)
+  },
+
+  async myHires() {
+    const p = me()
+    const mine = jobs.filter((j) => j.employer_id === p.id)
+    return wait(apps.filter((a) => a.status !== 'withdrawn' && mine.some((j) => j.id === a.job_id)).slice().reverse().map((a) => {
+      const s = users[a.seeker_id]?.profile
+      return { id: a.id, status: a.status, message: a.message, created_at: a.created_at, seeker_id: a.seeker_id, ...escrowOf(a, p.id), full_name: s?.full_name ?? '—', bio: s?.bio ?? null, phone: a.status === 'accepted' ? s?.phone ?? null : null,
+        birth_year: s?.birth_year ?? null, experience: s?.experience ?? [], availability: s?.availability ?? [], avatar_path: s?.avatar_path ?? null, job: jobOf(a) }
+    }))
+  },
+
+  async markPaidCash(id) {
+    const a = myApp(id, 'employer')
+    if (a.pay_status !== 'released' || (a.funding_mode ?? 'off') !== 'off') throw new AppError('ALREADY_SETTLED')
+    a.paid_cash_at = a.paid_cash_at ?? now()
+    return wait(undefined)
   },
 
   async decide(id, decision) {

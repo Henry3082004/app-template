@@ -476,3 +476,5 @@ textarea.inp{min-height:84px;resize:vertical}
 
 .incomepg .tiles>div{background:#fff;box-shadow:var(--sh)}
 @media(min-width:1024px){.incomepg>.ptitle,.shiftspg>.ptitle{display:none}}
+
+.navbadge{position:absolute;top:-6px;right:-10px;min-width:18px;height:18px;border-radius:999px;background:var(--danger-solid);color:#fff;font:700 11px/18px var(--font-sans);text-align:center;padding:0 5px;font-style:normal}.rail .ic,.bnav .ic{position:relative}

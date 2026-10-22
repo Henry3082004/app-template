@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { Ic } from '../components/Ic'
 import { JobCard } from '../components/JobCard'
 import { Btn, Chip, Dialog, ErrorBox, Fld, Tag } from '../components/ui'
@@ -22,6 +22,7 @@ const UNITS: PayUnit[] = ['hour', 'day', 'shift', 'job']
 export default function PostJob() {
   const { t } = useI18n()
   const nav = useNavigate()
+  const [qs] = useSearchParams()
   const bp = useBp()
   const { profile, ready } = useSession()
   const cfg = useAppConfig()
@@ -41,16 +42,16 @@ export default function PostJob() {
   useEffect(() => {
     if (profile?.role !== 'employer') return
     api.myJobs().then((list) => {
-      const last = list[0]
+      const last = list.find((j) => j.id === qs.get('lai')) ?? list[0]
       if (!last) return
       setF((cur) => ({
-        ...cur, title: last.title, description: last.description ?? '', category: last.category, pay_amount: last.pay_amount,
+        ...cur, title: cur.title || last.title, description: last.description ?? '', category: last.category, pay_amount: last.pay_amount,
         pay_unit: last.pay_unit, shift_note: last.shift_note ?? '', address: last.address, city: last.city,
         lat: last.lat, lng: last.lng, slots: last.slots,
       }))
       setPrefilled(true)
     }).catch(() => undefined)
-  }, [profile])
+  }, [profile]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!ready) return null
   if (profile?.role !== 'employer') return <Navigate to="/app" replace />

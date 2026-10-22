@@ -13,12 +13,15 @@ import { SessionProvider } from './lib/session'
 import { IN_ZALO } from './lib/zalo'
 import Admin from './pages/Admin'
 import Account from './pages/Account'
+import EmployerCandidates from './pages/EmployerCandidates'
 import EmployerJobs from './pages/EmployerJobs'
+import EmployerShifts from './pages/EmployerShifts'
 import Income from './pages/Income'
 import Jobs from './pages/Jobs'
 import MyApplications from './pages/MyApplications'
 import PostJob from './pages/PostJob'
 import Shifts from './pages/Shifts'
+import Spend from './pages/Spend'
 import Pricing from './pages/Pricing'
 
 const Landing = lazy(() => import('./pages/Landing'))
@@ -41,6 +44,9 @@ function AppPages() {
         <Route path="tai-khoan" element={<Account />} />
         <Route path="tin-cua-toi" element={<EmployerJobs />} />
         <Route path="tin/:id" element={<EmployerJobs />} />
+        <Route path="ung-vien" element={<EmployerCandidates />} />
+        <Route path="ca-lam" element={<EmployerShifts />} />
+        <Route path="chi-phi" element={<Spend />} />
         <Route path="dang-tin" element={<PostJob />} />
         <Route path="bang-gia" element={<Pricing />} />
         <Route path="quan-tri" element={<Admin />} />

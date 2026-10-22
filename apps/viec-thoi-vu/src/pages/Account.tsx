@@ -10,6 +10,7 @@ import { Avatar, Btn, Empty, ErrorBox, Fld } from '../components/ui'
 import { WorkerFields, workerInfoOf } from '../components/WorkerFields'
 import { CITIES } from '../lib/geo'
 import { useI18n, type TKey } from '../lib/i18n'
+import { Regulars } from '../components/Regulars'
 import { displayPhone } from '../lib/phone'
 import { useSession } from '../lib/session'
 import type { Locale, WorkerInfo } from '../lib/types'
@@ -122,7 +123,8 @@ export default function Account() {
         <OwnRepTiles userId={profile.id} employer={emp} />
       </section>
       <Sect title={t('secInfo')} sub={t(emp ? 'secInfoEmployer' : 'secInfoSeeker')}>{form}</Sect>
-      <Sect title={t('secVerify')} sub={t('secVerifySub')}>
+      {emp && <Sect title={t('regularsTitle')} sub={t('regularsSub')}><Regulars /></Sect>}
+      <Sect title={t('secVerify')} sub={t(emp ? 'secVerifySubEmp' : 'secVerifySub')}>
         <div className="stack">
           <div className={'notice ' + (profile.auth_provider === 'zalo' ? 'ok' : 'warn')}>{t(profile.auth_provider === 'zalo' ? 'verifyPhoneOk' : 'verifyPhoneNo')}</div>
           <div className="sub" style={{ fontSize: 14 }}>{t('verifyId')}</div>

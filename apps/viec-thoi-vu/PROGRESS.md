@@ -134,3 +134,6 @@
 - Thu nhập tính từ các đơn đã `released` (`src/lib/earnings.ts`), không thêm bảng DB. App miễn phí → số tiền là ƯỚC TÍNH (giá công bố × 8 giờ/ngày) và ghi rõ; số dư = tiền đã về app chưa chuyển (0đ khi miễn phí).
 - Hồ sơ thêm: Xác thực tài khoản, Cài đặt & Bảo mật (ngôn ngữ + cách đăng nhập), Hỗ trợ & HDSD (hỏi đáp), Tài khoản nhận tiền luôn hiện cho người tìm việc.
 - Test: `e2e/tabs.spec.ts`. Chưa làm: tab Chấm công/Chi phí cho phía quán; luồng rút tiền thật.
+
+## 22/10/2026 — 4 tab cho chủ quán
+Tuyển người (Tin đăng | Ứng viên, đăng lại tin cũ) · Ca làm (Cần xác nhận / Hôm nay / Sắp tới / Đã xong, số đỏ trên menu, nút "Đã trả tiền mặt") · Chi phí (tháng này, tổng, theo ca, theo tháng) · Hồ sơ (+ "Nhân viên quen" có nút Mời làm lại). Dữ liệu từ `api.myHires()`; DB thêm `paid_cash_at` + `mark_paid_cash`.

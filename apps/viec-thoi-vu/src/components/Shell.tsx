@@ -1,6 +1,9 @@
 import type { ReactNode } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { api } from '../lib/api'
 import { LOGO } from '../lib/capy'
+import { needsAction } from '../lib/hires'
 import { useI18n, type TKey } from '../lib/i18n'
 import { useSession } from '../lib/session'
 import { Ic, type IconName } from './Ic'
@@ -12,13 +15,15 @@ function pageTitle(path: string): TKey {
   if (path.startsWith('/app/thu-nhap')) return 'navIncome'
   if (path.startsWith('/app/tai-khoan')) return 'navAccount'
   if (path.startsWith('/app/dang-tin')) return 'postTitle'
-  if (path.startsWith('/app/tin')) return 'navMyJobs'
+  if (path.startsWith('/app/ca-lam')) return 'navEmpShifts'
+  if (path.startsWith('/app/chi-phi')) return 'navSpend'
+  if (path.startsWith('/app/ung-vien') || path.startsWith('/app/tin')) return 'navHiring'
   if (path.startsWith('/app/bang-gia')) return 'pricing'
   if (path.startsWith('/app/quan-tri')) return 'navAdmin'
   return 'navJobs'
 }
 
-interface Item { to: string; ico: IconName; label: string; end?: boolean; match?: string[] }
+interface Item { to: string; ico: IconName; label: string; end?: boolean; match?: string[]; badge?: number }
 
 /** Phone: bottom bar · tablet: left rail · desktop (≥1280px): top bar. Visibility is pure CSS. */
 export function Shell({ children }: { children: ReactNode }) {
@@ -27,9 +32,21 @@ export function Shell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation()
   const nav = useNavigate()
 
+  // shifts the shop still has to confirm → red number on "Ca làm"
+  const [toConfirm, setToConfirm] = useState(0)
+  const employer = profile?.role === 'employer'
+  useEffect(() => {
+    if (!employer) { setToConfirm(0); return }
+    let live = true
+    api.myHires().then((l) => { if (live) setToConfirm(needsAction(l)) }).catch(() => undefined)
+    return () => { live = false }
+  }, [employer, pathname])
+
   const items: Item[] = profile?.role === 'employer'
     ? [
-        { to: '/app/tin-cua-toi', ico: 'store', label: t('navMyJobs'), match: ['/app/tin', '/app/dang-tin'] },
+        { to: '/app/tin-cua-toi', ico: 'store', label: t('navHiring'), match: ['/app/tin', '/app/dang-tin', '/app/ung-vien'] },
+        { to: '/app/ca-lam', ico: 'clipboard', label: t('navEmpShifts'), badge: toConfirm },
+        { to: '/app/chi-phi', ico: 'wallet', label: t('navSpend') },
         { to: '/app/tai-khoan', ico: 'user', label: t('navAccount'), match: ['/app/bang-gia'] },
       ]
     : profile
@@ -51,7 +68,7 @@ export function Shell({ children }: { children: ReactNode }) {
     <>
       {items.map((i) => (
         <NavLink key={i.to} to={i.to} end={i.end} className={isOn(i) ? 'on' : ''} aria-current={isOn(i) ? 'page' : undefined}>
-          <span className="ic"><Ic n={i.ico} size={22} /></span>{i.label}
+          <span className="ic"><Ic n={i.ico} size={22} />{!!i.badge && <i className="navbadge" aria-label={String(i.badge)}>{i.badge}</i>}</span>{i.label}
         </NavLink>
       ))}
     </>

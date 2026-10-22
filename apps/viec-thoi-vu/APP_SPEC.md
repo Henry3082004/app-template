@@ -169,3 +169,6 @@ Menu của người tìm việc (đã đăng nhập): **Việc làm · Chấm c�
   - Nguồn số liệu: các đơn `pay_status = released` của mình (`escrow_amount`, `platform_fee`, `funding_mode`, `payout`) — KHÔNG cần bảng mới. Khi app miễn phí (`funding_mode = off`) quán trả tiền mặt trực tiếp và số tiền là **ước tính** (giá công bố × 8 giờ/ngày) → ghi rõ "ước tính".
   - Chưa có luồng rút tiền: quản trị chuyển tay (Admin → Chuyển tiền); nút Rút tiền luôn khóa cho tới khi làm.
 - **Hồ sơ** (`/app/tai-khoan`): thêm hàng "Xác thực tài khoản" (SĐT đã/chưa xác thực; CCCD "sắp có"), "Cài đặt & Bảo mật" (ngôn ngữ, cách đăng nhập), "Hỗ trợ & HDSD" (hỏi đáp ngắn + điều khoản); "Tài khoản nhận tiền" luôn hiện cho người tìm việc.
+
+### Menu chủ quán (22/10/2026)
+Tuyển người (`/app/tin-cua-toi`, `/app/ung-vien`) · Ca làm (`/app/ca-lam`) · Chi phí (`/app/chi-phi`) · Hồ sơ. Đăng lại tin: `/app/dang-tin?lai=<id>`. Quán ghi đã trả tiền mặt: `mark_paid_cash` (chỉ khi thanh toán tắt).

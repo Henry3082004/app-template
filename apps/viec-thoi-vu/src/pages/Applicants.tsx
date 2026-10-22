@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Ic } from '../components/Ic'
 import { EmployerPay, Rep } from '../components/escrow'
 import { Avatar, Btn, Dialog, Empty, ErrorBox, Skel, Tag } from '../components/ui'
@@ -15,6 +16,7 @@ import { avatarUrl } from '../lib/worker'
 /** Applicants of one post: a page on phones, the right-hand column on tablet/desktop. */
 export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: () => void; onChanged(): void }) {
   const { t } = useI18n()
+  const nav = useNavigate()
   const [list, setList] = useState<Applicant[] | null>(null)
   const [reps, setReps] = useState<Record<string, Reputation>>({})
   const [error, setError] = useState<unknown>(null)
@@ -102,25 +104,31 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
             </div>
           ))}
         </div>
-        <div className="center mt24"><Btn v="text" onClick={toggle}>{job.status === 'open' ? t('closeJob') : t('reopenJob')}</Btn></div>
+        <div className="center mt24 acts"><Btn v="text" onClick={() => nav(`/app/dang-tin?lai=${job.id}`)}>{t('repostJob')}</Btn><Btn v="text" onClick={toggle}>{job.status === 'open' ? t('closeJob') : t('reopenJob')}</Btn></div>
       </div>
-      {accepted && (
-        <Dialog full label={t('acceptedTitle', { name: accepted.name })} onClose={() => setAccepted(null)}>
-          <img className="capy sm hop" src={capy('cheer')} alt="" />
-          <h2>{t('acceptedTitle', { name: accepted.name.replace(/\(.*?\)/g, '').trim().split(' ').slice(-1)[0] })}</h2>
-          <div className="sub">{t('acceptedText')}</div>
-          {accepted.phone && (
-            <>
-              <div className="phone">{displayPhone(accepted.phone)}</div>
-              <div className="row" style={{ gap: 10, width: '100%' }}>
-                <a className="btn btn-primary block" href={telHref(accepted.phone)}>{<Ic n="phone" size={16} />} {t('call')}</a>
-                <a className="btn btn-ghost block" href={zaloHref(accepted.phone)} target="_blank" rel="noreferrer">{<Ic n="message" size={16} />} {t('zalo')}</a>
-              </div>
-            </>
-          )}
-          <Btn v="text" onClick={() => setAccepted(null)}>{t('done')}</Btn>
-        </Dialog>
-      )}
+      {accepted && <AcceptedDialog accepted={accepted} onClose={() => setAccepted(null)} />}
     </div>
+  )
+}
+
+/** "Đã nhận X" — the worker's phone right after accepting. */
+export function AcceptedDialog({ accepted, onClose }: { accepted: { name: string; phone: string | null }; onClose(): void }) {
+  const { t } = useI18n()
+  return (
+    <Dialog full label={t('acceptedTitle', { name: accepted.name })} onClose={onClose}>
+      <img className="capy sm hop" src={capy('cheer')} alt="" />
+      <h2>{t('acceptedTitle', { name: accepted.name.replace(/\(.*?\)/g, '').trim().split(' ').slice(-1)[0] })}</h2>
+      <div className="sub">{t('acceptedText')}</div>
+      {accepted.phone && (
+        <>
+          <div className="phone">{displayPhone(accepted.phone)}</div>
+          <div className="row" style={{ gap: 10, width: '100%' }}>
+            <a className="btn btn-primary block" href={telHref(accepted.phone)}>{<Ic n="phone" size={16} />} {t('call')}</a>
+            <a className="btn btn-ghost block" href={zaloHref(accepted.phone)} target="_blank" rel="noreferrer">{<Ic n="message" size={16} />} {t('zalo')}</a>
+          </div>
+        </>
+      )}
+      <Btn v="text" onClick={onClose}>{t('done')}</Btn>
+    </Dialog>
   )
 }

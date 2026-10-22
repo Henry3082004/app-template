@@ -34,7 +34,7 @@ for (const [name, width, height] of [['landscape tablet', 1100, 760], ['desktop'
     test('other pages sit in the same centred frame', async ({ page: p }) => {
       const h = helpers(p)
       await p.goto('/app'); await h.see('Phụ bếp ca tối')
-      await h.asEmployer(); await h.go('/app/tin-cua-toi'); await h.see('Tin của tôi'); await h.noHScroll()
+      await h.asEmployer(); await h.go('/app/tin-cua-toi'); await h.see('Tuyển người'); await h.noHScroll()
       await h.go('/app/tai-khoan'); await h.see('Uy tín của bạn'); await h.noHScroll()
     })
   })

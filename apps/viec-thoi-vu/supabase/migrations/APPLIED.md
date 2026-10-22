@@ -37,3 +37,5 @@ Xoá hết mẫu: `delete from auth.users where id in (select id from public.pro
 
 21/10/2026: `20261027_quick_quiz.sql` áp dụng thành `quick_quiz_1_table`, `quick_quiz_2_clean`, `quick_quiz_3_save_read`.
 Test: `supabase/tests/80_quiz.sql`.
+
+22/10/2026: `20261028_cash_paid.sql` áp dụng thành `cash_paid_1_column`, `cash_paid_2_rpc` — cột `applications.paid_cash_at` + hàm `mark_paid_cash` (quán ghi "đã trả tiền mặt", chế độ miễn phí). Test: `supabase/tests/90_cash_paid.sql`.

@@ -193,6 +193,15 @@ const vi = {
   eBAD_PHONE: 'Số điện thoại chưa đúng. Hãy chọn đúng quốc gia và nhập số của bạn.', ePROFILE_EXISTS: 'Tài khoản này đã có hồ sơ rồi.', eINVALID_ROLE: 'Hãy chọn bạn là người tìm việc hay nhà tuyển dụng.',
   zaloSoonTitle: 'Đăng nhập bằng Zalo sắp có', zaloSoonText: 'Zalo đang duyệt Việc Thời Vụ. Khi xong, người dùng ở Việt Nam sẽ đăng nhập một chạm bằng Zalo. Trong lúc chờ, bạn có thể đăng nhập bằng Google.',
   googleOnlyTitle: 'Đăng nhập bằng Google', googleOnlyText: 'Sau khi đăng nhập, bạn chọn quốc gia và nhập số điện thoại để liên hệ.',
+  navHiring: 'Tuyển người', navEmpShifts: 'Ca làm', navSpend: 'Chi phí', hireJobsTab: 'Tin đăng', hireCandTab: 'Ứng viên',
+  candAll: 'Tất cả tin', candFilter: 'Lọc theo tin', noCandidates: 'Chưa có ứng viên nào đang chờ', noCandidatesSub: 'Khi có người ứng tuyển, họ sẽ hiện ở đây để bạn nhận hoặc từ chối.',
+  hireShiftsConfirm: 'Cần xác nhận', empNoShifts: 'Chưa có ca nào', empNoShiftsSub: 'Nhận ứng viên xong, ca làm của họ sẽ hiện ở đây.',
+  repostJob: 'Đăng lại tin này', paidCashCta: 'Đã trả tiền mặt', paidCashDone: 'Đã ghi trả tiền mặt', paidCashTag: 'Đã trả', unpaidCashTag: 'Chưa ghi trả', unpaidCashN: '{n} ca chưa ghi đã trả tiền mặt',
+  spendMonth: 'Chi tháng này', spendTotal: 'Tổng đã chi', spendShifts: 'Ca đã thuê', spendPeople: 'Người đã thuê', spendHeld: 'Đang giữ chỗ: {n}',
+  spendEstimated: 'Quán trả tiền mặt trực tiếp nên đây là số ước tính theo mức lương trong tin (8 giờ/ngày).', spendByShift: 'Theo ca', spendByMonth: 'Theo tháng',
+  spendNone: 'Chưa có khoản chi nào', spendNoneSub: 'Sau khi bạn xác nhận ca làm xong, khoản chi sẽ hiện ở đây.',
+  regularsTitle: 'Nhân viên quen', regularsSub: 'Người đã làm tốt cho quán — mời làm lại', regularsEmpty: 'Chưa có nhân viên quen', regularsEmptySub: 'Người làm xong ca sẽ hiện ở đây để bạn mời lại.', inviteAgain: 'Mời làm lại',
+  secVerifySubEmp: 'Tăng độ tin cậy với ứng viên',
 }
 
 type Dict = typeof vi
@@ -375,6 +384,15 @@ const en: Dict = {
   eBAD_PHONE: "That phone number doesn't look right. Pick your country and enter your number.", ePROFILE_EXISTS: 'This account already has a profile.', eINVALID_ROLE: 'Please choose job seeker or employer.',
   zaloSoonTitle: 'Zalo sign-in is coming', zaloSoonText: 'Zalo is reviewing Việc Thời Vụ. Once approved, users in Vietnam will sign in with one tap through Zalo. Meanwhile you can sign in with Google.',
   googleOnlyTitle: 'Sign in with Google', googleOnlyText: 'After signing in, pick your country and enter your phone number so people can reach you.',
+  navHiring: 'Hiring', navEmpShifts: 'Shifts', navSpend: 'Spending', hireJobsTab: 'Posts', hireCandTab: 'Candidates',
+  candAll: 'All posts', candFilter: 'Filter by post', noCandidates: 'No candidates waiting', noCandidatesSub: 'People who apply show up here for you to accept or decline.',
+  hireShiftsConfirm: 'To confirm', empNoShifts: 'No shifts yet', empNoShiftsSub: 'Once you accept a candidate, their shift shows up here.',
+  repostJob: 'Repost this job', paidCashCta: 'Paid in cash', paidCashDone: 'Recorded as paid in cash', paidCashTag: 'Paid', unpaidCashTag: 'Not recorded', unpaidCashN: '{n} shifts not yet recorded as paid in cash',
+  spendMonth: 'Spent this month', spendTotal: 'Total spent', spendShifts: 'Shifts hired', spendPeople: 'People hired', spendHeld: 'Held for shifts: {n}',
+  spendEstimated: 'You pay cash directly, so this is an estimate from the pay in each post (8 h/day).', spendByShift: 'By shift', spendByMonth: 'By month',
+  spendNone: 'No spending yet', spendNoneSub: 'Once you confirm a finished shift, the cost shows up here.',
+  regularsTitle: 'Regular staff', regularsSub: 'People who did well for you — invite them again', regularsEmpty: 'No regular staff yet', regularsEmptySub: 'Workers who finish a shift show up here so you can invite them back.', inviteAgain: 'Invite again',
+  secVerifySubEmp: 'Be more trusted by candidates',
 }
 
 export type TKey = keyof Dict

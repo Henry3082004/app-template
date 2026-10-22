@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { api } from '../../lib/api'
 import { money, today } from '../../lib/format'
 import { useI18n } from '../../lib/i18n'
 import { useAppConfig } from '../../lib/config'
-import { Btn } from '../ui'
+import { Btn, ErrorBox } from '../ui'
 import type { Applicant } from '../../lib/types'
 import { net, type JobTerms, type Dlg } from './shared'
 import { FundDialog, CompleteDialog, DisputeDialog } from './dialogs'
@@ -14,7 +15,9 @@ export function EmployerPay({ app, job, onChanged }: { app: Applicant; job: JobT
   const [dlg, setDlg] = useState<Dlg>(null)
   const close = () => setDlg(null)
   const done = () => { close(); onChanged() }
+  const [payErr, setPayErr] = useState<unknown>(null)
   const early = today() < job.start_date
+  const markPaid = async () => { setPayErr(null); try { await api.markPaidCash(app.id); onChanged() } catch (e) { setPayErr(e) } }
   const s = app.pay_status
   const cfg = useAppConfig()
   if (!cfg && s === 'none') return null
@@ -33,6 +36,10 @@ export function EmployerPay({ app, job, onChanged }: { app: Applicant; job: JobT
         {s === 'released' && (
           <>
             <div className="notice ok">{t('releasedFree')}</div>
+            {app.paid_cash_at
+              ? <div className="small muted">✓ {t('paidCashDone')}</div>
+              : <Btn v="ghost" onClick={markPaid}>{t('paidCashCta')}</Btn>}
+            {payErr != null && <ErrorBox error={payErr} where="EmployerPay.markPaid" />}
             <ReviewPrompt app={app} onReview={() => setDlg('review')} />
           </>
         )}

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Applicants } from './Applicants'
+import { HireTabs } from '../components/HireTabs'
 import { PendingReviews } from '../components/escrow'
 import { isProFor, useAppConfig } from '../lib/config'
 import { Ic } from '../components/Ic'
@@ -48,9 +49,10 @@ export default function EmployerJobs() {
   const listing = (
     <>
       <div className="hrow" style={{ alignItems: 'center', marginBottom: 12 }}>
-        <h1 className="ptitle">{t('myJobsTitle')}</h1>
+        <h1 className="ptitle">{t('navHiring')}</h1>
         {wide && <Btn sm onClick={post_}>{t('postJob')}</Btn>}
       </div>
+      <HireTabs pending={list?.reduce((n, j) => n + j.newApplicants, 0)} />
       {cfg?.billing === 'on' && (
         <div className="plan" style={{ marginBottom: 12 }}>
           <span>{isPro ? t('proBar') : t('planBar', { open })}</span>
@@ -93,7 +95,7 @@ export default function EmployerJobs() {
   return (
     <div className="split two">
       <section className="listcol" style={{ position: 'relative' }}>
-        {list && list.length === 0 && <div className="coach" style={{ top: 62, left: 150 }}>{t('firstTip')}</div>}
+        {list && list.length === 0 && <div className="coach" style={{ top: 120, left: 150 }}>{t('firstTip')}</div>}
         {listing}
       </section>
       <section className="detailcol">

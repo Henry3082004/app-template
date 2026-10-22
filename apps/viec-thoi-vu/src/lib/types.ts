@@ -81,6 +81,8 @@ export interface Escrow {
   reviewed: boolean
   /** the other side already reviewed this shift (content stays hidden until I review too) */
   other_reviewed: boolean
+  /** free mode: when the shop recorded paying the worker in cash */
+  paid_cash_at?: string | null
 }
 
 export interface MyApplication extends Escrow {
@@ -108,6 +110,9 @@ export interface Applicant extends Escrow, WorkerInfo {
   bio: string | null
   phone: string | null
 }
+
+/** An accepted/pending/rejected application seen from the shop, with its post (all posts in one list). */
+export interface Hire extends Applicant { job: Job }
 
 export interface Reputation {
   user_id: string
@@ -226,6 +231,10 @@ export interface Api {
   createJob(input: JobInput): Promise<Job>
   setJobStatus(jobId: string, status: JobStatus): Promise<void>
   applicantsFor(jobId: string): Promise<Applicant[]>
+  /** every application to my posts (not withdrawn), newest first — for the Ứng viên / Ca làm / Chi phí tabs */
+  myHires(): Promise<Hire[]>
+  /** free mode: record that I paid this worker in cash */
+  markPaidCash(applicationId: string): Promise<void>
   decide(applicationId: string, decision: 'accepted' | 'rejected'): Promise<{ phone: string | null }>
   updateProfile(patch: ProfileUpdate): Promise<Profile>
   /** store a square profile photo; returns the path to save as avatar_path */

@@ -2,7 +2,7 @@ import type { QuizAnswers } from './quiz'
 import { createClient, type PostgrestError } from '@supabase/supabase-js'
 import { normalizePhone, phoneEmail } from './phone'
 import {
-  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type Applicant, type BankAccount, type Escrow, type Job, type JobInput, type MyApplication, type MyJob,
+  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type Applicant, type BankAccount, type Escrow, type Hire, type Job, type JobInput, type MyApplication, type MyJob,
   type Profile, type ProfileUpdate, type Reputation, type SignUpInput,
 } from './types'
 
@@ -79,7 +79,7 @@ async function phonesOf(userIds: string[]): Promise<Record<string, string>> {
   return Object.fromEntries((data ?? []).map((r) => [r.user_id, r.phone]))
 }
 
-const ESCROW_COLS = 'pay_status, escrow_amount, platform_fee, attendance, funding_mode'
+const ESCROW_COLS = 'pay_status, escrow_amount, platform_fee, attendance, funding_mode, paid_cash_at'
 
 /** Shifts where the other side already reviewed (content stays hidden until I review). */
 async function otherReviewed(appIds: string[]): Promise<Set<string>> {
@@ -107,6 +107,7 @@ const toEscrow = (r: any, reviewed: boolean, other: boolean): Escrow => ({
   pay_status: r.pay_status, attendance: r.attendance, funding_mode: r.funding_mode, reviewed, other_reviewed: other,
   escrow_amount: num(r.escrow_amount),
   platform_fee: num(r.platform_fee),
+  paid_cash_at: r.paid_cash_at ?? null,
 })
 
 /** POSTs to one of our Edge Functions; a non-2xx answer becomes an AppError with the function's error code. */
@@ -294,6 +295,26 @@ export const supabaseApi: Api = {
       full_name: r.seeker?.full_name ?? '—', phone: phones[r.seeker_id] ?? null,
       ...toWorker([r.seeker?.worker_profiles].flat()[0]),
     }))
+  },
+
+  async myHires() {
+    const me = await uid()
+    const { data, error } = await sb.from('applications')
+      .select(`id, status, message, created_at, seeker_id, ${ESCROW_COLS}, job:jobs!inner(${JOB_COLS}), seeker:profiles!applications_seeker_id_fkey(full_name, worker_profiles(${WORKER_COLS}))`)
+      .eq('job.employer_id', me).neq('status', 'withdrawn').order('created_at', { ascending: false }).limit(300)
+    if (error) fail(error)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows = (data ?? []) as any[]
+    const ids = rows.map((r) => r.id)
+    const [phones, done, other] = await Promise.all([phonesOf(rows.filter((r) => r.status === 'accepted').map((r) => r.seeker_id)), reviewedSet(ids, me), otherReviewed(ids)])
+    return rows.map((r): Hire => ({
+      id: r.id, status: r.status, message: r.message, created_at: r.created_at, seeker_id: r.seeker_id, ...toEscrow(r, done.has(r.id), other.has(r.id)),
+      full_name: r.seeker?.full_name ?? '—', phone: phones[r.seeker_id] ?? null, job: toJob(r.job), ...toWorker([r.seeker?.worker_profiles].flat()[0]),
+    }))
+  },
+
+  async markPaidCash(applicationId) {
+    await rpc('mark_paid_cash', { p_application: applicationId })
   },
 
   async decide(applicationId, decision) {
