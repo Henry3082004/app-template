@@ -13,6 +13,8 @@ export function initSentry() {
     sendDefaultPii: false,
     // Shares the org's existing Sentry project (members can't create projects); filter by tag app:viec-thoi-vu.
     initialScope: { tags: { app: 'viec-thoi-vu' } },
+    // Zalo's in-app browser runs its own script (zaloJSV2) in every page it opens, before its bridge is ready: not our code.
+    ignoreErrors: [/zaloJSV2/],
   })
   on = true
 }
