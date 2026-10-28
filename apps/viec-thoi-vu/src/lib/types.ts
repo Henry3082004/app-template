@@ -144,7 +144,7 @@ export interface AdminDeletion { id: string; user_id: string; name: string; emai
 export interface SentInvite { job_id: string; worker_id: string }
 /** A worker who chose to be found: shortened name, no phone. */
 export interface FoundWorker {
-  user_id: string; name: string; city: string | null; birth_year: number | null; experience: string[]; availability: string[]
+  user_id: string; name: string; city: string | null; birth_year: number | null; experience: Experience[]; availability: Availability[]
   avatar_path: string | null; shifts_done: number; avg_stars: number | null; ratings: number
 }
 export interface WorkerSearch { city?: string; exp?: string; when?: string }

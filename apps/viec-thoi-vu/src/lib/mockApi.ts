@@ -382,7 +382,7 @@ export const mockApi: Api = {
     if (!p.roles.includes('employer')) throw new AppError('FORBIDDEN')
     const found = Object.values(users).map((u) => u.profile)
       .filter((w) => w.roles.includes('seeker') && w.id !== p.id && discoverable.has(w.id)
-        && (!f.city || w.city === f.city) && (!f.exp || w.experience.includes(f.exp as never)) && (!f.when || w.availability.includes(f.when as never)))
+        && (!f.city || w.city === f.city) && (!f.exp || (w.experience as string[]).includes(f.exp)) && (!f.when || (w.availability as string[]).includes(f.when)))
     const reps = await mockApi.reputations(found.map((w) => w.id), 'seeker')
     return wait(found.map((w): FoundWorker => {
       const parts = w.full_name.trim().split(/\s+/)

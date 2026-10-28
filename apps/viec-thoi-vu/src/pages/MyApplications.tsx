@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ContactButtons } from '../components/ContactButtons'
 import { PendingReviews, SeekerPay } from '../components/escrow'
 import { Ic } from '../components/Ic'
 import { ShiftTabs } from '../components/ShiftTabs'
@@ -8,7 +9,7 @@ import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { api } from '../lib/api'
 import { dateRange } from '../lib/format'
 import { useI18n } from '../lib/i18n'
-import { displayPhone, telHref, zaloHref } from '../lib/phone'
+import { displayPhone } from '../lib/phone'
 import { useSession } from '../lib/session'
 import type { AppStatus, MyApplication } from '../lib/types'
 
@@ -67,10 +68,7 @@ export default function MyApplications() {
             {a.status === 'accepted' && a.employer_phone && (
               <>
                 <div className="phone"><Ic n="phone" size={20} /> {displayPhone(a.employer_phone)}</div>
-                <div className="row" style={{ gap: 10 }}>
-                  <a className="btn btn-primary sm" href={telHref(a.employer_phone)}>{<Ic n="phone" size={16} />} {t('call')}</a>
-                  <a className="btn btn-ghost sm" href={zaloHref(a.employer_phone)} target="_blank" rel="noreferrer">{<Ic n="message" size={16} />} {t('zalo')}</a>
-                </div>
+                <div className="row" style={{ gap: 10 }}><ContactButtons phone={a.employer_phone} /></div>
               </>
             )}
             {a.status === 'pending' && <div><Btn v="text" sm onClick={() => withdraw(a.id)}>{t('withdraw')}</Btn></div>}

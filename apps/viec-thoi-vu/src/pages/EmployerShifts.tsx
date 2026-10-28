@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { ChatDialog } from '../components/ChatDialog'
+import { ContactButtons } from '../components/ContactButtons'
 import { Ic } from '../components/Ic'
 import { ReportDialog } from '../components/ReportDialog'
 import { EmployerPay } from '../components/escrow'
@@ -8,7 +9,7 @@ import { Avatar, Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { dateRange, vnClock } from '../lib/format'
 import { hireShifts, useHires, type HireShift, type HireWhen } from '../lib/hires'
 import { useI18n, type TKey } from '../lib/i18n'
-import { displayPhone, telHref, zaloHref } from '../lib/phone'
+import { displayPhone } from '../lib/phone'
 import { useSession } from '../lib/session'
 import { avatarUrl } from '../lib/worker'
 
@@ -43,10 +44,7 @@ function Card({ s, onChanged }: { s: HireShift; onChanged(): void }) {
           : s.when === 'today' && <span className="muted"><Ic n="clock" size={15} /> {t('workerNotArrived')}</span>}
       </div>
       {h.phone && s.when !== 'done' && (
-        <div className="acts">
-          <a className="btn btn-primary sm" href={telHref(h.phone)}><Ic n="phone" size={16} /> {t('call')}</a>
-          <a className="btn btn-ghost sm" href={zaloHref(h.phone)} target="_blank" rel="noreferrer"><Ic n="message" size={16} /> {t('zalo')}</a>
-        </div>
+        <div className="acts"><ContactButtons phone={h.phone} /></div>
       )}
       <EmployerPay app={h} job={h.job} onChanged={onChanged} />
       {h.cash_received_at && <Tag tone="ok">{t('cashAckByWorker')}</Tag>}

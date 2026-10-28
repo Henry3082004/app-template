@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
 import { useI18n } from '../lib/i18n'
+import { useAction } from '../lib/useAction'
 import type { MyJob } from '../lib/types'
 import { Btn, Dialog, ErrorBox, Skel } from './ui'
 
@@ -8,14 +9,10 @@ import { Btn, Dialog, ErrorBox, Skel } from './ui'
 export function InviteDialog({ workerId, name, fresh, invited, onInvited, onClose }: { workerId: string; name: string; fresh?: boolean; invited: string[]; onInvited(jobId: string): void; onClose(): void }) {
   const { t } = useI18n()
   const [jobs, setJobs] = useState<MyJob[] | null>(null)
-  const [busy, setBusy] = useState<string | null>(null)
-  const [error, setError] = useState<unknown>(null)
+  const { busy, error, setError, run } = useAction()
   const [ok, setOk] = useState(false)
-  useEffect(() => { api.myJobs().then((l) => setJobs(l.filter((j) => j.status === 'open'))).catch(setError) }, [])
-  const invite = async (j: MyJob) => {
-    setBusy(j.id); setError(null)
-    try { await api.inviteWorker(j.id, workerId); onInvited(j.id); setOk(true) } catch (e) { setError(e) } finally { setBusy(null) }
-  }
+  useEffect(() => { api.myJobs().then((l) => setJobs(l.filter((j) => j.status === 'open'))).catch(setError) }, [setError])
+  const invite = (j: MyJob) => run(j.id, async () => { await api.inviteWorker(j.id, workerId); onInvited(j.id); setOk(true) })
   return (
     <Dialog label={t(fresh ? 'inviteTitleNew' : 'inviteTitle', { name })} onClose={onClose}>
       <h2 style={{ fontSize: 20 }}>{t(fresh ? 'inviteTitleNew' : 'inviteTitle', { name })}</h2>

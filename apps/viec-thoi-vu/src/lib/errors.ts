@@ -23,11 +23,6 @@ export function errorKey(e: unknown): TKey {
 }
 
 /** Errors that are the user's to fix — not worth reporting to Sentry. */
-export function isExpected(e: unknown): boolean {
-  const c = errorCode(e)
-  return c !== 'UNKNOWN'
-}
-
 export function errorReport(e: unknown, where: string): string {
   const err = e as Error
   return [
