@@ -34,7 +34,7 @@ test('public pages: landing and terms', async ({ page: p }) => {
   await p.goto('/dieu-khoan'); await h.see('Điều khoản sử dụng'); await h.noHScroll()
   // the legal pages name the operator and a real contact (Zalo / Google reviewers look for both)
   await h.see('CÔNG TY TNHH 1TV SAGO SOFTWARE'); await h.see('khang3082004@gmail.com'); await h.notSee('sắp cập nhật')
-  await h.go('/bao-mat'); await h.see('Chính sách bảo mật'); await h.see('Đăng nhập bằng Zalo'); await h.see('Capy hỏi nhanh'); await h.see('0319664968'); await h.noHScroll()
+  await h.go('/bao-mat'); await h.see('Chính sách bảo mật'); await h.see('Đăng nhập bằng Zalo'); await h.see('Capy hỏi nhanh'); await h.see('Chấm công:'); await h.see('Tin nhắn:'); await h.see('Báo cáo:'); await h.see('Xóa tài khoản'); await h.see('0319664968'); await h.noHScroll()
   await h.go('/hoan-tien'); await h.see('Chính sách hoàn tiền'); await h.noHScroll()
   await h.go('/gioi-thieu'); await h.see('nhận việc trong ngày'); await h.noHScroll()
   // the header spacer once picked up the progress-bar style (class clash on .bar) and showed as a big green pill

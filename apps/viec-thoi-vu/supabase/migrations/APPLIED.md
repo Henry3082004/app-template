@@ -46,3 +46,6 @@ Test: `supabase/tests/100_collab.sql`.
 
 28/10/2026: `20261030_collab_chat_reports.sql` áp dụng thành `collab2_1_chat`, `collab2_2_reports`, `collab2_3_deletion_invites_grants`
 (nhắn tin trong ca đã nhận, báo cáo người dùng, yêu cầu xóa tài khoản, mời làm lại). 4 bảng mới đều đóng (chỉ đi qua hàm). Test: `supabase/tests/110_collab2.sql`.
+
+29/10/2026: `20261031_reminders.sql` áp dụng thành `reminders_1_function`, `reminders_2_schedule` (pg_cron `vtv-reminders`, mỗi giờ phút 05), `reminders_3_skip_samples` (bỏ qua tài khoản mẫu).
+Nhắc việc: tối hôm trước (từ 17:00), sáng ngày làm (từ 06:00), quán chưa xác nhận ca (từ 08:00, một lần), nhắc đánh giá sau 1 đến 7 ngày (từ 09:00, một lần mỗi bên). Test: `supabase/tests/120_reminders.sql`.

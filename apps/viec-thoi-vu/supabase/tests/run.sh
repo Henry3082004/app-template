@@ -22,4 +22,4 @@ for f in 00_local_base_schema.sql ../migrations/20261016_escrow_reputation.sql .
   ../migrations/20261018_reputation_integrity.sql 10_scenarios.sql 20_integrity.sql ../migrations/20261018_free_mode.sql 30_free_mode.sql \
   ../migrations/20261019_multi_login.sql ../migrations/20261020_admin_email_zalo_published.sql 40_multi_login.sql \
   ../migrations/20261021_perf_admin_stats.sql 50_perf_admin_stats.sql ../migrations/20261022_seeker_profile.sql 60_seeker_profile.sql ../migrations/20261023_dual_role.sql ../migrations/20261024_worker_upsert_grant.sql 70_dual_role.sql \
-  ../migrations/20261027_quick_quiz.sql 80_quiz.sql ../migrations/20261028_cash_paid.sql 90_cash_paid.sql ../migrations/20261029_collab_notify_checkin.sql 100_collab.sql ../migrations/20261030_collab_chat_reports.sql 110_collab2.sql; do run "$f"; done
+  ../migrations/20261027_quick_quiz.sql 80_quiz.sql ../migrations/20261028_cash_paid.sql 90_cash_paid.sql ../migrations/20261029_collab_notify_checkin.sql 100_collab.sql ../migrations/20261030_collab_chat_reports.sql 110_collab2.sql ../migrations/20261031_reminders.sql 120_reminders.sql; do run "$f"; done

@@ -11,6 +11,7 @@ import type { AppNotification } from '../lib/types'
 const ICON: Record<string, IconName> = {
   new_applicant: 'users', accepted: 'check', rejected: 'user', shift_done: 'clipboard', noshow: 'zap',
   cash_paid: 'wallet', cash_received: 'wallet', checked_in: 'pin', message: 'message', invite: 'briefcase',
+  remind_today: 'clock', remind_tomorrow: 'clock', remind_confirm: 'clipboard', remind_review: 'star',
 }
 
 /** "08:05" for today, "27/10" for older ones. */

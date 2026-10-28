@@ -148,3 +148,7 @@ Tuyển người (Tin đăng | Ứng viên, đăng lại tin cũ) · Ca làm (C�
 - **Yêu cầu xóa tài khoản** trong Hồ sơ → admin xử lý tay trong 7 ngày (tab Yêu cầu xóa).
 - **Mời làm lại trong app** cho Nhân viên quen (chỉ người đã làm xong ca cho quán).
 - CHƯA làm: thanh toán/rút tiền thật, xác thực CCCD, thông báo đẩy ngoài app (cần OA Zalo), quán tự tìm người làm.
+
+## 29/10/2026 — Chính sách + nhắc việc
+- **Chính sách bảo mật / điều khoản** cập nhật cho chat, báo cáo, chấm công có vị trí (chỉ lưu số mét, không lưu tọa độ), thông báo, lời mời, xóa tài khoản ngay trong Hồ sơ.
+- **Nhắc việc tự động** (pg_cron mỗi giờ): tối hôm trước và sáng ngày làm cho người làm; quán chưa xác nhận ca; nhắc đánh giá cho cả hai bên. Mỗi nhắc chỉ gửi một lần, bỏ qua tài khoản mẫu. Chỉ hiện trong app (chưa đẩy ra ngoài app).
