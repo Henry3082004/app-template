@@ -18,6 +18,7 @@ import EmployerJobs from './pages/EmployerJobs'
 import EmployerShifts from './pages/EmployerShifts'
 import Income from './pages/Income'
 import Jobs from './pages/Jobs'
+import Notifications from './pages/Notifications'
 import MyApplications from './pages/MyApplications'
 import PostJob from './pages/PostJob'
 import Shifts from './pages/Shifts'
@@ -44,6 +45,7 @@ function AppPages() {
         <Route path="tai-khoan" element={<Account />} />
         <Route path="tin-cua-toi" element={<EmployerJobs />} />
         <Route path="tin/:id" element={<EmployerJobs />} />
+        <Route path="thong-bao" element={<Notifications />} />
         <Route path="ung-vien" element={<EmployerCandidates />} />
         <Route path="ca-lam" element={<EmployerShifts />} />
         <Route path="chi-phi" element={<Spend />} />

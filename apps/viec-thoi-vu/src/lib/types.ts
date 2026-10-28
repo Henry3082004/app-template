@@ -83,6 +83,12 @@ export interface Escrow {
   other_reviewed: boolean
   /** free mode: when the shop recorded paying the worker in cash */
   paid_cash_at?: string | null
+  /** free mode: when the worker confirmed receiving that cash */
+  cash_received_at?: string | null
+  /** the worker's "I'm here" / "I'm done" for the current day, and how far from the shop the phone was (metres, if known) */
+  checked_in_at?: string | null
+  checkin_distance_m?: number | null
+  checked_out_at?: string | null
 }
 
 export interface MyApplication extends Escrow {
@@ -125,6 +131,9 @@ export interface Reputation {
   avg_stars: number | null
   top_tags: string[]
 }
+
+/** In-app notification (named so it does not clash with the browser's own Notification). */
+export interface AppNotification { id: string; kind: string; title: string; body: string | null; link: string | null; created_at: string; read_at: string | null }
 
 export interface BankAccount { bank_name: string; account_no: string; holder_name: string }
 
@@ -266,6 +275,15 @@ export interface Api {
   /** "Capy hỏi nhanh": answers kept per device, folded into the account once signed in */
   saveQuiz(device: string, answers: QuizAnswers): Promise<void>
   myQuiz(): Promise<QuizAnswers>
+  /** in-app notifications of the signed-in user, newest first */
+  notifications(): Promise<AppNotification[]>
+  unreadCount(): Promise<number>
+  /** no ids = mark them all */
+  markNotificationsRead(ids?: string[]): Promise<void>
+  /** the worker says "I'm here" (location is optional) and "I'm done"; later the cash they received */
+  checkIn(applicationId: string, lat?: number, lng?: number): Promise<void>
+  checkOut(applicationId: string): Promise<void>
+  ackCashReceived(applicationId: string): Promise<void>
   /** finished shifts (last 30 days) I still have to review */
   pendingReviews(): Promise<number>
   /** settle overdue shifts for the signed-in user (also done hourly on the server) */

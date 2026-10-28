@@ -2,7 +2,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { Ic } from '../components/Ic'
 import { EmployerPay } from '../components/escrow'
 import { Avatar, Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
-import { dateRange } from '../lib/format'
+import { dateRange, vnClock } from '../lib/format'
 import { hireShifts, useHires, type HireShift, type HireWhen } from '../lib/hires'
 import { useI18n, type TKey } from '../lib/i18n'
 import { displayPhone, telHref, zaloHref } from '../lib/phone'
@@ -29,6 +29,14 @@ function Card({ s, onChanged }: { s: HireShift; onChanged(): void }) {
       <div className="shiftmeta">
         <span><Ic n="calendar" size={15} /> {dateRange(h.job.start_date, h.job.end_date)}{h.job.shift_note ? ` · ${h.job.shift_note}` : ''}</span>
         {h.phone && <span><Ic n="phone" size={15} /> {displayPhone(h.phone)}</span>}
+        {h.checked_in_at
+          ? (
+            <span>
+              <Ic n="clock" size={15} /> {h.checkin_distance_m != null ? t('workerArrivedFar', { name: h.full_name, time: vnClock(h.checked_in_at), m: h.checkin_distance_m }) : t('workerArrived', { name: h.full_name, time: vnClock(h.checked_in_at) })}
+              {h.checked_out_at && h.checked_out_at >= h.checked_in_at ? ` · ${t('workerLeft', { time: vnClock(h.checked_out_at) })}` : ''}
+            </span>
+          )
+          : s.when === 'today' && <span className="muted"><Ic n="clock" size={15} /> {t('workerNotArrived')}</span>}
       </div>
       {h.phone && s.when !== 'done' && (
         <div className="acts">
@@ -37,6 +45,7 @@ function Card({ s, onChanged }: { s: HireShift; onChanged(): void }) {
         </div>
       )}
       <EmployerPay app={h} job={h.job} onChanged={onChanged} />
+      {h.cash_received_at && <Tag tone="ok">{t('cashAckByWorker')}</Tag>}
     </article>
   )
 }

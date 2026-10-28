@@ -1,9 +1,9 @@
 import type { QuizAnswers } from './quiz'
 import { normalizePhone } from './phone'
 import { seedEmployers, seedJobs } from './seed'
-import { addDays, today } from './format'
+import { addDays, today, vnDate, vnToday } from './format'
 import {
-  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
+  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type AppNotification, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
 } from './types'
 
 // In-memory backend for local UI testing (VITE_MOCK=1). Enforces the same rules as the database.
@@ -24,6 +24,10 @@ const EMPLOYER_TAGS = ['hardworking', 'punctual', 'polite', 'fast_learner']
 const now = () => new Date().toISOString()
 let seq = 100
 const nid = () => `m${++seq}`
+
+// in-app notifications (the database writes them from a trigger on applications; here the same events call notify())
+const notes: (AppNotification & { user_id: string })[] = []
+const notify = (user_id: string, kind: string, title: string, body: string, link: string) => { notes.unshift({ id: nid(), user_id, kind, title, body, link, created_at: now(), read_at: null }) }
 
 const users: Record<string, User> = {}
 function addUser(id: string, digits: string, password: string, role: Role, full_name: string, extra: Partial<Profile> = {}) {
@@ -64,12 +68,15 @@ const me = () => {
 const byDigits = (d: string) => Object.values(users).find((u) => u.profile.phone === '+' + d)
 
 const jobOf = (a: App) => jobs.find((j) => j.id === a.job_id)!
+const bizOf = (j: Job) => users[j.employer_id]?.profile.business_name || users[j.employer_id]?.profile.full_name || 'Quán'
+const personOf = (id: string) => users[id]?.profile.full_name || 'Ứng viên'
 const revealed = (appId: string) => {
   const a = apps.find((x) => x.id === appId)
   return !!a && (reviews.filter((r) => r.application_id === appId).length >= 2 || (!!a.released_at && Date.now() - a.released_at > 7 * 864e5))
 }
 const escrowOf = (a: App, viewer: string): Escrow => ({
-  paid_cash_at: a.paid_cash_at ?? null,
+  paid_cash_at: a.paid_cash_at ?? null, cash_received_at: a.cash_received_at ?? null,
+  checked_in_at: a.checked_in_at ?? null, checkin_distance_m: a.checkin_distance_m ?? null, checked_out_at: a.checked_out_at ?? null,
   pay_status: a.pay_status, escrow_amount: a.escrow_amount, platform_fee: a.platform_fee, attendance: a.attendance, funding_mode: a.funding_mode,
   reviewed: reviews.some((r) => r.application_id === a.id && r.reviewer_id === viewer),
   other_reviewed: reviews.some((r) => r.application_id === a.id && r.reviewer_id !== viewer),
@@ -84,6 +91,7 @@ function quoteOf(a: App, hours?: number) {
 }
 const release = (a: App) => {
   a.pay_status = 'released'; a.released_at = Date.now(); a.completed_at ??= Date.now()
+  notify(a.seeker_id, 'shift_done', 'Ca làm đã được xác nhận', `${bizOf(jobOf(a))} xác nhận bạn đã làm "${jobOf(a).title}"`, '/app/thu-nhap')
   if (a.funding_mode !== 'off' && !payouts.some((p) => p.application_id === a.id)) {
     payouts.push({ id: nid(), application_id: a.id, seeker_id: a.seeker_id, amount: (a.escrow_amount ?? 0) - (a.platform_fee ?? 0), mode: a.funding_mode === 'live' ? 'live' : 'test', status: 'pending', reference: null, created_at: now(), paid_at: null })
   }
@@ -207,6 +215,7 @@ export const mockApi: Api = {
     if (job.employer_id === p.id) throw new AppError('FORBIDDEN')
     if (apps.some((a) => a.job_id === jobId && a.seeker_id === p.id)) throw new AppError('ALREADY_APPLIED')
     apps.push({ id: nid(), job_id: jobId, seeker_id: p.id, status: 'pending', message: message.trim() || null, created_at: now(), seen: false, ...NEW_PAY })
+    notify(job.employer_id, 'new_applicant', 'Có người ứng tuyển mới', `${p.full_name} ứng tuyển "${job.title}"`, '/app/ung-vien')
     return wait(undefined)
   },
 
@@ -278,7 +287,58 @@ export const mockApi: Api = {
   async markPaidCash(id) {
     const a = myApp(id, 'employer')
     if (a.pay_status !== 'released' || (a.funding_mode ?? 'off') !== 'off') throw new AppError('ALREADY_SETTLED')
+    if (!a.paid_cash_at) notify(a.seeker_id, 'cash_paid', `${bizOf(jobOf(a))} đã ghi trả tiền mặt`, `Ca "${jobOf(a).title}" — bấm xác nhận nếu bạn đã nhận`, '/app/thu-nhap')
     a.paid_cash_at = a.paid_cash_at ?? now()
+    return wait(undefined)
+  },
+
+  async notifications() {
+    const p = me()
+    return wait(notes.filter((n) => n.user_id === p.id).map(({ user_id: _u, ...n }) => n))
+  },
+  async unreadCount() {
+    if (!current) return wait(0)
+    return wait(notes.filter((n) => n.user_id === current && !n.read_at).length)
+  },
+  async markNotificationsRead(ids) {
+    const p = me()
+    notes.filter((n) => n.user_id === p.id && !n.read_at && (!ids || ids.includes(n.id))).forEach((n) => { n.read_at = now() })
+    return wait(undefined)
+  },
+  async checkIn(id, lat, lng) {
+    const a = myApp(id, 'seeker')
+    const j = jobOf(a)
+    if (a.status !== 'accepted') throw new AppError('NOT_ACCEPTED')
+    if (!['none', 'held'].includes(a.pay_status)) throw new AppError('ALREADY_SETTLED')
+    if (vnToday() < j.start_date) throw new AppError('TOO_EARLY')
+    if (vnToday() > j.end_date) throw new AppError('JOB_ENDED')
+    if (a.checked_in_at && vnDate(a.checked_in_at) === vnToday()) throw new AppError('ALREADY_CHECKED_IN')
+    if ((lat == null) !== (lng == null) || (lat != null && (Math.abs(lat) > 90 || Math.abs(lng!) > 180))) throw new AppError('BAD_LOCATION')
+    let d: number | null = null
+    if (lat != null && lng != null && j.lat != null && j.lng != null) {
+      const r = Math.PI / 180
+      d = Math.round(2 * 6371000 * Math.asin(Math.sqrt(Math.sin(((j.lat - lat) * r) / 2) ** 2 + Math.cos(lat * r) * Math.cos(j.lat * r) * Math.sin(((j.lng - lng) * r) / 2) ** 2)))
+    }
+    Object.assign(a, { checked_in_at: now(), checkin_distance_m: d, checked_out_at: null })
+    notify(j.employer_id, 'checked_in', `${personOf(a.seeker_id)} đã đến`, `"${j.title}"`, '/app/ca-lam')
+    return wait(undefined)
+  },
+  async checkOut(id) {
+    const a = myApp(id, 'seeker')
+    if (a.status !== 'accepted') throw new AppError('NOT_ACCEPTED')
+    if (!a.checked_in_at || vnDate(a.checked_in_at) !== vnToday()) throw new AppError('NOT_CHECKED_IN')
+    if (a.checked_out_at && a.checked_out_at >= a.checked_in_at) throw new AppError('ALREADY_CHECKED_OUT')
+    a.checked_out_at = now()
+    return wait(undefined)
+  },
+  async ackCashReceived(id) {
+    const a = myApp(id, 'seeker')
+    if (a.status !== 'accepted' || a.pay_status !== 'released') throw new AppError('NOT_COMPLETED')
+    if ((a.funding_mode ?? 'off') !== 'off') throw new AppError('NOT_CASH')
+    if (!a.cash_received_at) {
+      a.cash_received_at = now()
+      notify(jobOf(a).employer_id, 'cash_received', 'Người làm xác nhận đã nhận tiền', `${personOf(a.seeker_id)} · "${jobOf(a).title}"`, '/app/chi-phi')
+    }
     return wait(undefined)
   },
 
@@ -295,6 +355,8 @@ export const mockApi: Api = {
       if (job.filled >= job.slots) job.status = 'closed'
     }
     a.status = decision
+    if (decision === 'accepted') notify(a.seeker_id, 'accepted', `${bizOf(job)} đã nhận bạn`, `Việc "${job.title}" — xem ca và liên hệ quán`, '/app/cham-cong')
+    else notify(a.seeker_id, 'rejected', 'Đơn chưa được chọn', `Việc "${job.title}" của ${bizOf(job)}`, '/app/da-ung-tuyen')
     return wait({ phone: decision === 'accepted' ? users[a.seeker_id]?.profile.phone ?? null : null })
   },
 
@@ -356,7 +418,7 @@ export const mockApi: Api = {
     if (today() < jobOf(a).start_date) throw new AppError('TOO_EARLY')
     a.attendance = attendance
     a.completed_at = Date.now()
-    if (attendance === 'noshow') a.pay_status = 'noshow_reported'
+    if (attendance === 'noshow') { a.pay_status = 'noshow_reported'; notify(a.seeker_id, 'noshow', 'Quán báo bạn vắng ca', `Việc "${jobOf(a).title}" — xem và phản hồi nếu không đúng`, '/app/cham-cong') }
     else release(a)
     return wait(undefined)
   },

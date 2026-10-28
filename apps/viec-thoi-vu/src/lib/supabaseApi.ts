@@ -2,7 +2,7 @@ import type { QuizAnswers } from './quiz'
 import { createClient, type PostgrestError } from '@supabase/supabase-js'
 import { normalizePhone, phoneEmail } from './phone'
 import {
-  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type Applicant, type BankAccount, type Escrow, type Hire, type Job, type JobInput, type MyApplication, type MyJob,
+  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type AppNotification, type Applicant, type BankAccount, type Escrow, type Hire, type Job, type JobInput, type MyApplication, type MyJob,
   type Profile, type ProfileUpdate, type Reputation, type SignUpInput,
 } from './types'
 
@@ -15,7 +15,8 @@ const JOB_COLS = '*, employer:profiles!jobs_employer_id_fkey(business_name, full
 const KNOWN = ['FREE_PLAN_LIMIT', 'URGENT_REQUIRES_PRO', 'JOB_NOT_OPEN', 'SLOTS_BELOW_FILLED', 'FORBIDDEN',
   'ALREADY_DECIDED', 'JOB_FULL', 'NOT_FOUND', 'CANNOT_WITHDRAW', 'NOT_FUNDED', 'TOO_EARLY', 'ALREADY_FUNDED', 'ALREADY_SETTLED',
   'NOT_ACCEPTED', 'JOB_ENDED', 'PAYMENT_NOT_AVAILABLE', 'CANNOT_DISPUTE', 'NOT_COMPLETED', 'ALREADY_REVIEWED', 'REVIEW_WINDOW_CLOSED',
-  'BAD_PHONE', 'PROFILE_EXISTS', 'INVALID_ROLE', 'NAME_REQUIRED', 'BAD_HOURS', 'BAD_STARS', 'BAD_TAGS', 'BAD_ATTENDANCE', 'BAD_BANK', 'BAD_OUTCOME', 'NOT_DISPUTED', 'PAYOUT_DONE', 'REFERENCE_REQUIRED', 'ROLE_EXISTS', 'BUSINESS_REQUIRED', 'ROLE_NOT_OWNED']
+  'BAD_PHONE', 'PROFILE_EXISTS', 'INVALID_ROLE', 'NAME_REQUIRED', 'BAD_HOURS', 'BAD_STARS', 'BAD_TAGS', 'BAD_ATTENDANCE', 'BAD_BANK', 'BAD_OUTCOME', 'NOT_DISPUTED', 'PAYOUT_DONE', 'REFERENCE_REQUIRED', 'ROLE_EXISTS', 'BUSINESS_REQUIRED', 'ROLE_NOT_OWNED',
+  'ALREADY_CHECKED_IN', 'NOT_CHECKED_IN', 'ALREADY_CHECKED_OUT', 'BAD_LOCATION', 'NOT_CASH']
 
 function fail(e: PostgrestError | Error | null | undefined): never {
   const msg = e?.message ?? ''
@@ -79,7 +80,7 @@ async function phonesOf(userIds: string[]): Promise<Record<string, string>> {
   return Object.fromEntries((data ?? []).map((r) => [r.user_id, r.phone]))
 }
 
-const ESCROW_COLS = 'pay_status, escrow_amount, platform_fee, attendance, funding_mode, paid_cash_at'
+const ESCROW_COLS = 'pay_status, escrow_amount, platform_fee, attendance, funding_mode, paid_cash_at, cash_received_at, checked_in_at, checkin_distance_m, checked_out_at'
 
 /** Shifts where the other side already reviewed (content stays hidden until I review). */
 async function otherReviewed(appIds: string[]): Promise<Set<string>> {
@@ -108,6 +109,10 @@ const toEscrow = (r: any, reviewed: boolean, other: boolean): Escrow => ({
   escrow_amount: num(r.escrow_amount),
   platform_fee: num(r.platform_fee),
   paid_cash_at: r.paid_cash_at ?? null,
+  cash_received_at: r.cash_received_at ?? null,
+  checked_in_at: r.checked_in_at ?? null,
+  checkin_distance_m: r.checkin_distance_m ?? null,
+  checked_out_at: r.checked_out_at ?? null,
 })
 
 /** POSTs to one of our Edge Functions; a non-2xx answer becomes an AppError with the function's error code. */
@@ -311,6 +316,30 @@ export const supabaseApi: Api = {
       id: r.id, status: r.status, message: r.message, created_at: r.created_at, seeker_id: r.seeker_id, ...toEscrow(r, done.has(r.id), other.has(r.id)),
       full_name: r.seeker?.full_name ?? '—', phone: phones[r.seeker_id] ?? null, job: toJob(r.job), ...toWorker([r.seeker?.worker_profiles].flat()[0]),
     }))
+  },
+
+  async notifications() {
+    return ((await rpc('my_notifications', { p_limit: 40 })) ?? []) as AppNotification[]
+  },
+
+  async unreadCount() {
+    return Number(await rpc('unread_notifications')) || 0
+  },
+
+  async markNotificationsRead(ids) {
+    await rpc('mark_notifications_read', { p_ids: ids ?? null })
+  },
+
+  async checkIn(applicationId, lat, lng) {
+    await rpc('check_in', { p_application: applicationId, p_lat: lat ?? null, p_lng: lng ?? null })
+  },
+
+  async checkOut(applicationId) {
+    await rpc('check_out', { p_application: applicationId })
+  },
+
+  async ackCashReceived(applicationId) {
+    await rpc('ack_cash_received', { p_application: applicationId })
   },
 
   async markPaidCash(applicationId) {

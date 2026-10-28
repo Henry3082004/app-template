@@ -28,6 +28,11 @@ export function initials(name: string): string {
 }
 
 export const today = () => new Date().toISOString().slice(0, 10)
+/** The date in Vietnam (UTC+7), which is what the database uses to decide "today" for check-in. */
+export const vnDate = (d: Date | string) => new Date(new Date(d).getTime() + 7 * 36e5).toISOString().slice(0, 10)
+export const vnToday = () => vnDate(new Date())
+/** "08:05" in Vietnam time. */
+export const vnClock = (iso: string) => new Date(new Date(iso).getTime() + 7 * 36e5).toISOString().slice(11, 16)
 export const addDays = (s: string, n: number) => {
   const x = new Date(s + 'T00:00:00Z')
   x.setUTCDate(x.getUTCDate() + n)

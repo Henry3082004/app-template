@@ -39,3 +39,7 @@ Xoá hết mẫu: `delete from auth.users where id in (select id from public.pro
 Test: `supabase/tests/80_quiz.sql`.
 
 22/10/2026: `20261028_cash_paid.sql` áp dụng thành `cash_paid_1_column`, `cash_paid_2_rpc` — cột `applications.paid_cash_at` + hàm `mark_paid_cash` (quán ghi "đã trả tiền mặt", chế độ miễn phí). Test: `supabase/tests/90_cash_paid.sql`.
+
+28/10/2026: `20261029_collab_notify_checkin.sql` áp dụng thành `collab_1_columns_table`, `collab_2_notify_trigger`, `collab_3_functions`
+(thông báo trong app, chấm công đến/làm xong, người làm xác nhận đã nhận tiền mặt). Lưu ý: công cụ Supabase hỏi xác nhận khi gặp `drop trigger`, nên file dùng `create or replace trigger`.
+Test: `supabase/tests/100_collab.sql`.

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { api } from '../lib/api'
 import { LOGO } from '../lib/capy'
 import { needsAction } from '../lib/hires'
@@ -15,6 +15,7 @@ function pageTitle(path: string): TKey {
   if (path.startsWith('/app/thu-nhap')) return 'navIncome'
   if (path.startsWith('/app/tai-khoan')) return 'navAccount'
   if (path.startsWith('/app/dang-tin')) return 'postTitle'
+  if (path.startsWith('/app/thong-bao')) return 'notifTitle'
   if (path.startsWith('/app/ca-lam')) return 'navEmpShifts'
   if (path.startsWith('/app/chi-phi')) return 'navSpend'
   if (path.startsWith('/app/ung-vien') || path.startsWith('/app/tin')) return 'navHiring'
@@ -41,6 +42,24 @@ export function Shell({ children }: { children: ReactNode }) {
     api.myHires().then((l) => { if (live) setToConfirm(needsAction(l)) }).catch(() => undefined)
     return () => { live = false }
   }, [employer, pathname])
+
+  // unread notifications → red number on the bell (refreshed when you move around, every minute, and when one is opened)
+  const [unread, setUnread] = useState(0)
+  const refreshUnread = useCallback(() => {
+    if (!profile) { setUnread(0); return }
+    api.unreadCount().then(setUnread).catch(() => undefined)
+  }, [profile?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    refreshUnread()
+    const timer = setInterval(refreshUnread, 60_000)
+    window.addEventListener('vtv-notif', refreshUnread)
+    return () => { clearInterval(timer); window.removeEventListener('vtv-notif', refreshUnread) }
+  }, [refreshUnread, pathname])
+  const bell = (cls: string) => profile && (
+    <button type="button" className={'bell ' + cls} aria-label={t('notifBell')} onClick={() => nav('/app/thong-bao')}>
+      <Ic n="bell" size={20} />{unread > 0 && <i className="bellbadge">{unread > 9 ? '9+' : unread}</i>}
+    </button>
+  )
 
   const items: Item[] = profile?.role === 'employer'
     ? [
@@ -87,6 +106,7 @@ export function Shell({ children }: { children: ReactNode }) {
           {profile?.role === 'employer'
             ? <Btn sm onClick={() => nav('/app/dang-tin')}>{t('postJob')}</Btn>
             : !profile && <Btn v="ghost" sm onClick={hire}>{t('iNeedStaff')}</Btn>}
+          {bell('inbar')}
           <div className="lang">
             <button type="button" className={locale === 'vi' ? 'on' : ''} onClick={() => setLocale('vi')}>VI</button>
             <button type="button" className={locale === 'en' ? 'on' : ''} onClick={() => setLocale('en')}>EN</button>
@@ -108,6 +128,7 @@ export function Shell({ children }: { children: ReactNode }) {
             : <Btn block onClick={() => askAuth({ role: 'seeker' })}>{t('signIn')}</Btn>}
         </div>
       </nav>
+      {bell('fab')}
       <main className="main">{children}</main>
       <nav className="bnav" aria-label="Chính"><Items /></nav>
     </div>

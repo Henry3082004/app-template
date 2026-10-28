@@ -478,3 +478,13 @@ textarea.inp{min-height:84px;resize:vertical}
 @media(min-width:1024px){.incomepg>.ptitle,.shiftspg>.ptitle{display:none}}
 
 .navbadge{position:absolute;top:-6px;right:-10px;min-width:18px;height:18px;border-radius:999px;background:var(--danger-solid);color:#fff;font:700 11px/18px var(--font-sans);text-align:center;padding:0 5px;font-style:normal}.rail .ic,.bnav .ic{position:relative}
+
+/* notifications: bell (top bar on desktop, small floating button on phone/tablet) and the list page */
+.bell{position:relative;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:999px;border:1px solid var(--gray-100);background:#fff;color:var(--tx);box-shadow:var(--sh);cursor:pointer}
+.bell.fab{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);right:8px;z-index:20}.bell.inbar{display:none}
+@media (min-width:1024px){.bell.fab{display:none}.bell.inbar{display:inline-flex}}
+.bellbadge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:999px;background:var(--danger-solid);color:#fff;font:700 11px/18px var(--font-sans);text-align:center;padding:0 5px;font-style:normal}
+.notiflist{padding:4px 0;overflow:hidden}.notif{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 18px;border:0;border-bottom:1px solid var(--gray-100);background:none;cursor:pointer;color:var(--tx)}.notif:last-child{border-bottom:0}
+.notif.unread{background:var(--pbg)}.notif .nicon{flex:none;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;background:#fff;color:var(--p2)}
+.notif .ntext{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}.notif .ntext small{color:var(--tx2);font-size:13px}.notif .nwhen{flex:none;color:var(--tx2);font-size:12px}
+.attend{display:flex;flex-direction:column;gap:6px;align-items:flex-start}.attend .arrived{display:inline-flex;align-items:center;gap:6px;color:var(--tx2);font-size:14px}

@@ -202,6 +202,12 @@ const vi = {
   spendNone: 'Chưa có khoản chi nào', spendNoneSub: 'Sau khi bạn xác nhận ca làm xong, khoản chi sẽ hiện ở đây.',
   regularsTitle: 'Nhân viên quen', regularsSub: 'Người đã làm tốt cho quán — mời làm lại', regularsEmpty: 'Chưa có nhân viên quen', regularsEmptySub: 'Người làm xong ca sẽ hiện ở đây để bạn mời lại.', inviteAgain: 'Mời làm lại',
   secVerifySubEmp: 'Tăng độ tin cậy với ứng viên',
+  notifLogin: 'Đăng nhập để xem thông báo.', notifTitle: 'Thông báo', notifEmpty: 'Chưa có thông báo nào', notifEmptySub: 'Khi có đơn ứng tuyển, kết quả duyệt hay ca làm, bạn sẽ thấy ở đây.', notifMarkAll: 'Đánh dấu đã đọc hết', notifBell: 'Mở thông báo',
+  checkIn: 'Tôi đã đến', checkOut: 'Tôi đã làm xong', checkingIn: 'Đang lấy vị trí…', arrivedAt: 'Đã đến lúc {time}', arrivedAtFar: 'Đã đến lúc {time} · cách quán {m} m', leftAt: 'Làm xong lúc {time}', attendNote: 'Quán vẫn là bên xác nhận ca làm.',
+  ackCash: 'Tôi đã nhận tiền', cashReceivedTag: 'Đã nhận tiền', cashWaitShop: 'Chờ quán ghi trả', cashShopPaid: 'Quán đã ghi trả tiền mặt',
+  workerArrived: '{name} đã đến lúc {time}', workerArrivedFar: '{name} đã đến lúc {time} · cách quán {m} m', workerLeft: 'Làm xong lúc {time}', workerNotArrived: 'Chưa thấy người làm báo đã đến', cashAckByWorker: 'Người làm xác nhận đã nhận tiền',
+  exportCsv: 'Tải bảng kê (CSV)',
+  eALREADY_CHECKED_IN: 'Hôm nay bạn đã báo đã đến rồi.', eNOT_CHECKED_IN: 'Bạn chưa báo đã đến hôm nay.', eALREADY_CHECKED_OUT: 'Bạn đã báo làm xong rồi.', eBAD_LOCATION: 'Vị trí không hợp lệ.', eNOT_CASH: 'Ca này không trả bằng tiền mặt.',
 }
 
 type Dict = typeof vi
@@ -393,6 +399,12 @@ const en: Dict = {
   spendNone: 'No spending yet', spendNoneSub: 'Once you confirm a finished shift, the cost shows up here.',
   regularsTitle: 'Regular staff', regularsSub: 'People who did well for you — invite them again', regularsEmpty: 'No regular staff yet', regularsEmptySub: 'Workers who finish a shift show up here so you can invite them back.', inviteAgain: 'Invite again',
   secVerifySubEmp: 'Be more trusted by candidates',
+  notifLogin: 'Sign in to see your notifications.', notifTitle: 'Notifications', notifEmpty: 'No notifications yet', notifEmptySub: 'New applications, decisions and shifts will show up here.', notifMarkAll: 'Mark all as read', notifBell: 'Open notifications',
+  checkIn: "I'm here", checkOut: "I'm done", checkingIn: 'Getting your location…', arrivedAt: 'Arrived at {time}', arrivedAtFar: 'Arrived at {time} · {m} m from the shop', leftAt: 'Finished at {time}', attendNote: 'The shop still confirms the shift.',
+  ackCash: 'I got the cash', cashReceivedTag: 'Cash received', cashWaitShop: 'Waiting for the shop to record it', cashShopPaid: 'The shop recorded the cash payment',
+  workerArrived: '{name} arrived at {time}', workerArrivedFar: '{name} arrived at {time} · {m} m from the shop', workerLeft: 'Finished at {time}', workerNotArrived: 'The worker has not said they arrived', cashAckByWorker: 'The worker confirmed receiving the cash',
+  exportCsv: 'Download statement (CSV)',
+  eALREADY_CHECKED_IN: 'You already said you arrived today.', eNOT_CHECKED_IN: "You haven't said you arrived today.", eALREADY_CHECKED_OUT: 'You already said you finished.', eBAD_LOCATION: 'That location is not valid.', eNOT_CASH: 'This shift is not paid in cash.',
 }
 
 export type TKey = keyof Dict

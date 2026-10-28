@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { Empty, ErrorBox, Skel, Tag } from '../components/ui'
+import { Ic } from '../components/Ic'
+import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { dateRange, money } from '../lib/format'
 import { spendOf } from '../lib/hires'
 import { useHires } from '../lib/hires'
@@ -16,6 +17,22 @@ export default function Spend() {
   if (!ready) return <div className="pg"><Skel n={2} /></div>
   if (profile?.role !== 'employer') return <Navigate to="/app" replace />
   const s = list ? spendOf(list) : null
+  // a plain statement the shop can open in Excel / Google Sheets (UTF-8 with a BOM so Vietnamese letters show right)
+  const exportCsv = () => {
+    if (!s) return
+    const cell = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`
+    const rows = [['Ngày', 'Người làm', 'Việc', 'Số tiền (đ)', 'Hình thức', 'Ghi trả tiền mặt', 'Người làm xác nhận đã nhận']]
+    for (const h of s.rows) {
+      rows.push([h.job.end_date, h.full_name, h.job.title, String(Number(h.escrow_amount)), h.funding_mode === 'off' ? 'Tiền mặt (ước tính)' : 'Qua ứng dụng',
+        h.funding_mode === 'off' ? (h.paid_cash_at ? 'Đã ghi trả' : 'Chưa ghi trả') : '', h.cash_received_at ? 'Có' : ''])
+    }
+    const blob = new Blob(['\ufeff' + rows.map((r) => r.map(cell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = `chi-phi-${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(a); a.click(); a.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
   return (
     <div className="page-scroll"><div className="pg wide incomepg">
       <h1 className="ptitle">{t('navSpend')}</h1>
@@ -36,6 +53,7 @@ export default function Spend() {
         <button type="button" role="tab" aria-selected={tab === 'shifts'} className={tab === 'shifts' ? 'on' : ''} onClick={() => setTab('shifts')}>{t('spendByShift')}</button>
         <button type="button" role="tab" aria-selected={tab === 'months'} className={tab === 'months' ? 'on' : ''} onClick={() => setTab('months')}>{t('spendByMonth')}</button>
       </div>
+      {s && s.rows.length > 0 && <div><Btn v="ghost" sm onClick={exportCsv}><Ic n="download" size={16} /> {t('exportCsv')}</Btn></div>}
       {!s && !error && <Skel n={2} />}
       {s && s.rows.length === 0 && <Empty pose="empty" title={t('spendNone')} sub={t('spendNoneSub')} />}
       {s && tab === 'shifts' && s.rows.length > 0 && (
