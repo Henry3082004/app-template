@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { api } from './api'
+import { qk } from './query'
 import type { AppConfig } from './types'
 import type { Profile } from './types'
 
@@ -12,9 +13,7 @@ export function getConfig(): Promise<AppConfig> {
 
 /** undefined until loaded — callers render nothing money-related until then. */
 export function useAppConfig(): AppConfig | undefined {
-  const [c, setC] = useState<AppConfig>()
-  useEffect(() => { let live = true; getConfig().then((x) => { if (live) setC(x) }); return () => { live = false } }, [])
-  return c
+  return useQuery({ queryKey: qk.config, queryFn: getConfig, staleTime: Infinity }).data
 }
 
 /** Pro features are free for everyone while billing is off. */

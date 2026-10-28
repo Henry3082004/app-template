@@ -1,20 +1,18 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { api } from './api'
+import { qk } from './query'
 import { useSession } from './session'
 import type { Hire } from './types'
 
 /** Every application to my posts (shop side); null while loading. */
 export function useHires() {
   const { profile } = useSession()
-  const [list, setList] = useState<Hire[] | null>(null)
-  const [error, setError] = useState<unknown>(null)
-  const load = useCallback(() => {
-    if (profile?.role !== 'employer') { setList(null); return }
-    setError(null)
-    api.sweep().catch(() => undefined).then(() => api.myHires()).then(setList).catch(setError)
-  }, [profile?.id, profile?.role]) // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(load, [load])
-  return { list, error, reload: load }
+  const q = useQuery({
+    queryKey: qk.hires(profile?.id),
+    queryFn: () => api.sweep().catch(() => undefined).then(() => api.myHires()),
+    enabled: profile?.role === 'employer',
+  })
+  return { list: (profile?.role === 'employer' && q.data) || null, error: q.error ?? null, reload: () => { void q.refetch() } }
 }
 
 /** today / confirm = shift over but nobody confirmed it yet / soon / done */

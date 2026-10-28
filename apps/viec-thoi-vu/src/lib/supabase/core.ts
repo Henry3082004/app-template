@@ -1,10 +1,11 @@
 import { createClient, type PostgrestError } from '@supabase/supabase-js'
+import type { Database } from '../database.types'
 import { AppError, type Escrow, type Job, type Profile } from '../types'
 
 export const URL = import.meta.env.VITE_SUPABASE_URL as string
 export const KEY = import.meta.env.VITE_SUPABASE_KEY as string
 
-export const sb = createClient(URL, KEY, { auth: { persistSession: true, autoRefreshToken: true } })
+export const sb = createClient<Database>(URL, KEY, { auth: { persistSession: true, autoRefreshToken: true } })
 
 export const JOB_COLS = '*, employer:profiles!jobs_employer_id_fkey(business_name, full_name, logo_path)'
 export const KNOWN = ['FREE_PLAN_LIMIT', 'URGENT_REQUIRES_PRO', 'JOB_NOT_OPEN', 'SLOTS_BELOW_FILLED', 'FORBIDDEN',
@@ -23,9 +24,12 @@ export function fail(e: PostgrestError | Error | null | undefined): never {
   throw new AppError('UNKNOWN', msg)
 }
 
+/** Names of the database functions, from the generated schema: a misspelt or removed function fails the type check. */
+export type DbFunction = keyof Database['public']['Functions']
+
 /** Calls a database function (every state change goes through one); database errors become AppErrors. */
-export async function rpc(fn: string, args?: Record<string, unknown>): Promise<unknown> {
-  const { data, error } = await sb.rpc(fn, args)
+export async function rpc(fn: DbFunction, args?: Record<string, unknown>): Promise<unknown> {
+  const { data, error } = await sb.rpc(fn, args as never)
   if (error) fail(error)
   return data
 }
@@ -96,7 +100,7 @@ export async function reviewedSet(appIds: string[], me: string): Promise<Set<str
 export async function payoutsOf(appIds: string[]): Promise<Record<string, { status: 'pending' | 'paid'; reference: string | null }>> {
   if (!appIds.length) return {}
   const { data } = await sb.from('payouts').select('application_id, status, reference').in('application_id', appIds)
-  return Object.fromEntries((data ?? []).map((r) => [r.application_id, { status: r.status, reference: r.reference }]))
+  return Object.fromEntries((data ?? []).map((r) => [r.application_id, { status: r.status as 'pending' | 'paid', reference: r.reference }]))
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

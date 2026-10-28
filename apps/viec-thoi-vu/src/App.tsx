@@ -1,33 +1,35 @@
+import { QueryClientProvider } from '@tanstack/react-query'
 import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
-import { AuthDialog } from './components/AuthDialog'
-import { CompleteProfileDialog } from './components/CompleteProfileDialog'
+import { AuthDialog } from './features/account/AuthDialog'
+import { CompleteProfileDialog } from './features/account/CompleteProfileDialog'
 import { InstallBanner } from './components/InstallBanner'
 import { QuickQuiz } from './components/QuickQuiz'
-import { ViewAsBar } from './components/ViewAsBar'
+import { ViewAsBar } from './features/account/ViewAsBar'
 import { Shell } from './components/Shell'
 import { Skel } from './components/ui'
-import { WorkerIntroDialog } from './components/WorkerIntroDialog'
+import { WorkerIntroDialog } from './features/account/WorkerIntroDialog'
 import { I18nProvider } from './lib/i18n'
+import { queryClient } from './lib/query'
 import { SessionProvider } from './lib/session'
 import { IN_ZALO } from './lib/zalo'
-import Admin from './pages/Admin'
-import Account from './pages/Account'
-import EmployerCandidates from './pages/EmployerCandidates'
-import FindWorkers from './pages/FindWorkers'
-import EmployerJobs from './pages/EmployerJobs'
-import EmployerShifts from './pages/EmployerShifts'
-import Income from './pages/Income'
-import Jobs from './pages/Jobs'
-import Notifications from './pages/Notifications'
-import MyApplications from './pages/MyApplications'
-import PostJob from './pages/PostJob'
-import Shifts from './pages/Shifts'
-import Spend from './pages/Spend'
-import Pricing from './pages/Pricing'
+import Admin from './features/admin/Admin'
+import Account from './features/account/Account'
+import EmployerCandidates from './features/hiring/EmployerCandidates'
+import FindWorkers from './features/hiring/FindWorkers'
+import EmployerJobs from './features/jobs/EmployerJobs'
+import EmployerShifts from './features/shifts/EmployerShifts'
+import Income from './features/shifts/Income'
+import Jobs from './features/jobs/Jobs'
+import Notifications from './features/collab/Notifications'
+import MyApplications from './features/jobs/MyApplications'
+import PostJob from './features/jobs/PostJob'
+import Shifts from './features/shifts/Shifts'
+import Spend from './features/shifts/Spend'
+import Pricing from './features/public/Pricing'
 
-const Landing = lazy(() => import('./pages/Landing'))
-const Legal = lazy(() => import('./pages/Legal'))
+const Landing = lazy(() => import('./features/public/Landing'))
+const Legal = lazy(() => import('./features/public/Legal'))
 
 /** Everything under /app lives in the responsive shell (bottom bar · side rail · top bar). */
 function AppPages() {
@@ -93,12 +95,14 @@ export default function App() {
   const Router = IN_ZALO ? MemoryRouter : BrowserRouter
   const routerProps = IN_ZALO ? { initialEntries: ['/app'] } : {}
   return (
-    <I18nProvider>
-      <SessionProvider>
-        <Router {...routerProps}>
-          <AppRoutes />
-        </Router>
-      </SessionProvider>
-    </I18nProvider>
+    <QueryClientProvider client={queryClient}>
+      <I18nProvider>
+        <SessionProvider>
+          <Router {...routerProps}>
+            <AppRoutes />
+          </Router>
+        </SessionProvider>
+      </I18nProvider>
+    </QueryClientProvider>
   )
 }

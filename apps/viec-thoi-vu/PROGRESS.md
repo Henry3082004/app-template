@@ -159,3 +159,9 @@ Tuyển người (Tin đăng | Ứng viên, đăng lại tin cũ) · Ca làm (C�
 
 ## 01/11/2026 — Sửa lỗ hổng bảo mật bảng contacts
 - Rà bảo mật (skill Cloudflare, mức quick, chạy dở rồi dừng) phát hiện người dùng đăng nhập tự đặt được `contacts.verified`/`phone`. Đã thu hồi quyền ghi (migration 20261102), có test. Phần rà còn lại CHƯA chạy.
+
+## 01/11/2026 — Refactor A + B + C (không đổi tính năng)
+- A: thành phần dùng chung `ContactButtons`, `PersonRow`, hàm `useAction`, `pendingOf`; bỏ chữ và code thừa.
+- B: `lib/supabaseApi.ts` và `lib/mockApi.ts` tách theo khu vực (`lib/supabase/*`, `lib/mock/*`); hợp đồng API ở `lib/apiTypes.ts`; chữ ở `lib/i18n/vi.ts` + `en.ts`.
+- C: dữ liệu dùng chung qua TanStack Query (`lib/query.ts`: ca của quán, đơn của người làm, cấu hình, lời mời, công tắc tìm thấy); thư mục theo tính năng `src/features/{jobs,shifts,hiring,collab,account,admin,public}` (còn `src/components` cho phần giao diện chung); kiểu sinh từ cơ sở dữ liệu `lib/database.types.ts` (tên hàm RPC được kiểm tra khi build — chạy lại generate_typescript_types sau mỗi migration).
+- 92 test đạt sau mỗi phần.
