@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
+import { ChatDialog } from '../components/ChatDialog'
 import { Ic } from '../components/Ic'
+import { ReportDialog } from '../components/ReportDialog'
 import { EmployerPay } from '../components/escrow'
 import { Avatar, Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { dateRange, vnClock } from '../lib/format'
@@ -15,6 +18,7 @@ function Card({ s, onChanged }: { s: HireShift; onChanged(): void }) {
   const { t } = useI18n()
   const h = s.hire
   const nav = useNavigate()
+  const [dlg, setDlg] = useState<null | 'chat' | 'report'>(null)
   return (
     <article className="card shiftcard">
       <div className="row">
@@ -46,6 +50,12 @@ function Card({ s, onChanged }: { s: HireShift; onChanged(): void }) {
       )}
       <EmployerPay app={h} job={h.job} onChanged={onChanged} />
       {h.cash_received_at && <Tag tone="ok">{t('cashAckByWorker')}</Tag>}
+      <div className="acts">
+        <Btn v="ghost" sm onClick={() => setDlg('chat')}><Ic n="message" size={16} /> {t('chat')}</Btn>
+        <Btn v="text" sm onClick={() => setDlg('report')}>{t('report')}</Btn>
+      </div>
+      {dlg === 'chat' && <ChatDialog applicationId={h.id} name={h.full_name} onClose={() => setDlg(null)} />}
+      {dlg === 'report' && <ReportDialog target={h.seeker_id} name={h.full_name} jobId={h.job.id} onClose={() => setDlg(null)} />}
     </article>
   )
 }

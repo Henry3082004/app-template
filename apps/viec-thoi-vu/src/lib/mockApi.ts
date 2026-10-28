@@ -3,7 +3,7 @@ import { normalizePhone } from './phone'
 import { seedEmployers, seedJobs } from './seed'
 import { addDays, today, vnDate, vnToday } from './format'
 import {
-  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type AppNotification, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
+  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type AppNotification, type AdminDeletion, type AdminReport, type ChatMessage, type ReportReason, type SentInvite, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
 } from './types'
 
 // In-memory backend for local UI testing (VITE_MOCK=1). Enforces the same rules as the database.
@@ -26,8 +26,12 @@ let seq = 100
 const nid = () => `m${++seq}`
 
 // in-app notifications (the database writes them from a trigger on applications; here the same events call notify())
-const notes: (AppNotification & { user_id: string })[] = []
-const notify = (user_id: string, kind: string, title: string, body: string, link: string) => { notes.unshift({ id: nid(), user_id, kind, title, body, link, created_at: now(), read_at: null }) }
+const notes: (AppNotification & { user_id: string; ref?: string })[] = []
+const notify = (user_id: string, kind: string, title: string, body: string, link: string, ref?: string) => { notes.unshift({ id: nid(), user_id, kind, title, body, link, created_at: now(), read_at: null, ref }) }
+const chat: (ChatMessage & { application_id: string })[] = []
+const reports: (AdminReport & { reporter_id: string })[] = []
+const deletions: (AdminDeletion & { user_id: string })[] = []
+const invites: (SentInvite & { employer_id: string })[] = []
 
 const users: Record<string, User> = {}
 function addUser(id: string, digits: string, password: string, role: Role, full_name: string, extra: Partial<Profile> = {}) {
@@ -282,6 +286,96 @@ export const mockApi: Api = {
       return { id: a.id, status: a.status, message: a.message, created_at: a.created_at, seeker_id: a.seeker_id, ...escrowOf(a, p.id), full_name: s?.full_name ?? '—', bio: s?.bio ?? null, phone: a.status === 'accepted' ? s?.phone ?? null : null,
         birth_year: s?.birth_year ?? null, experience: s?.experience ?? [], availability: s?.availability ?? [], avatar_path: s?.avatar_path ?? null, job: jobOf(a) }
     }))
+  },
+
+  async messages(id) {
+    const a = apps.find((x) => x.id === id)
+    const p = me()
+    if (!a || a.status !== 'accepted' || (a.seeker_id !== p.id && jobOf(a).employer_id !== p.id)) throw new AppError('FORBIDDEN')
+    return wait(chat.filter((m) => m.application_id === id).map(({ application_id: _a, ...m }) => m).reverse())
+  },
+  async sendMessage(id, body) {
+    const a = apps.find((x) => x.id === id)
+    const p = me()
+    if (!a || a.status !== 'accepted' || (a.seeker_id !== p.id && jobOf(a).employer_id !== p.id)) throw new AppError('FORBIDDEN')
+    const b = body.trim()
+    if (b.length < 1 || b.length > 1000) throw new AppError('BAD_MESSAGE')
+    if (chat.filter((m) => m.application_id === id && m.sender_id === p.id && Date.now() - Date.parse(m.created_at) < 36e5).length >= 30) throw new AppError('TOO_MANY')
+    chat.push({ id: nid(), application_id: id, sender_id: p.id, body: b, created_at: now() })
+    const j = jobOf(a)
+    const toSeeker = p.id === j.employer_id
+    const other = toSeeker ? a.seeker_id : j.employer_id
+    if (!notes.some((n) => n.user_id === other && n.kind === 'message' && n.ref === id && !n.read_at)) {
+      notify(other, 'message', `${toSeeker ? bizOf(j) : personOf(p.id)} nhắn tin cho bạn`, b.slice(0, 120), toSeeker ? '/app/cham-cong' : '/app/ca-lam', id)
+    }
+    return wait(undefined)
+  },
+  async report(target, reason: ReportReason, detail, jobId) {
+    const p = me()
+    if (target === p.id) throw new AppError('FORBIDDEN')
+    if (!['scam', 'fee', 'no_show', 'harassment', 'fake_info', 'other'].includes(reason)) throw new AppError('BAD_REASON')
+    const dealt = apps.some((a) => (a.seeker_id === p.id && jobOf(a).employer_id === target) || (a.seeker_id === target && jobOf(a).employer_id === p.id))
+    const viaJob = !!jobId && jobs.some((j) => j.id === jobId && j.employer_id === target)
+    if (!dealt && !viaJob) throw new AppError('FORBIDDEN')
+    if (reports.filter((r) => r.reporter_id === p.id && Date.now() - Date.parse(r.created_at) < 864e5).length >= 5) throw new AppError('TOO_MANY')
+    reports.push({ id: nid(), reporter_id: p.id, reporter_name: p.business_name || p.full_name, target_id: target, target_name: bizOf({ employer_id: target } as Job) === 'Quán' ? personOf(target) : bizOf({ employer_id: target } as Job),
+      reason, detail: (detail ?? '').trim().slice(0, 500) || null, job_title: jobs.find((j) => j.id === jobId)?.title ?? null, status: 'open', note: null, created_at: now() })
+    return wait(undefined)
+  },
+  async adminReports() {
+    admin()
+    return wait(reports.map(({ reporter_id: _r, ...r }) => r).sort((a, b) => Number(b.status === 'open') - Number(a.status === 'open') || b.created_at.localeCompare(a.created_at)))
+  },
+  async resolveReport(id, note) {
+    admin()
+    const r = reports.find((x) => x.id === id)
+    if (r) { r.status = 'resolved'; r.note = note.trim().slice(0, 300) }
+    return wait(undefined)
+  },
+  async myDeletionRequest() {
+    const p = me()
+    const d = deletions.find((x) => x.user_id === p.id && x.status === 'open')
+    return wait(d ? { status: 'open' as const, requested_at: d.requested_at } : null)
+  },
+  async requestDeletion(reason) {
+    const p = me()
+    if (!deletions.some((x) => x.user_id === p.id && x.status === 'open')) {
+      deletions.push({ id: nid(), user_id: p.id, name: p.business_name || p.full_name, email: null, reason: (reason ?? '').trim().slice(0, 300) || null, status: 'open', requested_at: now() })
+    }
+    return wait(undefined)
+  },
+  async cancelDeletion() {
+    const p = me()
+    deletions.filter((x) => x.user_id === p.id && x.status === 'open').forEach((x) => { x.status = 'cancelled' })
+    return wait(undefined)
+  },
+  async adminDeletions() {
+    admin()
+    return wait(deletions.map(({ user_id: _u, ...d }) => ({ ...d, user_id: _u })).sort((a, b) => Number(b.status === 'open') - Number(a.status === 'open') || b.requested_at.localeCompare(a.requested_at)))
+  },
+  async resolveDeletion(id) {
+    admin()
+    const d = deletions.find((x) => x.id === id && x.status === 'open')
+    if (d) d.status = 'done'
+    return wait(undefined)
+  },
+  async inviteWorker(jobId, workerId) {
+    const p = me()
+    const j = jobs.find((x) => x.id === jobId)
+    if (!j || j.employer_id !== p.id) throw new AppError('FORBIDDEN')
+    if (j.status !== 'open') throw new AppError('JOB_NOT_OPEN')
+    if (!apps.some((a) => jobOf(a).employer_id === p.id && a.seeker_id === workerId && a.pay_status === 'released' && a.attendance !== 'noshow')) throw new AppError('NOT_A_REGULAR')
+    if (apps.some((a) => a.job_id === jobId && a.seeker_id === workerId)) throw new AppError('ALREADY_APPLIED')
+    if (invites.filter((i) => i.employer_id === p.id).length >= 20) throw new AppError('TOO_MANY')
+    if (!invites.some((i) => i.job_id === jobId && i.worker_id === workerId)) {
+      invites.push({ job_id: jobId, worker_id: workerId, employer_id: p.id })
+      notify(workerId, 'invite', `${bizOf(j)} mời bạn làm lại`, `Việc "${j.title}" — xem và ứng tuyển`, `/app/viec/${jobId}`, jobId)
+    }
+    return wait(undefined)
+  },
+  async mySentInvites() {
+    const p = me()
+    return wait(invites.filter((i) => i.employer_id === p.id).map(({ employer_id: _e, ...i }) => i))
   },
 
   async markPaidCash(id) {

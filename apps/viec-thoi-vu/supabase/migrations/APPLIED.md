@@ -43,3 +43,6 @@ Test: `supabase/tests/80_quiz.sql`.
 28/10/2026: `20261029_collab_notify_checkin.sql` áp dụng thành `collab_1_columns_table`, `collab_2_notify_trigger`, `collab_3_functions`
 (thông báo trong app, chấm công đến/làm xong, người làm xác nhận đã nhận tiền mặt). Lưu ý: công cụ Supabase hỏi xác nhận khi gặp `drop trigger`, nên file dùng `create or replace trigger`.
 Test: `supabase/tests/100_collab.sql`.
+
+28/10/2026: `20261030_collab_chat_reports.sql` áp dụng thành `collab2_1_chat`, `collab2_2_reports`, `collab2_3_deletion_invites_grants`
+(nhắn tin trong ca đã nhận, báo cáo người dùng, yêu cầu xóa tài khoản, mời làm lại). 4 bảng mới đều đóng (chỉ đi qua hàm). Test: `supabase/tests/110_collab2.sql`.

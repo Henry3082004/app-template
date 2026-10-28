@@ -135,6 +135,14 @@ export interface Reputation {
 /** In-app notification (named so it does not clash with the browser's own Notification). */
 export interface AppNotification { id: string; kind: string; title: string; body: string | null; link: string | null; created_at: string; read_at: string | null }
 
+export interface ChatMessage { id: string; sender_id: string; body: string; created_at: string }
+export const REPORT_REASONS = ['scam', 'fee', 'no_show', 'harassment', 'fake_info', 'other'] as const
+export type ReportReason = (typeof REPORT_REASONS)[number]
+export interface AdminReport { id: string; reporter_name: string; target_id: string; target_name: string; reason: ReportReason; detail: string | null; job_title: string | null; status: 'open' | 'resolved'; note: string | null; created_at: string }
+export interface DeletionRequest { status: 'open'; requested_at: string }
+export interface AdminDeletion { id: string; user_id: string; name: string; email: string | null; reason: string | null; status: 'open' | 'done' | 'cancelled'; requested_at: string }
+export interface SentInvite { job_id: string; worker_id: string }
+
 export interface BankAccount { bank_name: string; account_no: string; holder_name: string }
 
 export interface AdminDispute {
@@ -284,6 +292,22 @@ export interface Api {
   checkIn(applicationId: string, lat?: number, lng?: number): Promise<void>
   checkOut(applicationId: string): Promise<void>
   ackCashReceived(applicationId: string): Promise<void>
+  /** chat of an accepted application (newest first); only the shop and that worker can read and write */
+  messages(applicationId: string): Promise<ChatMessage[]>
+  sendMessage(applicationId: string, body: string): Promise<void>
+  /** report someone I dealt with (or the shop behind a post I am looking at); the admin reads it */
+  report(target: string, reason: ReportReason, detail?: string, jobId?: string): Promise<void>
+  adminReports(): Promise<AdminReport[]>
+  resolveReport(id: string, note: string): Promise<void>
+  /** ask for the account to be deleted (the admin does it by hand within 7 days) */
+  myDeletionRequest(): Promise<DeletionRequest | null>
+  requestDeletion(reason?: string): Promise<void>
+  cancelDeletion(): Promise<void>
+  adminDeletions(): Promise<AdminDeletion[]>
+  resolveDeletion(id: string, note: string): Promise<void>
+  /** invite a worker who already did a shift for me to one of my open posts */
+  inviteWorker(jobId: string, workerId: string): Promise<void>
+  mySentInvites(): Promise<SentInvite[]>
   /** finished shifts (last 30 days) I still have to review */
   pendingReviews(): Promise<number>
   /** settle overdue shifts for the signed-in user (also done hourly on the server) */

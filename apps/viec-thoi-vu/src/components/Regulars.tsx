@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react'
 import { Ic } from './Ic'
-import { Avatar, Empty, ErrorBox, Skel } from './ui'
+import { InviteDialog } from './InviteDialog'
+import { api } from '../lib/api'
+import { Avatar, Btn, Empty, ErrorBox, Skel } from './ui'
 import { regularsOf, useHires } from '../lib/hires'
 import { useI18n } from '../lib/i18n'
 import { telHref, zaloHref } from '../lib/phone'
@@ -10,6 +13,9 @@ export function Regulars() {
   const { t } = useI18n()
   const { list, error, reload } = useHires()
   const regulars = regularsOf(list)
+  const [inviting, setInviting] = useState<{ id: string; name: string } | null>(null)
+  const [sent, setSent] = useState<{ job_id: string; worker_id: string }[]>([])
+  useEffect(() => { api.mySentInvites().then(setSent).catch(() => undefined) }, [])
   return (
     <div className="stack">
       {error != null && <ErrorBox error={error} where="Regulars.load" onRetry={reload} />}
@@ -23,12 +29,17 @@ export function Regulars() {
           </div>
           {r.hire.phone && (
             <div className="acts">
-              <a className="btn btn-primary sm" href={zaloHref(r.hire.phone)} target="_blank" rel="noreferrer"><Ic n="message" size={16} /> {t('inviteAgain')}</a>
+              <Btn sm onClick={() => setInviting({ id: r.seeker_id, name: r.name })}>{t('inviteInApp')}</Btn>
+              <a className="btn btn-ghost sm" href={zaloHref(r.hire.phone)} target="_blank" rel="noreferrer"><Ic n="message" size={16} /> {t('inviteAgain')}</a>
               <a className="btn btn-ghost sm" href={telHref(r.hire.phone)} aria-label={t('call')}><Ic n="phone" size={16} /></a>
             </div>
           )}
         </div>
       ))}
+      {inviting && (
+        <InviteDialog workerId={inviting.id} name={inviting.name} invited={sent.filter((i) => i.worker_id === inviting.id).map((i) => i.job_id)}
+          onInvited={(jobId) => setSent((cur) => [...cur, { job_id: jobId, worker_id: inviting.id }])} onClose={() => setInviting(null)} />
+      )}
     </div>
   )
 }

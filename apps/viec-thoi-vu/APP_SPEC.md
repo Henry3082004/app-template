@@ -172,3 +172,6 @@ Menu của người tìm việc (đã đăng nhập): **Việc làm · Chấm c�
 
 ### Menu chủ quán (22/10/2026)
 Tuyển người (`/app/tin-cua-toi`, `/app/ung-vien`) · Ca làm (`/app/ca-lam`) · Chi phí (`/app/chi-phi`) · Hồ sơ. Đăng lại tin: `/app/dang-tin?lai=<id>`. Quán ghi đã trả tiền mặt: `mark_paid_cash` (chỉ khi thanh toán tắt).
+
+### Hợp tác hai bên (28/10/2026)
+Thông báo `/app/thong-bao` · chấm công đến/xong (`check_in`, `check_out`) · `ack_cash_received` · nhắn tin (`send_message`, chỉ ca đã nhận, tối đa 30 tin/giờ/ca) · `report_user` (5/ngày) · `request_account_deletion` · `invite_worker` (20/ngày, chỉ người đã làm xong ca cho quán). Mọi bảng mới đóng, chỉ truy cập qua hàm.

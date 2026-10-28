@@ -137,3 +137,14 @@
 
 ## 22/10/2026 — 4 tab cho chủ quán
 Tuyển người (Tin đăng | Ứng viên, đăng lại tin cũ) · Ca làm (Cần xác nhận / Hôm nay / Sắp tới / Đã xong, số đỏ trên menu, nút "Đã trả tiền mặt") · Chi phí (tháng này, tổng, theo ca, theo tháng) · Hồ sơ (+ "Nhân viên quen" có nút Mời làm lại). Dữ liệu từ `api.myHires()`; DB thêm `paid_cash_at` + `mark_paid_cash`.
+
+## 28/10/2026 — Hợp tác hai bên (đợt 1 + 2)
+- **Thông báo trong app:** chuông (góc trên phải) + trang `/app/thong-bao`. Sinh tự động từ trigger: có đơn mới, được nhận/từ chối, ca xác nhận, báo vắng, quán ghi trả tiền mặt, người làm xác nhận nhận tiền, người làm đã đến, tin nhắn mới, lời mời làm lại.
+- **Chấm công thật:** người làm bấm "Tôi đã đến" (vị trí là tuỳ chọn, ghi khoảng cách tới quán) và "Tôi đã làm xong"; quán thấy ở tab Ca làm. Quán vẫn là bên xác nhận ca.
+- **Tiền mặt hai chiều:** quán "Đã trả tiền mặt" → người làm "Tôi đã nhận tiền".
+- **Xuất CSV** chi phí (tab Chi phí).
+- **Nhắn tin** trong ca đã nhận (cập nhật mỗi 8 giây khi mở, chưa có thông báo đẩy ngoài app).
+- **Báo cáo người dùng** (lý do, mô tả) → admin xem và đánh dấu đã xử lý ở trang Quản trị (tab Báo cáo).
+- **Yêu cầu xóa tài khoản** trong Hồ sơ → admin xử lý tay trong 7 ngày (tab Yêu cầu xóa).
+- **Mời làm lại trong app** cho Nhân viên quen (chỉ người đã làm xong ca cho quán).
+- CHƯA làm: thanh toán/rút tiền thật, xác thực CCCD, thông báo đẩy ngoài app (cần OA Zalo), quán tự tìm người làm.

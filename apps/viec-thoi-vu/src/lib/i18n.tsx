@@ -208,6 +208,13 @@ const vi = {
   workerArrived: '{name} đã đến lúc {time}', workerArrivedFar: '{name} đã đến lúc {time} · cách quán {m} m', workerLeft: 'Làm xong lúc {time}', workerNotArrived: 'Chưa thấy người làm báo đã đến', cashAckByWorker: 'Người làm xác nhận đã nhận tiền',
   exportCsv: 'Tải bảng kê (CSV)',
   eALREADY_CHECKED_IN: 'Hôm nay bạn đã báo đã đến rồi.', eNOT_CHECKED_IN: 'Bạn chưa báo đã đến hôm nay.', eALREADY_CHECKED_OUT: 'Bạn đã báo làm xong rồi.', eBAD_LOCATION: 'Vị trí không hợp lệ.', eNOT_CASH: 'Ca này không trả bằng tiền mặt.',
+  chat: 'Nhắn tin', chatTitle: 'Nhắn tin với {name}', chatPh: 'Nhập tin nhắn…', chatSend: 'Gửi', chatEmpty: 'Chưa có tin nhắn. Chào một câu để hẹn giờ làm nhé.', chatNote: 'Chỉ hai bên của ca này xem được. Đừng gửi mật khẩu hay mã OTP.',
+  report: 'Báo cáo', reportTitle: 'Báo cáo {name}', reportReason: 'Lý do', reportDetail: 'Mô tả thêm (không bắt buộc)', reportSend: 'Gửi báo cáo', reportDone: 'Đã gửi báo cáo. Quản trị viên sẽ xem xét.', reportNote: 'Chỉ quản trị viên xem được báo cáo; người bị báo cáo không biết ai đã báo.',
+  rr_scam: 'Lừa đảo', rr_fee: 'Đòi thu phí hoặc đặt cọc', rr_no_show: 'Hẹn rồi không đến hoặc không trả công', rr_harassment: 'Quấy rối, xúc phạm', rr_fake_info: 'Thông tin sai sự thật', rr_other: 'Lý do khác',
+  deleteTitle: 'Xóa tài khoản', deleteSub: 'Gửi yêu cầu xóa tài khoản và dữ liệu', deleteText: 'Chúng tôi xóa tài khoản và dữ liệu của bạn trong vòng 7 ngày. Ca làm và đánh giá liên quan có thể bị xóa theo.', deleteReason: 'Lý do (không bắt buộc)', deleteSend: 'Gửi yêu cầu xóa', deletePending: 'Đã gửi yêu cầu xóa lúc {when}. Chúng tôi sẽ xử lý trong 7 ngày.', deleteCancel: 'Hủy yêu cầu', deleteConfirm: 'Gửi yêu cầu xóa tài khoản? Dữ liệu sẽ bị xóa và không khôi phục được.',
+  inviteInApp: 'Mời vào tin', inviteTitle: 'Mời {name} làm lại', invitePick: 'Chọn một tin đang mở', inviteNoJobs: 'Bạn chưa có tin nào đang mở. Hãy đăng tin trước rồi mời nhé.', inviteSent: 'Đã mời', inviteOk: 'Đã gửi lời mời. {name} sẽ thấy thông báo trong app.',
+  adminPost: 'Tin', adminTabReports: 'Báo cáo', adminTabDeletions: 'Yêu cầu xóa', noReports: 'Chưa có báo cáo nào.', noDeletions: 'Chưa có yêu cầu xóa nào.', adminResolve: 'Đánh dấu đã xử lý', adminNoteOpt: 'Ghi chú (không bắt buộc)', adminReporter: 'Người báo', adminTarget: 'Bị báo cáo', adminHandled: 'Đã xử lý',
+  eBAD_MESSAGE: 'Tin nhắn cần từ 1 đến 1000 ký tự.', eTOO_MANY: 'Bạn thao tác quá nhiều lần, thử lại sau nhé.', eBAD_REASON: 'Lý do không hợp lệ.', eNOT_A_REGULAR: 'Chỉ mời được người đã làm xong ca cho quán.',
 }
 
 type Dict = typeof vi
@@ -405,6 +412,13 @@ const en: Dict = {
   workerArrived: '{name} arrived at {time}', workerArrivedFar: '{name} arrived at {time} · {m} m from the shop', workerLeft: 'Finished at {time}', workerNotArrived: 'The worker has not said they arrived', cashAckByWorker: 'The worker confirmed receiving the cash',
   exportCsv: 'Download statement (CSV)',
   eALREADY_CHECKED_IN: 'You already said you arrived today.', eNOT_CHECKED_IN: "You haven't said you arrived today.", eALREADY_CHECKED_OUT: 'You already said you finished.', eBAD_LOCATION: 'That location is not valid.', eNOT_CASH: 'This shift is not paid in cash.',
+  chat: 'Message', chatTitle: 'Chat with {name}', chatPh: 'Type a message…', chatSend: 'Send', chatEmpty: 'No messages yet. Say hi and agree on the time.', chatNote: 'Only the two of you can see this. Never send passwords or OTP codes.',
+  report: 'Report', reportTitle: 'Report {name}', reportReason: 'Reason', reportDetail: 'More details (optional)', reportSend: 'Send report', reportDone: 'Report sent. The admin will look into it.', reportNote: 'Only the admin sees the report; the person reported is not told who sent it.',
+  rr_scam: 'Scam', rr_fee: 'Asked for a fee or deposit', rr_no_show: 'Did not show up or did not pay', rr_harassment: 'Harassment or abuse', rr_fake_info: 'False information', rr_other: 'Something else',
+  deleteTitle: 'Delete account', deleteSub: 'Ask us to delete your account and data', deleteText: 'We delete your account and data within 7 days. Related shifts and reviews may be removed with it.', deleteReason: 'Reason (optional)', deleteSend: 'Request deletion', deletePending: 'Deletion requested at {when}. We will handle it within 7 days.', deleteCancel: 'Cancel request', deleteConfirm: 'Request account deletion? Your data will be deleted and cannot be restored.',
+  inviteInApp: 'Invite to a post', inviteTitle: 'Invite {name} back', invitePick: 'Pick an open post', inviteNoJobs: 'You have no open posts. Post one first, then invite.', inviteSent: 'Invited', inviteOk: 'Invitation sent. {name} will see a notification in the app.',
+  adminPost: 'Post', adminTabReports: 'Reports', adminTabDeletions: 'Deletions', noReports: 'No reports yet.', noDeletions: 'No deletion requests yet.', adminResolve: 'Mark as handled', adminNoteOpt: 'Note (optional)', adminReporter: 'Reported by', adminTarget: 'Reported', adminHandled: 'Handled',
+  eBAD_MESSAGE: 'A message needs 1 to 1000 characters.', eTOO_MANY: 'Too many attempts, try again later.', eBAD_REASON: 'That reason is not valid.', eNOT_A_REGULAR: 'You can only invite people who already finished a shift for you.',
 }
 
 export type TKey = keyof Dict

@@ -10,6 +10,7 @@ import { Avatar, Btn, Empty, ErrorBox, Fld } from '../components/ui'
 import { WorkerFields, workerInfoOf } from '../components/WorkerFields'
 import { CITIES } from '../lib/geo'
 import { useI18n, type TKey } from '../lib/i18n'
+import { DeleteAccount } from '../components/DeleteAccount'
 import { Regulars } from '../components/Regulars'
 import { displayPhone } from '../lib/phone'
 import { useSession } from '../lib/session'
@@ -139,6 +140,7 @@ export default function Account() {
           <div className="sub" style={{ fontSize: 14 }}>{t('signInVia', { x: t(profile.auth_provider === 'zalo' ? 'viaZalo' : profile.auth_provider === 'google' ? 'viaGoogle' : 'viaPassword') })}</div>
         </div>
       </Sect>
+      <Sect title={t('deleteTitle')} sub={t('deleteSub')}><DeleteAccount /></Sect>
       <Sect title={t('secHelpGuide')} sub={t('secHelpGuideSub')}>
         <div className="stack">
           {(['faq1', 'faq2', 'faq3'] as const).map((k) => <div key={k}><b>{t(`${k}q` as TKey)}</b><div className="sub" style={{ fontSize: 14 }}>{t(`${k}a` as TKey)}</div></div>)}

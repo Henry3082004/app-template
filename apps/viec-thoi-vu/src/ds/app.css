@@ -488,3 +488,10 @@ textarea.inp{min-height:84px;resize:vertical}
 .notif.unread{background:var(--pbg)}.notif .nicon{flex:none;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;background:#fff;color:var(--p2)}
 .notif .ntext{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}.notif .ntext small{color:var(--tx2);font-size:13px}.notif .nwhen{flex:none;color:var(--tx2);font-size:12px}
 .attend{display:flex;flex-direction:column;gap:6px;align-items:flex-start}.attend .arrived{display:inline-flex;align-items:center;gap:6px;color:var(--tx2);font-size:14px}
+
+/* chat */
+.chat{display:flex;flex-direction:column;gap:8px;min-height:140px;max-height:46vh;overflow:auto;padding:6px 2px}
+.bubble{max-width:82%;padding:9px 13px;border-radius:16px;display:flex;flex-direction:column;gap:2px;font-size:15px;line-height:1.4;white-space:pre-wrap;word-break:break-word}
+.bubble small{font-size:11px;opacity:.65;align-self:flex-end}.bubble.me{align-self:flex-end;background:var(--p);color:#fff;border-bottom-right-radius:4px}
+.bubble.them{align-self:flex-start;background:var(--bg);color:var(--tx);border-bottom-left-radius:4px}
+.chatform{display:flex;gap:8px;align-items:center}.chatform .inp{flex:1}

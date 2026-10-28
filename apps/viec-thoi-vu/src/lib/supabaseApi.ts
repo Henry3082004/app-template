@@ -2,7 +2,7 @@ import type { QuizAnswers } from './quiz'
 import { createClient, type PostgrestError } from '@supabase/supabase-js'
 import { normalizePhone, phoneEmail } from './phone'
 import {
-  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type AppNotification, type Applicant, type BankAccount, type Escrow, type Hire, type Job, type JobInput, type MyApplication, type MyJob,
+  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type AppNotification, type AdminDeletion, type AdminReport, type ChatMessage, type DeletionRequest, type ReportReason, type SentInvite, type Applicant, type BankAccount, type Escrow, type Hire, type Job, type JobInput, type MyApplication, type MyJob,
   type Profile, type ProfileUpdate, type Reputation, type SignUpInput,
 } from './types'
 
@@ -16,7 +16,8 @@ const KNOWN = ['FREE_PLAN_LIMIT', 'URGENT_REQUIRES_PRO', 'JOB_NOT_OPEN', 'SLOTS_
   'ALREADY_DECIDED', 'JOB_FULL', 'NOT_FOUND', 'CANNOT_WITHDRAW', 'NOT_FUNDED', 'TOO_EARLY', 'ALREADY_FUNDED', 'ALREADY_SETTLED',
   'NOT_ACCEPTED', 'JOB_ENDED', 'PAYMENT_NOT_AVAILABLE', 'CANNOT_DISPUTE', 'NOT_COMPLETED', 'ALREADY_REVIEWED', 'REVIEW_WINDOW_CLOSED',
   'BAD_PHONE', 'PROFILE_EXISTS', 'INVALID_ROLE', 'NAME_REQUIRED', 'BAD_HOURS', 'BAD_STARS', 'BAD_TAGS', 'BAD_ATTENDANCE', 'BAD_BANK', 'BAD_OUTCOME', 'NOT_DISPUTED', 'PAYOUT_DONE', 'REFERENCE_REQUIRED', 'ROLE_EXISTS', 'BUSINESS_REQUIRED', 'ROLE_NOT_OWNED',
-  'ALREADY_CHECKED_IN', 'NOT_CHECKED_IN', 'ALREADY_CHECKED_OUT', 'BAD_LOCATION', 'NOT_CASH']
+  'ALREADY_CHECKED_IN', 'NOT_CHECKED_IN', 'ALREADY_CHECKED_OUT', 'BAD_LOCATION', 'NOT_CASH',
+  'BAD_MESSAGE', 'TOO_MANY', 'BAD_REASON', 'NOT_A_REGULAR', 'ALREADY_APPLIED']
 
 function fail(e: PostgrestError | Error | null | undefined): never {
   const msg = e?.message ?? ''
@@ -340,6 +341,44 @@ export const supabaseApi: Api = {
 
   async ackCashReceived(applicationId) {
     await rpc('ack_cash_received', { p_application: applicationId })
+  },
+
+  async messages(applicationId) {
+    return ((await rpc('app_messages', { p_application: applicationId })) ?? []) as ChatMessage[]
+  },
+  async sendMessage(applicationId, body) {
+    await rpc('send_message', { p_application: applicationId, p_body: body })
+  },
+  async report(target, reason: ReportReason, detail, jobId) {
+    await rpc('report_user', { p_target: target, p_reason: reason, p_detail: detail ?? null, p_job: jobId ?? null })
+  },
+  async adminReports() {
+    return ((await rpc('admin_reports')) ?? []) as AdminReport[]
+  },
+  async resolveReport(id, note) {
+    await rpc('resolve_report', { p_id: id, p_note: note })
+  },
+  async myDeletionRequest() {
+    const rows = ((await rpc('my_deletion_request')) ?? []) as DeletionRequest[]
+    return rows[0] ?? null
+  },
+  async requestDeletion(reason) {
+    await rpc('request_account_deletion', { p_reason: reason ?? null })
+  },
+  async cancelDeletion() {
+    await rpc('cancel_account_deletion')
+  },
+  async adminDeletions() {
+    return ((await rpc('admin_deletions')) ?? []) as AdminDeletion[]
+  },
+  async resolveDeletion(id, note) {
+    await rpc('resolve_deletion', { p_id: id, p_note: note })
+  },
+  async inviteWorker(jobId, workerId) {
+    await rpc('invite_worker', { p_job: jobId, p_worker: workerId })
+  },
+  async mySentInvites() {
+    return ((await rpc('my_sent_invites')) ?? []) as SentInvite[]
   },
 
   async markPaidCash(applicationId) {

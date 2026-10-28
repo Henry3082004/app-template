@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ChatDialog } from '../components/ChatDialog'
 import { Ic } from '../components/Ic'
+import { ReportDialog } from '../components/ReportDialog'
 import { ShiftTabs } from '../components/ShiftTabs'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../components/ui'
 import { api } from '../lib/api'
@@ -21,6 +23,7 @@ function ShiftCard({ s, onChanged }: { s: Shift; onChanged(): void }) {
   const a = s.app
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<unknown>(null)
+  const [dlg, setDlg] = useState<null | 'chat' | 'report'>(null)
   const run = async (fn: () => Promise<unknown>) => {
     setBusy(true); setErr(null)
     try { await fn(); onChanged() } catch (e) { setErr(e) } finally { setBusy(false) }
@@ -72,6 +75,12 @@ function ShiftCard({ s, onChanged }: { s: Shift; onChanged(): void }) {
         </div>
       )}
       {err != null && <ErrorBox error={err} where="Shifts.action" />}
+      <div className="acts">
+        <Btn v="ghost" sm onClick={() => setDlg('chat')}><Ic n="message" size={16} /> {t('chat')}</Btn>
+        <Btn v="text" sm onClick={() => setDlg('report')}>{t('report')}</Btn>
+      </div>
+      {dlg === 'chat' && <ChatDialog applicationId={a.id} name={job.business_name ?? '—'} onClose={() => setDlg(null)} />}
+      {dlg === 'report' && <ReportDialog target={job.employer_id} name={job.business_name ?? '—'} jobId={job.id} onClose={() => setDlg(null)} />}
       <div className="shiftfoot">
         {paid
           ? <b className="pay">{money(Number(s.app.escrow_amount) - Number(s.app.platform_fee ?? 0), locale)}</b>

@@ -9,9 +9,9 @@ import { displayPhone, telHref } from '../lib/phone'
 import { sendTestError } from '../lib/sentry'
 import { useSession } from '../lib/session'
 import { avatarUrl } from '../lib/worker'
-import type { AdminDispute, AdminFlag, AdminPayout, AdminSamples, AdminStats, Availability, Experience } from '../lib/types'
+import type { AdminDeletion, AdminDispute, AdminFlag, AdminReport, AdminPayout, AdminSamples, AdminStats, Availability, Experience } from '../lib/types'
 
-type Tab = 'disputes' | 'payouts' | 'flags' | 'samples'
+type Tab = 'disputes' | 'payouts' | 'flags' | 'samples' | 'reports' | 'deletions'
 
 function DisputeCard({ d, onDone }: { d: AdminDispute; onDone(): void }) {
   const { t, locale } = useI18n()
@@ -149,6 +149,51 @@ function SentryCheck() {
   )
 }
 
+function ReportCard({ r, onDone }: { r: AdminReport; onDone(): void }) {
+  const { t } = useI18n()
+  const [note, setNote] = useState('')
+  const [err, setErr] = useState<unknown>(null)
+  const resolve = async () => { try { await api.resolveReport(r.id, note); onDone() } catch (e) { setErr(e) } }
+  return (
+    <article className="card stack">
+      <div className="hrow"><Tag tone={r.status === 'open' ? 'urgent' : 'ok'}>{t(`rr_${r.reason}` as TKey)}</Tag>{r.status === 'resolved' && <Tag tone="ok">{t('adminHandled')}</Tag>}</div>
+      <div className="adminrows">
+        <div><span>{t('adminReporter')}</span><b>{r.reporter_name}</b></div>
+        <div><span>{t('adminTarget')}</span><b>{r.target_name}</b></div>
+        {r.job_title && <div><span>{t('adminPost')}</span><b>{r.job_title}</b></div>}
+      </div>
+      {r.detail && <div className="sub" style={{ fontSize: 14 }}>“{r.detail}”</div>}
+      {r.note && <div className="muted small">{r.note}</div>}
+      {r.status === 'open' && (
+        <>
+          <input className="inp" value={note} onChange={(e) => setNote(e.target.value)} placeholder={t('adminNoteOpt')} aria-label={t('adminNoteOpt')} maxLength={300} />
+          <Btn sm onClick={resolve}>{t('adminResolve')}</Btn>
+        </>
+      )}
+      {err != null && <ErrorBox error={err} where="Admin.report" />}
+    </article>
+  )
+}
+
+function DeletionCard({ d, onDone }: { d: AdminDeletion; onDone(): void }) {
+  const { t } = useI18n()
+  const [err, setErr] = useState<unknown>(null)
+  const resolve = async () => { try { await api.resolveDeletion(d.id, ''); onDone() } catch (e) { setErr(e) } }
+  return (
+    <article className="card stack">
+      <div className="hrow"><b>{d.name}</b><Tag tone={d.status === 'open' ? 'urgent' : 'ok'}>{d.status === 'open' ? t('adminTabDeletions') : t('adminHandled')}</Tag></div>
+      <div className="adminrows">
+        {d.email && <div><span>Email</span><b>{d.email}</b></div>}
+        <div><span>ID</span><b>{d.user_id}</b></div>
+      </div>
+      {d.reason && <div className="sub" style={{ fontSize: 14 }}>“{d.reason}”</div>}
+      <div className="muted small">{new Date(d.requested_at).toLocaleString()}</div>
+      {d.status === 'open' && <Btn sm onClick={resolve}>{t('adminResolve')}</Btn>}
+      {err != null && <ErrorBox error={err} where="Admin.deletion" />}
+    </article>
+  )
+}
+
 export default function Admin() {
   const { t, locale } = useI18n()
   const { profile, ready } = useSession()
@@ -158,6 +203,8 @@ export default function Admin() {
   const [flags, setFlags] = useState<AdminFlag[] | null>(null)
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [samples, setSamples] = useState<AdminSamples | null>(null)
+  const [reports, setReports] = useState<AdminReport[] | null>(null)
+  const [deletions, setDeletions] = useState<AdminDeletion[] | null>(null)
   const [error, setError] = useState<unknown>(null)
 
   const load = () => {
@@ -167,6 +214,8 @@ export default function Admin() {
     api.adminFlags().then(setFlags).catch(setError)
     api.adminStats().then(setStats).catch(setError)
     api.adminSamples().then(setSamples).catch(setError)
+    api.adminReports().then(setReports).catch(setError)
+    api.adminDeletions().then(setDeletions).catch(setError)
   }
   useEffect(() => { if (profile?.is_admin) load() }, [profile?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -174,6 +223,8 @@ export default function Admin() {
   if (!profile?.is_admin) return <div className="page-scroll"><div className="pg"><Empty pose="error" title={t('adminNoAccess')} /></div></div>
 
   const pendingN = payouts?.filter((p) => p.status === 'pending').length ?? 0
+  const openReports = reports?.filter((r) => r.status === 'open').length ?? 0
+  const openDeletions = deletions?.filter((d) => d.status === 'open').length ?? 0
   return (
     <div className="page-scroll"><div className="pg wide">
       <h1 className="ptitle" style={{ marginBottom: 16 }}>{t('adminTitle')}</h1>
@@ -182,6 +233,8 @@ export default function Admin() {
         <button type="button" className={tab === 'disputes' ? 'on' : ''} onClick={() => setTab('disputes')}>{t('adminTabDisputes')}{disputes?.length ? ` (${disputes.length})` : ''}</button>
         <button type="button" className={tab === 'payouts' ? 'on' : ''} onClick={() => setTab('payouts')}>{t('adminTabPayouts')}{pendingN ? ` (${pendingN})` : ''}</button>
         <button type="button" className={tab === 'flags' ? 'on' : ''} onClick={() => setTab('flags')}>{t('adminTabFlags')}{flags?.length ? ` (${flags.length})` : ''}</button>
+        <button type="button" className={tab === 'reports' ? 'on' : ''} onClick={() => setTab('reports')}>{t('adminTabReports')}{openReports ? ` (${openReports})` : ''}</button>
+        <button type="button" className={tab === 'deletions' ? 'on' : ''} onClick={() => setTab('deletions')}>{t('adminTabDeletions')}{openDeletions ? ` (${openDeletions})` : ''}</button>
         <button type="button" className={tab === 'samples' ? 'on' : ''} onClick={() => setTab('samples')}>{t('adminTabSamples')}</button>
       </div>
       {error != null && <ErrorBox error={error} where="Admin.load" onRetry={load} />}
@@ -213,6 +266,20 @@ export default function Admin() {
               </div>
             </article>
           ))}</div>
+        </>
+      )}
+      {tab === 'reports' && (
+        <>
+          {!reports && !error && <Skel n={2} />}
+          {reports?.length === 0 && <Empty pose="empty" title={t('noReports')} />}
+          <div className="g2">{reports?.map((r) => <ReportCard key={r.id} r={r} onDone={load} />)}</div>
+        </>
+      )}
+      {tab === 'deletions' && (
+        <>
+          {!deletions && !error && <Skel n={2} />}
+          {deletions?.length === 0 && <Empty pose="empty" title={t('noDeletions')} />}
+          <div className="g2">{deletions?.map((d) => <DeletionCard key={d.id} d={d} onDone={load} />)}</div>
         </>
       )}
       {tab === 'samples' && <SamplesTab s={samples} />}
