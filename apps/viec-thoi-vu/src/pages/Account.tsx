@@ -11,6 +11,7 @@ import { WorkerFields, workerInfoOf } from '../components/WorkerFields'
 import { CITIES } from '../lib/geo'
 import { useI18n, type TKey } from '../lib/i18n'
 import { DeleteAccount } from '../components/DeleteAccount'
+import { Discoverable } from '../components/Discoverable'
 import { Regulars } from '../components/Regulars'
 import { displayPhone } from '../lib/phone'
 import { useSession } from '../lib/session'
@@ -124,6 +125,7 @@ export default function Account() {
         <OwnRepTiles userId={profile.id} employer={emp} />
       </section>
       <Sect title={t('secInfo')} sub={t(emp ? 'secInfoEmployer' : 'secInfoSeeker')}>{form}</Sect>
+      {!emp && <Sect title={t('discoverTitle')} sub={t('discoverSub')}><Discoverable /></Sect>}
       {emp && <Sect title={t('regularsTitle')} sub={t('regularsSub')}><Regulars /></Sect>}
       <Sect title={t('secVerify')} sub={t(emp ? 'secVerifySubEmp' : 'secVerifySub')}>
         <div className="stack">

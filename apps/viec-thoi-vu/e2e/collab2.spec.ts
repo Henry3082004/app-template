@@ -11,7 +11,7 @@ async function acceptedShift(h: ReturnType<typeof helpers>, p: P, title: string)
   await h.go('/app'); await p.locator('button.job', { hasText: title }).first().click(); await p.getByRole('button', { name: 'Ứng tuyển ngay' }).first().click()
   await p.getByRole('button', { name: 'Dùng thử: Người tìm việc' }).click(); await h.see('Đã gửi đơn!'); await h.signOut()
   await h.asEmployer(); await h.openApplicants(title); await h.see('Minh Anh')
-  await p.getByRole('button', { name: 'Nhận', exact: true }).first().click(); await p.getByRole('button', { name: 'Xong' }).click(); await h.signOut()
+  await p.getByRole('button', { name: 'Nhận', exact: true }).first().click(); await p.getByRole('button', { name: 'Xong', exact: true }).click(); await h.signOut()
 }
 
 test('chat between the shop and the worker, a report, and the admin handles it', async ({ page: p }) => {
@@ -31,7 +31,7 @@ test('chat between the shop and the worker, a report, and the admin handles it',
   await h.noHScroll(); await p.keyboard.press('Escape')
   // ... and reports the shop
   await p.getByRole('button', { name: 'Báo cáo' }).first().click(); await p.getByLabel('Mô tả thêm (không bắt buộc)').fill('Quán đòi đặt cọc')
-  await p.getByRole('button', { name: 'Gửi báo cáo' }).click(); await h.see('Đã gửi báo cáo'); await p.getByRole('button', { name: 'Xong' }).click(); await h.signOut()
+  await p.getByRole('button', { name: 'Gửi báo cáo' }).click(); await h.see('Đã gửi báo cáo'); await p.getByRole('button', { name: 'Xong', exact: true }).click(); await h.signOut()
 
   // the shop sees the answer
   await h.asEmployer(); await bell(p).click(); await h.see('nhắn tin cho bạn'); await h.signOut()
@@ -65,4 +65,24 @@ test('a regular is invited to another post in the app; a deletion request reache
   await h.asAdmin(); await h.go('/app/quan-tri')
   await p.getByRole('button', { name: /^Yêu cầu xóa/ }).click(); await h.see('Minh Anh'); await h.see('Không dùng nữa')
   await p.getByRole('button', { name: 'Đánh dấu đã xử lý' }).click(); await h.see('Đã xử lý')
+})
+
+test('a shop finds a worker who chose to be found and invites them; switching off hides them', async ({ page: p }) => {
+  const h = helpers(p)
+  await p.goto(url(PORTS.free, '/app')); await h.see('Phụ bếp ca tối')
+  // listed by default? no: the demo worker has not switched it on, only the sample worker Hoa has
+  await h.asEmployer(); await h.postJob('Việc cho người mới'); await p.getByRole('button', { name: 'Về Tin của tôi' }).click()
+  await h.go('/app/tim-nguoi'); await h.see('Không thấy số điện thoại'); await h.see('Hoa T.'); await h.notSee('Minh Anh'); await h.noHScroll()
+  await p.getByLabel('Bạn từng làm gì?').selectOption('kitchen'); await h.see('Chưa có ai phù hợp'); await p.getByLabel('Bạn từng làm gì?').selectOption('')
+  await p.getByRole('button', { name: 'Mời vào tin' }).first().click(); await h.see('Mời Hoa T. làm việc')
+  await p.locator('.dlg .tx', { hasText: 'Việc cho người mới' }).getByRole('button', { name: 'Mời vào tin' }).click(); await h.see('Đã gửi lời mời')
+  await p.keyboard.press('Escape'); await h.signOut()
+
+  // the demo worker switches it on and becomes visible to shops
+  await h.asSeeker(); await nav(p, 'Hồ sơ').click(); await h.section('Cho quán tìm thấy tôi')
+  await p.getByRole('switch', { name: 'Cho quán tìm thấy tôi' }).click(); await h.see('Đang bật'); await h.signOut()
+  await h.asEmployer(); await h.go('/app/tim-nguoi'); await h.see('thử) M.'); await h.signOut()
+  await h.asSeeker(); await nav(p, 'Hồ sơ').click(); await h.section('Cho quán tìm thấy tôi')
+  await p.getByRole('switch', { name: 'Cho quán tìm thấy tôi' }).click(); await h.see('Đang tắt'); await h.signOut()
+  await h.asEmployer(); await h.go('/app/tim-nguoi'); await h.see('Hoa T.'); await h.notSee('thử) M.')
 })

@@ -142,6 +142,12 @@ export interface AdminReport { id: string; reporter_name: string; target_id: str
 export interface DeletionRequest { status: 'open'; requested_at: string }
 export interface AdminDeletion { id: string; user_id: string; name: string; email: string | null; reason: string | null; status: 'open' | 'done' | 'cancelled'; requested_at: string }
 export interface SentInvite { job_id: string; worker_id: string }
+/** A worker who chose to be found: shortened name, no phone. */
+export interface FoundWorker {
+  user_id: string; name: string; city: string | null; birth_year: number | null; experience: string[]; availability: string[]
+  avatar_path: string | null; shifts_done: number; avg_stars: number | null; ratings: number
+}
+export interface WorkerSearch { city?: string; exp?: string; when?: string }
 
 export interface BankAccount { bank_name: string; account_no: string; holder_name: string }
 
@@ -308,6 +314,11 @@ export interface Api {
   /** invite a worker who already did a shift for me to one of my open posts */
   inviteWorker(jobId: string, workerId: string): Promise<void>
   mySentInvites(): Promise<SentInvite[]>
+  /** shops: workers who switched "let shops find me" on */
+  searchWorkers(f: WorkerSearch): Promise<FoundWorker[]>
+  /** workers: appear in shops' search (default off) */
+  myDiscoverable(): Promise<boolean>
+  setDiscoverable(on: boolean): Promise<void>
   /** finished shifts (last 30 days) I still have to review */
   pendingReviews(): Promise<number>
   /** settle overdue shifts for the signed-in user (also done hourly on the server) */

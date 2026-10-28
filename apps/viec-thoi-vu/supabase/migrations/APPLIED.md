@@ -49,3 +49,5 @@ Test: `supabase/tests/100_collab.sql`.
 
 29/10/2026: `20261031_reminders.sql` áp dụng thành `reminders_1_function`, `reminders_2_schedule` (pg_cron `vtv-reminders`, mỗi giờ phút 05), `reminders_3_skip_samples` (bỏ qua tài khoản mẫu).
 Nhắc việc: tối hôm trước (từ 17:00), sáng ngày làm (từ 06:00), quán chưa xác nhận ca (từ 08:00, một lần), nhắc đánh giá sau 1 đến 7 ngày (từ 09:00, một lần mỗi bên). Test: `supabase/tests/120_reminders.sql`.
+
+01/11/2026: `20261101_find_workers.sql` áp dụng thành `find_workers` (cột `worker_profiles.discoverable` mặc định tắt, `set_discoverable`, `my_discoverable`, `search_workers`, `invite_worker` cho người đã bật). Anon không gọi được. Test: `supabase/tests/130_find_workers.sql`.

@@ -5,7 +5,7 @@ import type { MyJob } from '../lib/types'
 import { Btn, Dialog, ErrorBox, Skel } from './ui'
 
 /** Invite a worker who already did a shift for this shop to one of its open posts (they get a notification with the job). */
-export function InviteDialog({ workerId, name, invited, onInvited, onClose }: { workerId: string; name: string; invited: string[]; onInvited(jobId: string): void; onClose(): void }) {
+export function InviteDialog({ workerId, name, fresh, invited, onInvited, onClose }: { workerId: string; name: string; fresh?: boolean; invited: string[]; onInvited(jobId: string): void; onClose(): void }) {
   const { t } = useI18n()
   const [jobs, setJobs] = useState<MyJob[] | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
@@ -17,8 +17,8 @@ export function InviteDialog({ workerId, name, invited, onInvited, onClose }: { 
     try { await api.inviteWorker(j.id, workerId); onInvited(j.id); setOk(true) } catch (e) { setError(e) } finally { setBusy(null) }
   }
   return (
-    <Dialog label={t('inviteTitle', { name })} onClose={onClose}>
-      <h2 style={{ fontSize: 20 }}>{t('inviteTitle', { name })}</h2>
+    <Dialog label={t(fresh ? 'inviteTitleNew' : 'inviteTitle', { name })} onClose={onClose}>
+      <h2 style={{ fontSize: 20 }}>{t(fresh ? 'inviteTitleNew' : 'inviteTitle', { name })}</h2>
       {ok && <div className="notice ok">{t('inviteOk', { name })}</div>}
       {!jobs && !error && <Skel n={1} />}
       {jobs && jobs.length === 0 && <div className="notice info">{t('inviteNoJobs')}</div>}

@@ -2,7 +2,7 @@ import type { QuizAnswers } from './quiz'
 import { createClient, type PostgrestError } from '@supabase/supabase-js'
 import { normalizePhone, phoneEmail } from './phone'
 import {
-  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type AppNotification, type AdminDeletion, type AdminReport, type ChatMessage, type DeletionRequest, type ReportReason, type SentInvite, type Applicant, type BankAccount, type Escrow, type Hire, type Job, type JobInput, type MyApplication, type MyJob,
+  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type AppNotification, type AdminDeletion, type AdminReport, type ChatMessage, type FoundWorker, type DeletionRequest, type ReportReason, type SentInvite, type Applicant, type BankAccount, type Escrow, type Hire, type Job, type JobInput, type MyApplication, type MyJob,
   type Profile, type ProfileUpdate, type Reputation, type SignUpInput,
 } from './types'
 
@@ -379,6 +379,16 @@ export const supabaseApi: Api = {
   },
   async mySentInvites() {
     return ((await rpc('my_sent_invites')) ?? []) as SentInvite[]
+  },
+  async searchWorkers(f) {
+    const data = await rpc('search_workers', { p_city: f.city || null, p_exp: f.exp || null, p_when: f.when || null, p_limit: 30 })
+    return ((data ?? []) as FoundWorker[]).map((w) => ({ ...w, avg_stars: num(w.avg_stars) }))
+  },
+  async myDiscoverable() {
+    return (await rpc('my_discoverable')) === true
+  },
+  async setDiscoverable(on) {
+    await rpc('set_discoverable', { p_on: on })
   },
 
   async markPaidCash(applicationId) {

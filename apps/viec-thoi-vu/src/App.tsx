@@ -14,6 +14,7 @@ import { IN_ZALO } from './lib/zalo'
 import Admin from './pages/Admin'
 import Account from './pages/Account'
 import EmployerCandidates from './pages/EmployerCandidates'
+import FindWorkers from './pages/FindWorkers'
 import EmployerJobs from './pages/EmployerJobs'
 import EmployerShifts from './pages/EmployerShifts'
 import Income from './pages/Income'
@@ -47,6 +48,7 @@ function AppPages() {
         <Route path="tin/:id" element={<EmployerJobs />} />
         <Route path="thong-bao" element={<Notifications />} />
         <Route path="ung-vien" element={<EmployerCandidates />} />
+        <Route path="tim-nguoi" element={<FindWorkers />} />
         <Route path="ca-lam" element={<EmployerShifts />} />
         <Route path="chi-phi" element={<Spend />} />
         <Route path="dang-tin" element={<PostJob />} />

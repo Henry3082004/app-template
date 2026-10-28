@@ -3,7 +3,7 @@ import { normalizePhone } from './phone'
 import { seedEmployers, seedJobs } from './seed'
 import { addDays, today, vnDate, vnToday } from './format'
 import {
-  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type AppNotification, type AdminDeletion, type AdminReport, type ChatMessage, type ReportReason, type SentInvite, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
+  AppError, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type Api, type AppConfig, type AppNotification, type AdminDeletion, type AdminReport, type ChatMessage, type FoundWorker, type ReportReason, type SentInvite, type AppStatus, type Attendance, type BankAccount, type Escrow, type Job, type PayStatus, type Profile, type Reputation, type Role,
 } from './types'
 
 // In-memory backend for local UI testing (VITE_MOCK=1). Enforces the same rules as the database.
@@ -32,6 +32,7 @@ const chat: (ChatMessage & { application_id: string })[] = []
 const reports: (AdminReport & { reporter_id: string })[] = []
 const deletions: (AdminDeletion & { user_id: string })[] = []
 const invites: (SentInvite & { employer_id: string })[] = []
+const discoverable = new Set<string>() // workers who chose "let shops find me"
 
 const users: Record<string, User> = {}
 function addUser(id: string, digits: string, password: string, role: Role, full_name: string, extra: Partial<Profile> = {}) {
@@ -42,6 +43,8 @@ function addUser(id: string, digits: string, password: string, role: Role, full_
   }
 }
 addUser('11111111-1111-4111-8111-000000000001', '84900000001', 'demo-tim-viec', 'seeker', 'Minh Anh (dùng thử)', { bio: 'Sinh viên năm 2, rảnh buổi sáng và cuối tuần.', city: 'TP.HCM', birth_year: 2005, experience: ['service', 'cashier'], availability: ['morning', 'weekend'] })
+addUser('11111111-1111-4111-8111-000000000004', '84900000004', 'x-not-usable', 'seeker', 'Trần Thị Hoa', { city: 'TP.HCM', birth_year: 2002, experience: ['barista', 'service'], availability: ['evening', 'weekend'] })
+discoverable.add('11111111-1111-4111-8111-000000000004')
 addUser('11111111-1111-4111-8111-000000000003', '84900000003', 'quan-tri-thu-1', 'employer', 'Quản trị (dùng thử)', { business_name: 'Quản trị', is_admin: true })
 addUser('11111111-1111-4111-8111-000000000002', '84900000002', 'demo-tuyen-dung', 'employer', 'Chủ quán (dùng thử)', { business_name: 'Quán Cà Phê Dùng Thử', address: '45 Lê Lợi, Q.1', city: 'TP.HCM' })
 Object.entries(seedEmployers).forEach(([id, e], i) => {
@@ -364,13 +367,37 @@ export const mockApi: Api = {
     const j = jobs.find((x) => x.id === jobId)
     if (!j || j.employer_id !== p.id) throw new AppError('FORBIDDEN')
     if (j.status !== 'open') throw new AppError('JOB_NOT_OPEN')
-    if (!apps.some((a) => jobOf(a).employer_id === p.id && a.seeker_id === workerId && a.pay_status === 'released' && a.attendance !== 'noshow')) throw new AppError('NOT_A_REGULAR')
+    const regular = apps.some((a) => jobOf(a).employer_id === p.id && a.seeker_id === workerId && a.pay_status === 'released' && a.attendance !== 'noshow')
+    if (!regular && !discoverable.has(workerId)) throw new AppError('NOT_A_REGULAR')
     if (apps.some((a) => a.job_id === jobId && a.seeker_id === workerId)) throw new AppError('ALREADY_APPLIED')
     if (invites.filter((i) => i.employer_id === p.id).length >= 20) throw new AppError('TOO_MANY')
     if (!invites.some((i) => i.job_id === jobId && i.worker_id === workerId)) {
       invites.push({ job_id: jobId, worker_id: workerId, employer_id: p.id })
-      notify(workerId, 'invite', `${bizOf(j)} mời bạn làm lại`, `Việc "${j.title}" — xem và ứng tuyển`, `/app/viec/${jobId}`, jobId)
+      notify(workerId, 'invite', `${bizOf(j)} mời bạn làm${regular ? ' lại' : ''}`, `Việc "${j.title}" — xem và ứng tuyển`, `/app/viec/${jobId}`, jobId)
     }
+    return wait(undefined)
+  },
+  async searchWorkers(f) {
+    const p = me()
+    if (!p.roles.includes('employer')) throw new AppError('FORBIDDEN')
+    const found = Object.values(users).map((u) => u.profile)
+      .filter((w) => w.roles.includes('seeker') && w.id !== p.id && discoverable.has(w.id)
+        && (!f.city || w.city === f.city) && (!f.exp || w.experience.includes(f.exp as never)) && (!f.when || w.availability.includes(f.when as never)))
+    const reps = await mockApi.reputations(found.map((w) => w.id), 'seeker')
+    return wait(found.map((w): FoundWorker => {
+      const parts = w.full_name.trim().split(/\s+/)
+      return {
+        user_id: w.id, name: parts.length > 1 ? `${parts[parts.length - 1]} ${parts[0][0].toUpperCase()}.` : parts[0],
+        city: w.city, birth_year: w.birth_year, experience: w.experience, availability: w.availability, avatar_path: w.avatar_path,
+        shifts_done: reps[w.id]?.shifts_done ?? 0, avg_stars: reps[w.id]?.avg_stars ?? null, ratings: reps[w.id]?.ratings ?? 0,
+      }
+    }).sort((a, b) => b.shifts_done - a.shifts_done))
+  },
+  async myDiscoverable() { return wait(discoverable.has(me().id)) },
+  async setDiscoverable(on) {
+    const p = me()
+    if (!p.roles.includes('seeker')) throw new AppError('FORBIDDEN')
+    if (on) discoverable.add(p.id); else discoverable.delete(p.id)
     return wait(undefined)
   },
   async mySentInvites() {

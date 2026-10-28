@@ -152,3 +152,7 @@ Tuyển người (Tin đăng | Ứng viên, đăng lại tin cũ) · Ca làm (C�
 ## 29/10/2026 — Chính sách + nhắc việc
 - **Chính sách bảo mật / điều khoản** cập nhật cho chat, báo cáo, chấm công có vị trí (chỉ lưu số mét, không lưu tọa độ), thông báo, lời mời, xóa tài khoản ngay trong Hồ sơ.
 - **Nhắc việc tự động** (pg_cron mỗi giờ): tối hôm trước và sáng ngày làm cho người làm; quán chưa xác nhận ca; nhắc đánh giá cho cả hai bên. Mỗi nhắc chỉ gửi một lần, bỏ qua tài khoản mẫu. Chỉ hiện trong app (chưa đẩy ra ngoài app).
+
+## 01/11/2026 — Quán tìm người
+- Người làm bật "Cho quán tìm thấy tôi" trong Hồ sơ (mặc định TẮT). Quán vào Tuyển người → Tìm người: lọc khu vực, kinh nghiệm, giờ rảnh; thấy tên rút gọn, tuổi, khu vực, uy tín, không thấy số điện thoại. Mời vào tin bằng `invite_worker` (20/ngày). Số điện thoại chỉ hiện khi người làm nhận việc.
+- Chính sách bảo mật có thêm mục "Hồ sơ hiển thị cho quán". 92 test đạt.
