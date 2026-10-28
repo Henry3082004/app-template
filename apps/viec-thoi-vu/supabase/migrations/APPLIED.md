@@ -51,3 +51,5 @@ Test: `supabase/tests/100_collab.sql`.
 Nhắc việc: tối hôm trước (từ 17:00), sáng ngày làm (từ 06:00), quán chưa xác nhận ca (từ 08:00, một lần), nhắc đánh giá sau 1 đến 7 ngày (từ 09:00, một lần mỗi bên). Test: `supabase/tests/120_reminders.sql`.
 
 01/11/2026: `20261101_find_workers.sql` áp dụng thành `find_workers` (cột `worker_profiles.discoverable` mặc định tắt, `set_discoverable`, `my_discoverable`, `search_workers`, `invite_worker` cho người đã bật). Anon không gọi được. Test: `supabase/tests/130_find_workers.sql`.
+
+01/11/2026: `20261102_contacts_lockdown.sql` áp dụng thành `contacts_lockdown`. Người dùng và khách không còn ghi được bảng `contacts` (trước đó tự đặt được `verified`/`phone`, có thể chiếm số điện thoại của người khác khi đăng nhập Zalo). App chỉ đọc bảng này. Test: `supabase/tests/140_contacts_lockdown.sql`.

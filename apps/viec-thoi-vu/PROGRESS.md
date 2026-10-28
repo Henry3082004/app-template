@@ -156,3 +156,6 @@ Tuyển người (Tin đăng | Ứng viên, đăng lại tin cũ) · Ca làm (C�
 ## 01/11/2026 — Quán tìm người
 - Người làm bật "Cho quán tìm thấy tôi" trong Hồ sơ (mặc định TẮT). Quán vào Tuyển người → Tìm người: lọc khu vực, kinh nghiệm, giờ rảnh; thấy tên rút gọn, tuổi, khu vực, uy tín, không thấy số điện thoại. Mời vào tin bằng `invite_worker` (20/ngày). Số điện thoại chỉ hiện khi người làm nhận việc.
 - Chính sách bảo mật có thêm mục "Hồ sơ hiển thị cho quán". 92 test đạt.
+
+## 01/11/2026 — Sửa lỗ hổng bảo mật bảng contacts
+- Rà bảo mật (skill Cloudflare, mức quick, chạy dở rồi dừng) phát hiện người dùng đăng nhập tự đặt được `contacts.verified`/`phone`. Đã thu hồi quyền ghi (migration 20261102), có test. Phần rà còn lại CHƯA chạy.
