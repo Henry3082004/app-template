@@ -11,10 +11,10 @@ export function avatarUrl(path: string | null | undefined): string | null {
 
 export const ageOf = (birthYear: number | null) => (birthYear ? new Date().getFullYear() - birthYear : null)
 
-/** Birth years offered in the picker: 15 to 65 years old, youngest first. */
+/** Birth years offered in the picker: 16 to 65 years old, youngest first. */
 export function birthYears(): number[] {
   const now = new Date().getFullYear()
-  return Array.from({ length: 51 }, (_, i) => now - 15 - i)
+  return Array.from({ length: 50 }, (_, i) => now - 16 - i)
 }
 
 // "Help businesses know you" is asked once after sign-in; if skipped, once more on the first Apply.
