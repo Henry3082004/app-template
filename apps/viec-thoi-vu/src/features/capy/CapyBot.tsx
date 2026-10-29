@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { capy } from '../../lib/capy'
 import { useI18n } from '../../lib/i18n'
+import { CapyFigure } from './CapyFigure'
 
 const POS_KEY = 'vtv-capy-pos'
 const HI_KEY = 'vtv-capy-hi'
@@ -95,8 +95,7 @@ export function CapyBot({ onOpen }: { onOpen: () => void }) {
       )}
       <button type="button" className="capyme" aria-label={t('capyFab')}
         onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onClick={click}>
-        <img src={capy('wave')} alt="" draggable={false} />
-        <span className="capyhand" aria-hidden="true">👋</span>
+        <CapyFigure />
       </button>
     </div>
   )

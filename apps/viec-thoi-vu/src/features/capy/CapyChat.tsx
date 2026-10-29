@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Ic } from '../../components/Ic'
 import { api } from '../../lib/api'
 import { runSearch } from '../../lib/capySearch'
-import { capy } from '../../lib/capy'
 import { useAppConfig } from '../../lib/config'
 import { errorKey } from '../../lib/errors'
 import { fmtKm } from '../../lib/geo'
@@ -16,6 +15,7 @@ import type { CapyDraft, CapyMsg, CapySearch, Job } from '../../lib/types'
 import { Pay } from '../jobs/JobCard'
 import { SaveButton } from '../jobs/SaveButton'
 import { CapyBot } from './CapyBot'
+import { CapyFigure } from './CapyFigure'
 
 type Item = { role: 'user' | 'assistant'; text: string; search?: CapySearch; draft?: CapyDraft }
 
@@ -67,7 +67,7 @@ export function CapyChat() {
         <div className="capyscrim" onClick={() => setOpen(false)}>
           <section className="capypanel" role="dialog" aria-label={t('capyName')} onClick={(e) => e.stopPropagation()}>
             <header>
-              <span className="capyav"><img src={capy('wave')} alt="" /></span>
+              <span className="capyav"><CapyFigure /></span>
               <div><b>{t('capyName')}</b><small>{t('capyWho')}</small></div>
               <button type="button" className="capyx" onClick={() => setOpen(false)} aria-label={t('capyClose')}>×</button>
             </header>
