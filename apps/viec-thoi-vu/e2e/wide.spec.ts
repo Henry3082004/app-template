@@ -10,13 +10,13 @@ for (const [name, width, height] of [['landscape tablet', 1100, 760], ['desktop'
       const h = helpers(p)
       await p.goto('/app'); await h.see('Phụ bếp ca tối'); await h.noHScroll()
       // the menu down the left, the page title and today's date on top
-      await expect(p.locator('.rail .navlabel')).toBeVisible(); await expect(p.locator('.top')).toContainText('Hôm nay')
+      await expect(p.locator('.rail .navlabel')).toBeVisible(); await expect(p.locator('.top')).toContainText(/\d{2}\/\d{2}\/\d{4}/)
       await h.see('Xin chào'); await h.see('Việc làm cho bạn')
       const banner = (await p.locator('.banners').boundingBox())!, card = (await p.locator('.searchcard').boundingBox())!
       expect(banner.width).toBeGreaterThan((width - 264) * 0.8)
       expect(card.y).toBeGreaterThan(banner.y + banner.height / 2) // the search card floats over the banner's lower edge
       // filtering works from the search card
-      await p.getByLabel('Tìm việc, cơ sở, khu vực…').fill('hải sản'); await h.see('Chưa có việc hợp ý')
+      await p.getByLabel('Tìm việc, cơ sở, khu vực…').fill('hải sản'); await h.see('Chưa có việc phù hợp')
       await p.getByLabel('Tìm việc, cơ sở, khu vực…').fill('')
       await p.getByRole('button', { name: 'Kho hàng', exact: true }).click(); await h.see('Soạn hàng kho mùa cao điểm'); await h.notSee('Phụ bếp ca tối')
       await p.getByRole('button', { name: 'Tất cả', exact: true }).click(); await h.see('Phụ bếp ca tối')

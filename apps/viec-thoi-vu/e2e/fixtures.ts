@@ -41,7 +41,7 @@ export function helpers(p: Page) {
 }
 
 /** Every test fails if the page logs an error/warning or throws; Google Fonts are blocked like in the sandbox. */
-// Most tests start as someone who already answered "Capy hỏi nhanh"; the quiz tests turn this off.
+// Most tests start as someone who already answered the quick questions; the quiz tests turn this off.
 const QUIZ_DONE = JSON.stringify({ device: 'aaaaaaaa-e2e0-4000-8000-000000000000', answers: { goal: null, city: null, cats: null, time: null, exp: null }, synced: null })
 
 export const test = base.extend<{ problems: string[]; quizSeen: boolean }>({

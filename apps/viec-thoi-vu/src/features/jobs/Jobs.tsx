@@ -21,7 +21,7 @@ const FILTERS: { id: Filter; key: TKey }[] = [
   { id: 'warehouse', key: 'catwarehouse' }, { id: 'event', key: 'catevent' }, { id: 'farm', key: 'catfarm' }, { id: 'retail', key: 'catretail' },
 ]
 const PAY_OPTS: { v: string; label: string }[] = [
-  { v: '', label: '' }, { v: 'hour:25000', label: '25.000đ / giờ' }, { v: 'hour:35000', label: '35.000đ / giờ' }, { v: 'day:300000', label: '300.000đ / ngày' },
+  { v: '', label: '' }, { v: 'hour:25000', label: 'Từ 25.000đ / giờ' }, { v: 'hour:35000', label: 'Từ 35.000đ / giờ' }, { v: 'day:300000', label: 'Từ 300.000đ / ngày' },
 ]
 const AREAS = ['TP.HCM', 'Hà Nội', 'Đà Nẵng', 'Cần Thơ', 'Bình Dương']
 
@@ -212,7 +212,6 @@ export default function Jobs() {
               <div className="searchbox">
                 <span className="si"><Ic n="search" size={18} /></span>
                 <input ref={searchRef} className="inp" type="search" placeholder={t('searchPh')} aria-label={t('searchPh')} value={q} onChange={(e) => setQ(e.target.value)} />
-                <span className="kbd" aria-hidden="true">/</span>
               </div>
               {selects}
             </div>

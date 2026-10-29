@@ -171,3 +171,8 @@ Tuyển người (Tin đăng | Ứng viên, đăng lại tin cũ) · Ca làm (C�
 - Ba loại slide trộn xen kẽ: số liệu thật từ cơ sở dữ liệu (việc đang mở, tin mới 7 ngày, khu vực và ngành nhiều việc nhất, việc gấp, số người sẵn sàng; chỉ hiện khi từ 3 trở lên, không bịa số), tin tức có link ngoài (mở tab mới), mẹo cho người tìm việc / quán. Slide hợp với vai trò người đang đăng nhập được xếp lên trước.
 - Tin tức đặt ở `app_settings.home_news`; hai tin đầu mới lấy từ tiêu đề tìm kiếm, CHƯA ai mở đọc kỹ: nên xem lại và thay bằng bài chọn lọc.
 - 92 test đạt (có test kéo chuột, tạm dừng, vòng lặp, link tin tức).
+
+## 01/11/2026 — Chữ và giao diện danh sách việc gọn, chuyên nghiệp hơn
+- Bỏ giọng Capy và biểu tượng cảm xúc khỏi chữ (giữ hình Capy làm nhân vật): "Capy tìm được 14 việc nè 🍊" → "14 việc đang tuyển"; lời chào, thông báo gửi đơn, lỗi, câu hỏi nhanh... viết lại trung tính, lịch sự (vi + en).
+- Bỏ nhãn phím "/" trong ô tìm kiếm; dòng ngày ở thanh trên chỉ còn "Thứ Năm, 29/10/2026"; ô lương ghi rõ "Từ 25.000đ / giờ"; danh sách chọn luôn nền sáng; "Mọi mức lương" thay "Không giới hạn".
+- "Capy hỏi nhanh" đổi tên thành "Gợi ý việc phù hợp" (cả trong chính sách bảo mật). 92 test đạt.

@@ -93,7 +93,7 @@ export function Shell({ children }: { children: ReactNode }) {
     </>
   )
 
-  const today = new Intl.DateTimeFormat(locale === 'vi' ? 'vi-VN' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())
+  const today = new Intl.DateTimeFormat(locale === 'vi' ? 'vi-VN' : 'en-GB', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date())
   const hire = () => askAuth({ role: 'employer', onDone: (p) => nav(p.role === 'employer' ? '/app/dang-tin' : '/app') })
 
   return (
@@ -102,7 +102,7 @@ export function Shell({ children }: { children: ReactNode }) {
       <header className="top">
         <div className="toptitle">{t(pageTitle(pathname))}</div>
         <div className="right">
-          <span className="today">{t('today')}, {today}</span>
+          <span className="today">{today}</span>
           {profile?.role === 'employer'
             ? <Btn sm onClick={() => nav('/app/dang-tin')}>{t('postJob')}</Btn>
             : !profile && <Btn v="ghost" sm onClick={hire}>{t('iNeedStaff')}</Btn>}
