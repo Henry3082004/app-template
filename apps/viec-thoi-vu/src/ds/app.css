@@ -504,7 +504,7 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 /* ---------- Việc đã lưu ---------- */
 .jobwrap{position:relative}.jobwrap .job .meta{padding-right:44px}
 .savebtn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--brand-600);display:inline-grid;place-items:center;cursor:pointer;flex:none;transition:.15s}
-.savebtn:hover{border-color:var(--brand-300)}.savebtn.on{background:var(--p);border-color:var(--p);color:#fff}.savebtn.on svg{fill:currentColor}
+.savebtn:hover{border-color:var(--brand-300)}.savebtn.on{background:var(--p);border-color:var(--p);color:#fff}.savebtn svg{fill:none;stroke-width:2.6}
 .jobwrap>.savebtn{position:absolute;right:12px;bottom:10px}
 .cards.wide .jobwrap>.savebtn{bottom:12px;right:16px}
 .savedbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:4px 0 14px}
