@@ -60,3 +60,15 @@ test('free mode: income is a cash estimate and says so', async ({ page: p }) => 
   await h.asSeeker(); await nav(p, 'Thu nhập').click()
   await h.see('Quán trả tiền mặt trực tiếp'); await h.see('ước tính'); await h.see('Quán trả trực tiếp'); await h.see('Số dư hiện tại')
 })
+
+test('"Việc gần tôi" is one clear button next to the job count, and toggles sorting by distance', async ({ page: p, context }) => {
+  const h = helpers(p)
+  await context.grantPermissions(['geolocation']); await context.setGeolocation({ latitude: 10.7769, longitude: 106.7009 })
+  await p.goto('/app'); await h.see('Phụ bếp ca tối')
+  await h.see('việc đang tuyển')
+  const near = p.getByRole('button', { name: 'Việc gần tôi' })
+  await expect(near).toHaveAttribute('aria-pressed', 'false')
+  await near.click(); await expect(near).toHaveAttribute('aria-pressed', 'true')
+  await near.click(); await expect(near).toHaveAttribute('aria-pressed', 'false')
+  await h.noHScroll()
+})

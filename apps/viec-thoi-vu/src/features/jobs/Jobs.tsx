@@ -162,10 +162,10 @@ export default function Jobs() {
 
   const sortLine = (
     <div className="sortline">
-      {jobs && <span>{t('capyFound', { n: shown.length })}</span>}
-      {coords
-        ? <span>{t('nearYou')}</span>
-        : <button type="button" className="back" style={{ minHeight: 0, padding: 0, fontSize: 14 }} onClick={findMe} disabled={loc === 'busy'}>{loc === 'busy' ? t('locating') : <><Ic n="pin" size={14} /> {t('useLocation')}</>}</button>}
+      {jobs && <span className="jcount"><b>{shown.length}</b> {t('jobsOpen')}</span>}
+      <Chip on={!!coords} onClick={coords ? () => setCoords(null) : findMe} disabled={loc === 'busy'}>
+        <Ic n="pin" size={16} />{loc === 'busy' ? t('locating') : t('nearMe')}
+      </Chip>
     </div>
   )
   const chips = FILTERS.map((f) => <Chip key={f.id} on={filter === f.id} onClick={() => setFilter(f.id)}>{f.id === 'urgent' && <Ic n="zap" size={14} />}{t(f.key)}</Chip>)

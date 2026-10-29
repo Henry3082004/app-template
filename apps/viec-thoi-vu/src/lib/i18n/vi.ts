@@ -7,8 +7,7 @@ export const vi = {
   iNeedStaff: 'Tôi cần tuyển người', searchPh: 'Tìm việc, cơ sở, khu vực…',
   fAll: 'Tất cả', fUrgent: 'Gấp', catservice: 'Phục vụ', catwarehouse: 'Kho hàng', catevent: 'Sự kiện',
   catfarm: 'Nông nghiệp', catretail: 'Bán hàng', catother: 'Khác',
-  nearYou: 'Xếp theo khoảng cách gần nhất',
-  useLocation: 'Sắp xếp theo khoảng cách', locating: 'Đang tìm vị trí…', locDenied: 'Chưa lấy được vị trí, danh sách đang xếp theo tin mới nhất.',
+  nearMe: 'Việc gần tôi', locating: 'Đang tìm vị trí…', locDenied: 'Chưa lấy được vị trí, danh sách đang xếp theo tin mới nhất.',
   urgent: 'Gấp', slotsLeft: 'còn {n} chỗ', full: 'Đã đủ người', closed: 'Đã đóng',
   // units
   perhour: 'giờ', perday: 'ngày', pershift: 'ca', perjob: 'việc',
@@ -75,7 +74,7 @@ export const vi = {
   eCANNOT_WITHDRAW: 'Đơn đã được xử lý nên không rút được nữa.', eFORBIDDEN: 'Tài khoản này không làm được việc đó.',
   eNOT_SIGNED_IN: 'Vui lòng đăng nhập trước.', eSLOTS_BELOW_FILLED: 'Số người cần không được ít hơn số đã nhận.',
   eUNKNOWN: 'Đã có lỗi xảy ra. Vui lòng thử lại sau.',
-  capyFound: '{n} việc đang tuyển', capyLoading: 'Đang tải danh sách việc…',
+  jobsOpen: 'việc đang tuyển', capyLoading: 'Đang tải danh sách việc…',
   emptyTitle: 'Chưa có việc phù hợp', emptySub: 'Hãy thử bỏ bớt bộ lọc hoặc chọn khu vực khác.', clearFilters: 'Bỏ bộ lọc',
   pickJob: 'Chọn một việc để xem chi tiết', pickJobSub: 'Thông tin ca làm và nút ứng tuyển sẽ hiện ở đây.',
   pickPost: 'Chọn một tin', pickPostSub: 'Danh sách ứng viên sẽ hiện ở đây.',
