@@ -122,7 +122,9 @@ export default function Jobs() {
   // businesses live on "My posts"; one that can also work may still open a shared job link (and switch to apply)
   if (profile?.role === 'employer' && !(id && profile.roles.includes('seeker'))) return <Navigate to="/app/tin-cua-toi" replace />
 
-  const selected = id ? (jobs?.find((j) => j.id === id) ?? single ?? null) : null
+  // wide screens: the side card shows the chosen job, or the first one of the list until the visitor picks another
+  const activeId = id ?? (big ? shown[0]?.j.id : undefined)
+  const selected = activeId ? (jobs?.find((j) => j.id === activeId) ?? single ?? null) : null
   const open = (jid: string) => nav(`/app/viec/${jid}`)
   const clear = () => { setFilter('all'); setQ(''); setArea(''); setMinPay('') }
 
@@ -176,7 +178,7 @@ export default function Jobs() {
       ? <><div className="center" style={{ marginBottom: 12 }}><img className="capy sm" src={capy('bath')} alt="" style={{ margin: '0 auto' }} /><div className="sub">{t('capyLoading')}</div></div><Skel n={big ? 4 : 3} /></>
       : shown.length === 0
         ? <Empty pose="empty" title={t('emptyTitle')} sub={t('emptySub')}><Btn v="ghost" sm onClick={clear}>{t('clearFilters')}</Btn></Empty>
-        : <div className={'cards' + (desk ? ' wide' : '')}>{shown.map(({ j, d }) => <JobCard key={j.id} job={j} distance={d} rep={reps[j.employer_id]} fit={isFit(j, quiz)} sel={big && j.id === id} onOpen={() => open(j.id)} />)}</div>
+        : <div className={'cards' + (desk ? ' wide' : '')}>{shown.map(({ j, d }) => <JobCard key={j.id} job={j} distance={d} rep={reps[j.employer_id]} fit={isFit(j, quiz)} sel={big && j.id === activeId} onOpen={() => open(j.id)} />)}</div>
 
   const selects = (
     <>
@@ -230,7 +232,7 @@ export default function Jobs() {
             </section>
             {big && (
               <aside className="jdetail" aria-label={t('about')}>
-                {selected ? detail : <Empty pose="wave" title={t('pickJob')} sub={t('pickJobSub')} />}
+                {selected ? detail : jobs === null ? <Skel n={2} /> : <Empty pose="wave" title={t('pickJob')} sub={t('pickJobSub')} />}
               </aside>
             )}
           </div>

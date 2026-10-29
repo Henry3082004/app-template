@@ -9,6 +9,18 @@ for (const [name, width, height] of [['landscape tablet', 1100, 760], ['desktop'
     test('job list: banner, search card, grid and detail side by side', async ({ page: p }) => {
       const h = helpers(p)
       await p.goto('/app'); await h.see('Phụ bếp ca tối'); await h.noHScroll()
+      if (width >= 1280) {
+        // the side card is filled from the start with the first job of the list, and follows the filter until a job is picked
+        const detail = p.locator('.jdetail')
+        await expect(detail.getByRole('button', { name: 'Ứng tuyển ngay' })).toBeVisible(); await expect(p.locator('button.job.sel')).toHaveCount(1)
+        const firstTitle = await p.locator('button.job').first().locator('h3, b').first().innerText()
+        await expect(detail).toContainText(firstTitle)
+        await p.getByRole('button', { name: 'Kho hàng', exact: true }).click(); await expect(detail).toContainText('Soạn hàng kho mùa cao điểm')
+        await p.getByRole('button', { name: 'Tất cả', exact: true }).click()
+        await p.locator('button.job', { hasText: 'Pha chế ca sáng' }).first().click(); await expect(detail).toContainText('Pha chế ca sáng')
+        await p.getByRole('button', { name: 'Kho hàng', exact: true }).click(); await expect(detail).toContainText('Pha chế ca sáng') // a job the visitor picked stays
+        await p.getByRole('button', { name: 'Tất cả', exact: true }).click()
+      }
       // the menu down the left, the page title and today's date on top
       await expect(p.locator('.rail .navlabel')).toBeVisible(); await expect(p.locator('.top')).toContainText(/\d{2}\/\d{2}\/\d{4}/)
       await h.see('Xin chào'); await h.see('Việc làm cho bạn')
