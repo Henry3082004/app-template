@@ -15,6 +15,7 @@ import { useSession } from '../../lib/session'
 import type { CapyDraft, CapyMsg, CapySearch, Job } from '../../lib/types'
 import { Pay } from '../jobs/JobCard'
 import { SaveButton } from '../jobs/SaveButton'
+import { CapyBot } from './CapyBot'
 
 type Item = { role: 'user' | 'assistant'; text: string; search?: CapySearch; draft?: CapyDraft }
 
@@ -60,9 +61,7 @@ export function CapyChat() {
   return (
     <>
       {!open && (
-        <button type="button" className="capyfab" onClick={() => setOpen(true)} aria-label={t('capyFab')}>
-          <img src={capy('wave')} alt="" /><span>{t('capyFab')}</span>
-        </button>
+        <CapyBot onOpen={() => setOpen(true)} />
       )}
       {open && (
         <div className="capyscrim" onClick={() => setOpen(false)}>

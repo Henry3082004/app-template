@@ -157,7 +157,7 @@ export const vi = {
   applyAll: 'Ứng tuyển tất cả ({n})', compareBtn: 'So sánh ({n})', compareHint: 'Đánh dấu 2–3 việc để so sánh.', comparePick: 'So sánh', compareTitle: 'So sánh việc',
   applyAllSent: 'Đã gửi {n} đơn ứng tuyển.', applyAllSkipped: '{n} việc được bỏ qua vì đã ứng tuyển, đã đóng hoặc hết chỗ.', applyAllFailed: '{n} việc chưa gửi được. Vui lòng thử lại.',
   cmpPay: 'Lương', cmpDates: 'Ngày làm', cmpShift: 'Giờ làm', cmpPlace: 'Địa điểm', cmpShop: 'Quán', cmpSlots: 'Chỗ còn', cmpUrgent: 'Cần gấp', yes: 'Có', no: 'Không', openJob: 'Xem việc',
-  capyFab: 'Hỏi Capy', capyName: 'Capy', capyWho: 'Trợ lý việc làm', capyClose: 'Đóng', capySend: 'Gửi', capyPh: 'Nhập yêu cầu của bạn…', capyThinking: 'Capy đang suy nghĩ…',
+  capyFab: 'Hỏi Capy', capyGreet: 'Chào bạn! Mình là Capy 👋 Mình có thể giúp gì cho bạn?', capyName: 'Capy', capyWho: 'Trợ lý việc làm', capyClose: 'Đóng', capySend: 'Gửi', capyPh: 'Nhập yêu cầu của bạn…', capyThinking: 'Capy đang suy nghĩ…',
   capyHelloSeeker: 'Chào bạn, mình là Capy. Bạn muốn tìm việc gì, ở đâu? Cứ nói như nhắn tin, mình sẽ lọc giúp.',
   capyHelloEmployer: 'Chào bạn, mình là Capy. Bạn cần tuyển mấy người, làm việc gì, khi nào? Mình soạn sẵn tin để bạn chỉ cần kiểm tra rồi đăng.',
   capySugSeeker1: 'Việc phục vụ quán ăn gần trường Ngoại thương', capySugSeeker2: 'Việc cuối tuần, trên 30 nghìn một giờ', capySugSeeker3: 'Việc gấp ở Hà Nội',

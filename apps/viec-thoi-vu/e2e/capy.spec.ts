@@ -46,3 +46,34 @@ test('a shop tells Capy what it needs and gets a draft post to check and publish
   await p.getByRole('button', { name: 'Đăng tin', exact: true }).last().click(); await h.see('Vui lòng nhập mức lương')
   await p.locator('#p-pay').fill('35000'); await p.getByRole('button', { name: 'Đăng tin', exact: true }).last().click(); await h.see('Đã đăng tin!')
 })
+
+test.describe('Capy in the corner', () => {
+  test.use({ capyHello: true })
+  test('says hello on the first visit, can be dragged anywhere and stays there, a tap opens the chat', async ({ page: p }) => {
+    const h = helpers(p)
+    await p.goto('/app'); await h.see('Phụ bếp ca tối')
+    const say = p.getByRole('button', { name: /Mình có thể giúp gì cho bạn/ })
+    await expect(say).toBeVisible()
+    const me = p.getByRole('button', { name: 'Hỏi Capy' })
+    await expect(me).toBeVisible()
+    await p.waitForTimeout(1000) // the fly-in has landed
+    const a = (await me.boundingBox())!
+    const vp = p.viewportSize()!
+    expect(a.x + a.width).toBeGreaterThan(vp.width - 120) // starts in the bottom-right corner
+    // drag it to the top-left part of the screen
+    await p.mouse.move(a.x + a.width / 2, a.y + a.height / 2); await p.mouse.down()
+    await p.mouse.move(a.x - 40, a.y - 60, { steps: 4 }); await p.mouse.move(80, 200, { steps: 6 }); await p.mouse.up()
+    await expect(say).toHaveCount(0) // dragging hides the hello
+    await expect(p.getByRole('dialog', { name: 'Capy' })).toHaveCount(0) // a drag is not a tap
+    const b = (await me.boundingBox())!
+    expect(Math.abs(b.x + b.width / 2 - 80)).toBeLessThan(6); expect(Math.abs(b.y + b.height / 2 - 200)).toBeLessThan(6)
+    // the place is kept after reload, and no second hello in the same tab
+    await p.reload(); await h.see('Phụ bếp ca tối')
+    const c = (await me.boundingBox())!
+    expect(Math.abs(c.x - b.x)).toBeLessThan(4); expect(Math.abs(c.y - b.y)).toBeLessThan(4)
+    await expect(say).toHaveCount(0)
+    await me.click()
+    await expect(p.getByRole('dialog', { name: 'Capy' })).toContainText('Bạn muốn tìm việc gì')
+    await h.noHScroll()
+  })
+})

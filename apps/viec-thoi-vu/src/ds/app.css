@@ -526,9 +526,23 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 .savebtn.lg{width:52px;height:auto;min-height:52px;border-radius:16px}
 .detailcol .ctarow{max-width:360px}.detailcol .cta .ctarow .btn{max-width:none}
 /* ---------- Capy, the AI helper ---------- */
-.capyfab{position:fixed;left:14px;bottom:calc(84px + var(--safe-bottom));z-index:30;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 16px 0 8px;border:0;border-radius:999px;background:var(--p);color:#fff;font:700 14px var(--font-sans);box-shadow:var(--shadow-lg);cursor:pointer}
-.capyfab img{width:34px;height:34px;border-radius:50%;background:#fff;object-fit:cover}
-@media(min-width:600px){.capyfab{left:auto;right:24px;bottom:24px}}
+.capybot{position:fixed;right:12px;bottom:calc(150px + var(--safe-bottom));z-index:30;width:72px;height:72px}
+@media(min-width:600px){.capybot{right:24px;bottom:24px}}
+.capyme{position:relative;width:72px;height:72px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:var(--shadow-lg);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.capyme img{width:64px;height:64px;margin:4px;object-fit:contain;pointer-events:none;animation:capybob 3.2s ease-in-out infinite}
+.capyhand{position:absolute;left:-6px;top:4px;font-size:22px;line-height:1;transform-origin:70% 90%;pointer-events:none;opacity:0}
+.capybot.dragging .capyme{cursor:grabbing}.capybot.dragging .capyme img{animation:none;transform:scale(1.08) rotate(-8deg)}
+.capybot.hi{animation:capyfly .9s cubic-bezier(.2,1.25,.4,1) both}
+.capybot.hi .capyme img{animation:capywave .55s ease-in-out .9s 3,capybob 3.2s ease-in-out 2.6s infinite}
+.capybot.hi .capyhand{animation:capyhand .55s ease-in-out .9s 3}
+.capysay{position:absolute;bottom:calc(100% + 10px);right:0;width:max-content;max-width:min(240px,calc(100vw - 32px));padding:10px 14px;border:1px solid var(--line);border-radius:18px 18px 6px 18px;background:#fff;color:var(--tx);font:600 14px/1.4 var(--font-sans);text-align:left;box-shadow:var(--shadow-lg);cursor:pointer;animation:capysay .35s ease-out both}
+.capybot.hi .capysay{animation-delay:.9s}
+.capybot.onleft .capysay{right:auto;left:0;border-radius:18px 18px 18px 6px}
+@keyframes capyfly{0%{transform:translate(45vw,40vh) scale(.3) rotate(30deg);opacity:0}60%{opacity:1}100%{transform:none;opacity:1}}
+@keyframes capywave{0%,100%{transform:rotate(0)}30%{transform:rotate(-12deg)}70%{transform:rotate(10deg)}}
+@keyframes capyhand{0%,100%{opacity:1;transform:rotate(0)}50%{opacity:1;transform:rotate(30deg)}}
+@keyframes capybob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes capysay{from{opacity:0;transform:translateY(8px) scale(.9)}to{opacity:1;transform:none}}
 .capyscrim{position:fixed;inset:0;z-index:60;background:rgba(40,25,15,.35);display:flex;align-items:flex-end;justify-content:center}
 .capypanel{background:#fff;width:100%;max-width:520px;height:min(82dvh,640px);border-radius:24px 24px 0 0;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow-lg)}
 @media(min-width:600px){.capyscrim{background:transparent;align-items:flex-end;justify-content:flex-end;pointer-events:none}.capypanel{pointer-events:auto;margin:0 24px 24px 0;border-radius:24px;width:400px;height:min(78dvh,620px)}}
