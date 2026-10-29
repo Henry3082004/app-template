@@ -1,5 +1,5 @@
 // The contract every backend (Supabase or the in-memory mock) implements.
-import type { Role, JobStatus, AppStatus, Attendance, Profile, Job, MyApplication, MyJob, Applicant, Hire, Reputation, AppNotification, ChatMessage, ReportReason, AdminReport, DeletionRequest, AdminDeletion, SentInvite, FoundWorker, WorkerSearch, BankAccount, AdminDispute, AdminPayout, AdminFlag, AdminStats, AdminSamples, AppConfig, CompleteProfileInput, PendingProfile, Quote, ReceivedReview, SignUpInput, JobInput, ZaloLoginResult, ProfileUpdate } from './types'
+import type { Highlights, Role, JobStatus, AppStatus, Attendance, Profile, Job, MyApplication, MyJob, Applicant, Hire, Reputation, AppNotification, ChatMessage, ReportReason, AdminReport, DeletionRequest, AdminDeletion, SentInvite, FoundWorker, WorkerSearch, BankAccount, AdminDispute, AdminPayout, AdminFlag, AdminStats, AdminSamples, AppConfig, CompleteProfileInput, PendingProfile, Quote, ReceivedReview, SignUpInput, JobInput, ZaloLoginResult, ProfileUpdate } from './types'
 import type { QuizAnswers } from './quiz'
 
 export interface Api {
@@ -86,6 +86,8 @@ export interface Api {
   /** invite a worker who already did a shift for me to one of my open posts */
   inviteWorker(jobId: string, workerId: string): Promise<void>
   mySentInvites(): Promise<SentInvite[]>
+  /** counts + news for the home banner (anyone can read) */
+  homeHighlights(): Promise<Highlights>
   /** shops: workers who switched "let shops find me" on */
   searchWorkers(f: WorkerSearch): Promise<FoundWorker[]>
   /** workers: appear in shops' search (default off) */

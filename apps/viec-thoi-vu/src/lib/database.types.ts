@@ -1213,6 +1213,7 @@ export type Database = {
         }
       }
       has_applied: { Args: { p_job: string; uid: string }; Returns: boolean }
+      home_highlights: { Args: never; Returns: Json }
       invite_worker: {
         Args: { p_job: string; p_worker: string }
         Returns: undefined

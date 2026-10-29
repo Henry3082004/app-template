@@ -141,6 +141,13 @@ export interface AdminReport { id: string; reporter_name: string; target_id: str
 export interface DeletionRequest { status: 'open'; requested_at: string }
 export interface AdminDeletion { id: string; user_id: string; name: string; email: string | null; reason: string | null; status: 'open' | 'done' | 'cancelled'; requested_at: string }
 export interface SentInvite { job_id: string; worker_id: string }
+/** Numbers and news for the home banner: counts only, plus links an admin chose. */
+export interface Highlights {
+  open_jobs: number; new_jobs_7d: number; urgent_jobs: number; ready_workers: number
+  top_city: { name: string; n: number } | null
+  top_category: { name: string; n: number } | null
+  news: { title: string; sub: string; url: string; source: string }[]
+}
 /** A worker who chose to be found: shortened name, no phone. */
 export interface FoundWorker {
   user_id: string; name: string; city: string | null; birth_year: number | null; experience: Experience[]; availability: Availability[]

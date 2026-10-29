@@ -1,69 +1,128 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { BANNERS } from '../lib/banners'
+import { buildSlides } from '../lib/banners'
 import { capy } from '../lib/capy'
-import { useI18n } from '../lib/i18n'
+import { useHighlights } from '../lib/highlights'
+import { useI18n, type TKey } from '../lib/i18n'
+import { useSession } from '../lib/session'
 import { Ic } from './Ic'
 
 const EVERY_MS = 3000
+const SNAP = 0.2 // drag further than this share of the width (or flick fast) to change slide
 
-/** Slides across the top of the job list: moves on by itself every 3 s, stops while touched/hovered, swipe or tap the dots to browse. */
+/** Slides across the top of the job list. Moves on by itself every 3 s; drag it with a finger or the mouse, tap the dots or arrows,
+ *  or press ⏸. It waits while you hold it, while a control has keyboard focus, and when the tab is hidden. Loops forever. */
 export function Banners() {
   const { locale, t } = useI18n()
+  const { profile } = useSession()
+  const highlights = useHighlights()
+  const slides = useMemo(() => buildSlides(highlights, locale, profile?.role, (c) => t(`cat${c}` as TKey)), [highlights, locale, profile?.role, t])
+  const N = slides.length
   const track = useRef<HTMLDivElement>(null)
   const [cur, setCur] = useState(0)
-  const [paused, setPaused] = useState(false)
+  const [drag, setDrag] = useState<number | null>(null)
+  const [pressed, setPressed] = useState(false)
+  const [focused, setFocused] = useState(false)
+  const [userPaused, setUserPaused] = useState(false)
+  const [tick, setTick] = useState(0)
+  const prev = useRef(cur)
+  useEffect(() => { prev.current = cur }, [cur])
+  const reduce = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  const running = N > 1 && !userPaused && !pressed && !focused && !reduce
 
-  const go = useCallback((i: number) => {
-    const el = track.current
-    if (!el) return
-    const n = (i + BANNERS.length) % BANNERS.length
-    el.scrollTo({ left: n * el.clientWidth, behavior: 'smooth' })
-  }, [])
-
-  // keep the dots in step with swipes as well as automatic moves
-  const onScroll = () => {
-    const el = track.current
-    if (el && el.clientWidth) setCur(Math.round(el.scrollLeft / el.clientWidth))
-  }
+  const go = useCallback((i: number) => setCur(((i % N) + N) % N), [N])
+  useEffect(() => { if (cur >= N) setCur(0) }, [cur, N])
 
   useEffect(() => {
-    if (paused || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
-    const id = window.setInterval(() => { if (!document.hidden) go(cur + 1) }, EVERY_MS)
-    return () => window.clearInterval(id)
-  }, [paused, cur, go])
+    if (!running) return
+    const id = window.setTimeout(() => { if (document.hidden) setTick((x) => x + 1); else go(cur + 1) }, EVERY_MS)
+    return () => window.clearTimeout(id)
+  }, [running, cur, tick, go])
 
+  // ── dragging (mouse and touch; vertical swipes still scroll the page because of touch-action: pan-y) ──
+  const start = useRef<{ x: number; y: number; t: number } | null>(null)
+  const moved = useRef(false)
+  const down = (e: React.PointerEvent) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return
+    start.current = { x: e.clientX, y: e.clientY, t: Date.now() }; moved.current = false; setPressed(true)
+  }
+  const move = (e: React.PointerEvent) => {
+    const s = start.current
+    if (!s) return
+    const dx = e.clientX - s.x, dy = e.clientY - s.y
+    if (!moved.current && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy)) { moved.current = true; track.current?.setPointerCapture(e.pointerId) }
+    if (moved.current) setDrag(dx)
+  }
+  const up = (e: React.PointerEvent) => {
+    const s = start.current
+    start.current = null; setPressed(false)
+    if (!s || !moved.current) { setDrag(null); return }
+    const dx = e.clientX - s.x, w = track.current?.clientWidth || 1
+    const fast = Math.abs(dx) / Math.max(1, Date.now() - s.t) > 0.4 && Math.abs(dx) > 30
+    setDrag(null)
+    if (Math.abs(dx) > w * SNAP || fast) go(cur + (dx < 0 ? 1 : -1))
+    window.setTimeout(() => { moved.current = false }, 0) // lets the click that follows a drag be ignored
+  }
+  const cancel = () => { start.current = null; moved.current = false; setPressed(false); setDrag(null) }
+
+  const half = Math.floor(N / 2)
+  const rel = (i: number, c: number) => ((i - c + N + half) % N) - half
+
+  if (N === 0) return null
   return (
     <section
       className="banners"
       aria-roledescription="carousel"
       aria-label={t('bannersLabel')}
-      onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}
-      onTouchStart={() => setPaused(true)} onTouchEnd={() => setPaused(false)}
-      onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}
+      aria-live={running ? 'off' : 'polite'}
+      onFocus={(e) => { if ((e.target as HTMLElement).matches(':focus-visible')) setFocused(true) }}
+      onBlur={() => setFocused(false)}
+      onKeyDown={(e) => { if (e.key === 'ArrowLeft') go(cur - 1); else if (e.key === 'ArrowRight') go(cur + 1) }}
     >
-      <div className="bn-track" ref={track} onScroll={onScroll}>
-        {BANNERS.map((b, i) => {
-          const c = b.copy[locale]
+      <div
+        className={'bn-track' + (drag != null ? ' dragging' : '')} ref={track}
+        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={cancel}
+        onClickCapture={(e) => { if (moved.current) { e.preventDefault(); e.stopPropagation() } }}
+      >
+        {slides.map((s, i) => {
+          const r = rel(i, cur), jump = Math.abs(r - rel(i, prev.current)) > 1
+          const style: React.CSSProperties = {
+            transform: `translateX(calc(${r * 100}% + ${drag ?? 0}px))`,
+            transition: drag != null || jump ? 'none' : undefined,
+            visibility: Math.abs(r) > 1 ? 'hidden' : undefined,
+          }
+          const here = i === cur
           return (
             <div
-              key={b.id} className={`bn ${b.tone}${b.photo ? ' photo' : ''}`} style={b.photo ? { backgroundImage: `url(${b.photo})` } : undefined}
-              role="group" aria-roledescription="slide" aria-label={`${i + 1} / ${BANNERS.length}`} aria-hidden={i !== cur}
+              key={s.id} className={`bn ${s.tone}`} style={style}
+              role="group" aria-roledescription="slide" aria-label={`${i + 1} / ${N}`} aria-hidden={!here}
             >
-              <span className="bn-tag">{c.tag}</span>
-              <b className="bn-title">{c.title}</b>
-              <span className="bn-sub">{c.sub}</span>
-              {b.to && c.cta && <Link className="bn-cta" to={b.to} tabIndex={i === cur ? 0 : -1}>{c.cta} <Ic n="arrow" size={14} /></Link>}
-              <span className="bn-capy"><img src={capy(b.pose)} alt="" /></span>
+              <span className={'bn-tag' + (s.kind === 'stat' ? ' live' : '')}>{s.tag}</span>
+              <b className="bn-title">{s.title}</b>
+              <span className="bn-sub">{s.sub}</span>
+              {s.cta && s.to && <Link className="bn-cta" to={s.to} tabIndex={here ? 0 : -1} draggable={false}>{s.cta} <Ic n="arrow" size={14} /></Link>}
+              {s.cta && s.href && <a className="bn-cta" href={s.href} target="_blank" rel="noopener noreferrer" tabIndex={here ? 0 : -1} draggable={false}>{s.cta} <Ic n="arrow" size={14} /></a>}
+              <span className="bn-capy"><img src={capy(s.pose)} alt="" draggable={false} /></span>
             </div>
           )
         })}
       </div>
-      <button type="button" className="bn-arrow prev" aria-label={t('bannerPrev')} onClick={() => go(cur - 1)}><Ic n="chevL" size={18} /></button>
-      <button type="button" className="bn-arrow next" aria-label={t('bannerNext')} onClick={() => go(cur + 1)}><Ic n="chevR" size={18} /></button>
-      <div className="bn-dots">
-        {BANNERS.map((b, i) => <button key={b.id} type="button" className={i === cur ? 'on' : ''} aria-label={`${i + 1} / ${BANNERS.length}`} aria-current={i === cur} onClick={() => go(i)}><i /></button>)}
-      </div>
+      {N > 1 && (
+        <>
+          <button type="button" className="bn-arrow prev" aria-label={t('bannerPrev')} onClick={() => go(cur - 1)}><Ic n="chevL" size={18} /></button>
+          <button type="button" className="bn-arrow next" aria-label={t('bannerNext')} onClick={() => go(cur + 1)}><Ic n="chevR" size={18} /></button>
+          <div className="bn-dots">
+            {slides.map((s, i) => (
+              <button key={s.id} type="button" className={i === cur ? 'on' : ''} aria-label={`${i + 1} / ${N}`} aria-current={i === cur} onClick={() => go(i)}>
+                <i>{i === cur && <b key={`${cur}:${running}`} style={{ animationPlayState: running ? 'running' : 'paused' }} />}</i>
+              </button>
+            ))}
+          </div>
+          <button type="button" className="bn-pause" aria-label={t(userPaused ? 'bannerPlay' : 'bannerPause')} aria-pressed={userPaused} onClick={() => setUserPaused((p) => !p)}>
+            <Ic n={userPaused ? 'play' : 'pause'} size={14} />
+          </button>
+        </>
+      )}
     </section>
   )
 }

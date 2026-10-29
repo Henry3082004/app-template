@@ -9,6 +9,7 @@ export const queryClient = new QueryClient({
 /** Query keys in one place, so a change can refresh every screen that shows the same data. */
 export const qk = {
   config: ['config'] as const,
+  highlights: ['highlights'] as const,
   hires: (uid: string | undefined) => ['hires', uid] as const,
   mine: (uid: string | undefined) => ['mine', uid] as const,
   sentInvites: (uid: string | undefined) => ['sentInvites', uid] as const,

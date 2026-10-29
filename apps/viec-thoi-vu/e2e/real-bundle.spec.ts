@@ -22,6 +22,7 @@ test('production bundle: anonymous visitor sees jobs, employer reputation and jo
     const json = (body: unknown) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) })
     if (u.pathname.endsWith('/rpc/app_config')) return json(config)
     if (u.pathname.endsWith('/rpc/role_reputations')) return json([rep])
+    if (u.pathname.endsWith('/rpc/home_highlights')) return json({ open_jobs: 7, new_jobs_7d: 0, urgent_jobs: 0, ready_workers: 0, top_city: null, top_category: null, news: [] })
     if (u.pathname.endsWith('/rest/v1/jobs')) {
       const single = r.request().headers()['accept']?.includes('vnd.pgrst.object')
       return json(single ? job : [job])
@@ -29,10 +30,12 @@ test('production bundle: anonymous visitor sees jobs, employer reputation and jo
     return json([])
   })
   await p.goto(url(PORTS.real, '/app')); await h.see('Phụ bếp thử nghiệm'); await h.see('Quán Thử Nghiệm'); await h.see('35.000đ')
+  await h.see('7 việc đang mở, ứng tuyển ngay') // the banner shows the numbers the database returned
   await expect(p.locator('button.job', { hasText: 'Phụ bếp thử nghiệm' }).getByText('3 ca xong')).toBeVisible()
   await p.locator('button.job', { hasText: 'Phụ bếp thử nghiệm' }).click(); await h.see('Rửa rau, sơ chế'); await h.see('4.5')
   await p.getByRole('button', { name: 'Ứng tuyển ngay' }).first().click(); await h.see('Tiếp tục với Google')
   await expect(p.locator('#a-pass')).toHaveCount(0)
   expect(calls).toContain('POST /rest/v1/rpc/app_config')
   expect(calls).toContain('POST /rest/v1/rpc/role_reputations')
+  expect(calls).toContain('POST /rest/v1/rpc/home_highlights')
 })

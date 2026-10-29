@@ -315,9 +315,9 @@ textarea.inp{min-height:84px;resize:vertical}
 .jwrap{max-width:1240px;margin:0 auto;padding:12px 12px 24px}
 .jlist{min-width:0}
 .banners{display:block;position:relative;border-radius:28px;overflow:hidden}
-.bn-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.bn-track::-webkit-scrollbar{display:none}
-.bn{flex:0 0 100%;scroll-snap-align:center;position:relative;overflow:hidden;min-height:218px;padding:20px 20px 52px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:6px;color:#fff;background-size:cover;background-position:center}
+.bn-track{display:grid;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab}
+.bn-track.dragging{cursor:grabbing}
+.bn{grid-area:1/1;transition:transform .45s cubic-bezier(.22,.8,.3,1);will-change:transform;position:relative;overflow:hidden;min-height:218px;padding:20px 20px 52px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:6px;color:#fff;background-size:cover;background-position:center}
 .bn.t1{background-color:#8F4519;background-image:radial-gradient(circle at 85% 15%,rgba(255,214,170,.35),transparent 55%),linear-gradient(135deg,#74370F,#B35A24)}
 .bn.t2{background-color:#3F6140;background-image:radial-gradient(circle at 85% 15%,rgba(233,240,228,.3),transparent 55%),linear-gradient(135deg,#3F6140,#6B8E67)}
 .bn.t3{background-color:#2F5470;background-image:radial-gradient(circle at 85% 15%,rgba(232,238,243,.3),transparent 55%),linear-gradient(135deg,#2F5470,#6E93B0)}
@@ -334,8 +334,16 @@ textarea.inp{min-height:84px;resize:vertical}
 .bn .bn-capy img{width:58px;height:auto;margin-top:6px;pointer-events:none}
 .bn-dots{position:absolute;left:14px;bottom:26px;display:flex}
 .bn-dots button{background:none;border:0;padding:0 3px;min-width:24px;min-height:28px;display:grid;place-items:center;cursor:pointer}
-.bn-dots i{display:block;width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.55);transition:width .2s,background .2s}
-.bn-dots .on i{width:22px;background:#fff}
+.bn-dots i{display:block;width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.55);transition:width .2s,background .2s;overflow:hidden;position:relative}
+.bn-dots .on i{width:30px;background:rgba(255,255,255,.45)}
+.bn-dots .on i b{position:absolute;left:0;top:0;bottom:0;background:#fff;border-radius:4px;animation:bnfill 3s linear forwards}
+@keyframes bnfill{from{width:0}to{width:100%}}
+.bn-pause{position:absolute;right:14px;bottom:24px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,.28);color:#fff;display:grid;place-items:center;cursor:pointer;z-index:2}
+.bn-pause:hover{background:rgba(255,255,255,.45)}
+.bn-tag.live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#2FBF71;margin-right:6px;vertical-align:1px;animation:bnpulse 1.6s ease-in-out infinite}
+@keyframes bnpulse{0%,100%{box-shadow:0 0 0 0 rgba(47,191,113,.55)}60%{box-shadow:0 0 0 6px rgba(47,191,113,0)}}
+.bn-title{padding-right:72px}@media(min-width:600px){.bn-title{padding-right:0}}
+@media(prefers-reduced-motion:reduce){.bn{transition:none}.bn-tag.live::before,.bn-dots .on i b{animation:none}.bn-dots .on i b{width:100%}}
 .bn-arrow{display:none;position:absolute;top:50%;margin-top:-22px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.85);color:var(--brand-600);place-items:center;cursor:pointer;z-index:2;box-shadow:var(--shadow-sm)}
 .bn-arrow:hover{background:#fff}
 .bn-arrow.prev{left:16px}.bn-arrow.next{right:16px}
@@ -394,7 +402,6 @@ textarea.inp{min-height:84px;resize:vertical}
 .searchcard{margin:-40px 24px 0}
 }
 @media(min-width:600px) and (max-width:1023px){.bn{padding-right:220px}.bn .bn-capy{right:72px;width:124px;height:124px;margin-top:-78px}.bn .bn-capy img{width:108px}}
-@media(prefers-reduced-motion:reduce){.bn-track{scroll-behavior:auto}}
 .top nav a,.top .logo{white-space:nowrap}
 @media(min-width:1024px) and (max-width:1199px){.top{gap:12px;padding:0 20px}.top nav a{padding:10px 12px}.top .right{gap:8px}}
 @media(min-width:1024px){.page-scroll>.pg{max-width:1240px;margin-left:auto;margin-right:auto}.acct{max-width:none}}

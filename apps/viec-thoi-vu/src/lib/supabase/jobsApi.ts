@@ -1,7 +1,16 @@
-import { type Api, type Applicant, type Hire, type JobInput, type MyApplication, type MyJob } from '../types'
+import { type Api, type Highlights, type Applicant, type Hire, type JobInput, type MyApplication, type MyJob } from '../types'
 import { sb, JOB_COLS, fail, rpc, toJob, uid, WORKER_COLS, toWorker, phonesOf, ESCROW_COLS, otherReviewed, reviewedSet, payoutsOf, toEscrow } from './core'
 
-export const jobsApi: Pick<Api, 'listOpenJobs' | 'getJob' | 'myApplicationStatus' | 'apply' | 'myApplications' | 'withdraw' | 'myJobs' | 'createJob' | 'setJobStatus' | 'applicantsFor' | 'myHires' | 'decide'> = {
+export const jobsApi: Pick<Api, 'homeHighlights' | 'listOpenJobs' | 'getJob' | 'myApplicationStatus' | 'apply' | 'myApplications' | 'withdraw' | 'myJobs' | 'createJob' | 'setJobStatus' | 'applicantsFor' | 'myHires' | 'decide'> = {
+  async homeHighlights() {
+    // tolerate an odd answer: the banner then just shows the fixed tips
+    const r = ((await rpc('home_highlights')) ?? {}) as Partial<Highlights>
+    const named = (v: unknown) => (v && typeof v === 'object' && typeof (v as { name?: unknown }).name === 'string' ? (v as { name: string; n: number }) : null)
+    return {
+      open_jobs: Number(r.open_jobs) || 0, new_jobs_7d: Number(r.new_jobs_7d) || 0, urgent_jobs: Number(r.urgent_jobs) || 0, ready_workers: Number(r.ready_workers) || 0,
+      top_city: named(r.top_city), top_category: named(r.top_category), news: Array.isArray(r.news) ? r.news : [],
+    }
+  },
   async listOpenJobs() {
     const { data, error } = await sb.from('jobs').select(JOB_COLS).eq('status', 'open')
       .order('is_urgent', { ascending: false }).order('created_at', { ascending: false }).limit(200)

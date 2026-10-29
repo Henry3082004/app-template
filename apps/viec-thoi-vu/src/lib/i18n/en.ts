@@ -140,7 +140,7 @@ export const en: Dict = {
   quizDoneEmployer: 'Posting takes 1 minute and people apply the same day.', quizPostJob: 'Post a job', quizSeeJobs: 'Look at jobs first', quizSeeFit: 'See jobs for you',
   quizAdminTitle: 'Quick questions (admin only)', quizAdminHint: 'Take the questions new people see when they open the app, to try the wording. Your answers replace this account’s earlier ones.', quizAdminBtn: 'Try the questions',
   fitTag: 'Good fit',
-  bannersLabel: 'Highlights', bannerPrev: 'Previous banner', bannerNext: 'Next banner',
+  bannersLabel: 'Highlights', bannerPrev: 'Previous banner', bannerNext: 'Next banner', bannerPause: 'Pause banner', bannerPlay: 'Play banner',
   logoAdd: 'Add shop logo / photo', logoChange: 'Change shop logo / photo', logoHint: 'Shown next to your shop name on all your job posts.',
   footAbout: 'About', footTerms: 'Terms', footPrivacy: 'Privacy',
   adminTabSamples: 'Sample data', samplesHint: 'Admins only. Real users never see these sample shops, jobs and workers, and they are left out of the stats.', samplesShops: 'Sample shops', samplesWorkers: 'Sample workers', samplesJobsN: '{n} jobs', samplesAppsN: '{n} applications',

@@ -1,7 +1,21 @@
 import { AppError, type Api, type Job } from '../types'
-import { CFG, isPro, NEW_PAY, now, nid, notify, users, jobs, apps, payouts, current, wait, me, jobOf, bizOf, escrowOf } from './core'
+import { CFG, discoverable, isPro, NEW_PAY, now, nid, notify, users, jobs, apps, payouts, current, wait, me, jobOf, bizOf, escrowOf } from './core'
 
-export const jobsMock: Pick<Api, 'listOpenJobs' | 'getJob' | 'myApplicationStatus' | 'apply' | 'myApplications' | 'withdraw' | 'myJobs' | 'createJob' | 'setJobStatus' | 'applicantsFor' | 'myHires' | 'decide'> = {
+export const jobsMock: Pick<Api, 'homeHighlights' | 'listOpenJobs' | 'getJob' | 'myApplicationStatus' | 'apply' | 'myApplications' | 'withdraw' | 'myJobs' | 'createJob' | 'setJobStatus' | 'applicantsFor' | 'myHires' | 'decide'> = {
+  async homeHighlights() {
+    const open = jobs.filter((j) => j.status === 'open')
+    const top = (key: 'city' | 'category') => {
+      const n: Record<string, number> = {}
+      open.forEach((j) => { const v = j[key]; if (v) n[v] = (n[v] ?? 0) + 1 })
+      const best = Object.entries(n).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]
+      return best ? { name: best[0], n: best[1] } : null
+    }
+    return wait({
+      open_jobs: open.length, new_jobs_7d: open.length, urgent_jobs: open.filter((j) => j.is_urgent).length, ready_workers: discoverable.size,
+      top_city: top('city'), top_category: top('category'),
+      news: [{ title: 'Tuyển dụng TPHCM cận Tết 2026 dự kiến nhu cầu lên tới 30.000 vị trí', sub: 'Bài báo về nhu cầu tuyển dụng dịp cận Tết ở TP.HCM.', url: 'https://voh.com.vn/kinh-te/tuyen-dung-tphcm-can-tet-2026-du-kien-nhu-cau-len-toi-30000-vi-tri-630672.html', source: 'VOH' }],
+    })
+  },
   async listOpenJobs() { return wait(jobs.filter((j) => j.status === 'open')) },
   async getJob(id) { return wait(jobs.find((j) => j.id === id) ?? null) },
 
