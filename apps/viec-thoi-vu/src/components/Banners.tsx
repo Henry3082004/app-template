@@ -8,10 +8,23 @@ import { useSession } from '../lib/session'
 import { Ic } from './Ic'
 
 const EVERY_MS = 3000
+
+/** Follows the "reduce motion" setting of the device, also when it changes while the page is open. */
+function useReducedMotion() {
+  const [reduce, setReduce] = useState(() => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
+  useEffect(() => {
+    const m = window.matchMedia?.('(prefers-reduced-motion: reduce)')
+    if (!m) return
+    const on = () => setReduce(m.matches)
+    m.addEventListener('change', on)
+    return () => m.removeEventListener('change', on)
+  }, [])
+  return reduce
+}
 const SNAP = 0.2 // drag further than this share of the width (or flick fast) to change slide
 
-/** Slides across the top of the job list. Moves on by itself every 3 s; drag it with a finger or the mouse, tap the dots or arrows,
- *  or press ⏸. It waits while you hold it, while a control has keyboard focus, and when the tab is hidden. Loops forever. */
+/** Slides across the top of the job list. Moves on by itself every 3 s; drag it with a finger or the mouse, or tap the dots or arrows.
+ *  It waits while you hold it, while a control has keyboard focus, when the tab is hidden, and for people who asked for less motion. Loops forever. */
 export function Banners() {
   const { locale, t } = useI18n()
   const { profile } = useSession()
@@ -23,12 +36,11 @@ export function Banners() {
   const [drag, setDrag] = useState<number | null>(null)
   const [pressed, setPressed] = useState(false)
   const [focused, setFocused] = useState(false)
-  const [userPaused, setUserPaused] = useState(false)
   const [tick, setTick] = useState(0)
   const prev = useRef(cur)
   useEffect(() => { prev.current = cur }, [cur])
-  const reduce = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-  const running = N > 1 && !userPaused && !pressed && !focused && !reduce
+  const reduce = useReducedMotion()
+  const running = N > 1 && !pressed && !focused && !reduce
 
   const go = useCallback((i: number) => setCur(((i % N) + N) % N), [N])
   useEffect(() => { if (cur >= N) setCur(0) }, [cur, N])
@@ -118,9 +130,6 @@ export function Banners() {
               </button>
             ))}
           </div>
-          <button type="button" className="bn-pause" aria-label={t(userPaused ? 'bannerPlay' : 'bannerPause')} aria-pressed={userPaused} onClick={() => setUserPaused((p) => !p)}>
-            <Ic n={userPaused ? 'play' : 'pause'} size={14} />
-          </button>
         </>
       )}
     </section>

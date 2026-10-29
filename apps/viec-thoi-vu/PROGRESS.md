@@ -167,7 +167,7 @@ Tuyển người (Tin đăng | Ứng viên, đăng lại tin cũ) · Ca làm (C�
 - 92 test đạt sau mỗi phần.
 
 ## 01/11/2026 — Banner trang chủ "sống"
-- Kéo được bằng tay và bằng chuột, vòng lặp vô tận, tự chuyển mỗi 3 giây (không còn dừng khi rê chuột; dừng khi đang giữ/kéo, có nút ⏸ / ▶, tab ẩn, hoặc người dùng tắt hiệu ứng chuyển động). Chấm của slide hiện tại chạy thanh tiến độ 3 giây.
+- Kéo được bằng tay và bằng chuột, vòng lặp vô tận, tự chuyển mỗi 3 giây (không còn dừng khi rê chuột; dừng khi đang giữ/kéo, tab ẩn, hoặc người dùng tắt hiệu ứng chuyển động). Chấm của slide hiện tại chạy thanh tiến độ 3 giây.
 - Ba loại slide trộn xen kẽ: số liệu thật từ cơ sở dữ liệu (việc đang mở, tin mới 7 ngày, khu vực và ngành nhiều việc nhất, việc gấp, số người sẵn sàng; chỉ hiện khi từ 3 trở lên, không bịa số), tin tức có link ngoài (mở tab mới), mẹo cho người tìm việc / quán. Slide hợp với vai trò người đang đăng nhập được xếp lên trước.
 - Tin tức đặt ở `app_settings.home_news`; hai tin đầu mới lấy từ tiêu đề tìm kiếm, CHƯA ai mở đọc kỹ: nên xem lại và thay bằng bài chọn lọc.
 - 92 test đạt (có test kéo chuột, tạm dừng, vòng lặp, link tin tức).

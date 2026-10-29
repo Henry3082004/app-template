@@ -14,7 +14,7 @@ test('banner: real numbers first, moves on by itself every 3 s, dots and arrows 
   await expect(read).toHaveAttribute('target', '_blank'); await expect(read).toHaveAttribute('rel', /noopener/); await expect(read).toHaveAttribute('href', /^https:\/\//)
   // dots and arrows jump around; it loops from the last back to the first
   await dots.nth(7).click(); await expect(dots.nth(7)).toHaveAttribute('aria-current', 'true')
-  await p.locator('.bn-pause').click() // stop the timer so the next checks are steady
+  await p.emulateMedia({ reducedMotion: 'reduce' }) // stops the timer, as for people who asked for less motion, so the next checks are steady
   await p.locator('.bn-arrow.next').evaluate((b: HTMLElement) => b.click()); await expect(dots.nth(0)).toHaveAttribute('aria-current', 'true')
   await p.locator('.bn-arrow.prev').evaluate((b: HTMLElement) => b.click()); await expect(dots.nth(7)).toHaveAttribute('aria-current', 'true')
   // the banner is above the job list
@@ -23,17 +23,20 @@ test('banner: real numbers first, moves on by itself every 3 s, dots and arrows 
   await h.noHScroll()
 })
 
-test('banner: drag it with the mouse, pause and play, and a call-to-action opens the right page', async ({ page: p }) => {
+test('banner: it waits while held, can be dragged with the mouse, follows reduced motion, and a call-to-action opens the right page', async ({ page: p }) => {
   const h = helpers(p)
   await p.goto('/app'); await h.see('Phụ bếp ca tối')
-  const dots = p.locator('.bn-dots button'), pause = p.locator('.bn-pause')
+  const dots = p.locator('.bn-dots button')
   await expect(dots.nth(0)).toHaveAttribute('aria-current', 'true')
-  // pause: stays on the same slide for longer than 3 s
-  await pause.click(); await expect(pause).toHaveAttribute('aria-pressed', 'true')
+  await expect(p.locator('.bn-pause')).toHaveCount(0) // there is no pause button
+  // holding the banner (finger or mouse down) keeps it on the same slide for longer than 3 s
+  const box = (await p.locator('.bn-track').boundingBox())!
+  await p.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await p.mouse.down()
   await p.waitForTimeout(4000)
   await expect(dots.nth(0)).toHaveAttribute('aria-current', 'true')
-  // drag left = next slide, drag right = back
-  const box = (await p.locator('.bn-track').boundingBox())!
+  await p.mouse.up()
+  // drag left = next slide, drag right = back (timer off so the checks are steady)
+  await p.emulateMedia({ reducedMotion: 'reduce' })
   const swipe = async (from: number, to: number) => {
     const y = box.y + box.height / 2
     await p.mouse.move(box.x + from, y); await p.mouse.down(); await p.mouse.move(box.x + (from + to) / 2, y, { steps: 4 }); await p.mouse.move(box.x + to, y, { steps: 4 }); await p.mouse.up()
@@ -42,8 +45,8 @@ test('banner: drag it with the mouse, pause and play, and a call-to-action opens
   await swipe(box.width * 0.3, box.width * 0.8); await expect(dots.nth(0)).toHaveAttribute('aria-current', 'true')
   // a short drag snaps back
   await swipe(box.width * 0.5, box.width * 0.45); await expect(dots.nth(0)).toHaveAttribute('aria-current', 'true')
-  // play again: moves on by itself
-  await pause.click(); await expect(pause).toHaveAttribute('aria-pressed', 'false')
+  // motion allowed again: it moves on by itself
+  await p.emulateMedia({ reducedMotion: 'no-preference' })
   await expect(dots.nth(1)).toHaveAttribute('aria-current', 'true', { timeout: 6000 })
   // the tip's button goes to the right place
   await dots.nth(2).click(); await p.getByRole('link', { name: /Hoàn thiện hồ sơ/ }).click(); await h.see('Đăng nhập')

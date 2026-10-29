@@ -152,7 +152,7 @@ export const vi = {
   quizDoneEmployer: 'Đăng tin chỉ mất 1 phút, người làm nhận đơn ngay trong ngày.', quizPostJob: 'Đăng tin tuyển', quizSeeJobs: 'Xem việc trước đã', quizSeeFit: 'Xem việc hợp với bạn',
   quizAdminTitle: 'Bộ câu hỏi nhanh (chỉ admin)', quizAdminHint: 'Làm lại bộ câu hỏi người mới thấy khi mở app, để thử cách hỏi. Câu trả lời ghi đè câu trả lời trước của tài khoản này.', quizAdminBtn: 'Làm thử bộ câu hỏi',
   fitTag: 'Hợp với bạn',
-  bannersLabel: 'Thông tin nổi bật', bannerPrev: 'Banner trước', bannerNext: 'Banner sau', bannerPause: 'Tạm dừng banner', bannerPlay: 'Chạy banner',
+  bannersLabel: 'Thông tin nổi bật', bannerPrev: 'Banner trước', bannerNext: 'Banner sau',
   logoAdd: 'Thêm logo / ảnh quán', logoChange: 'Đổi logo / ảnh quán', logoHint: 'Hiện cạnh tên quán trên mọi tin tuyển của bạn.',
   footAbout: 'Giới thiệu', footTerms: 'Điều khoản', footPrivacy: 'Bảo mật',
   adminTabSamples: 'Dữ liệu mẫu', samplesHint: 'Chỉ admin thấy. Người dùng thật không thấy quán, tin và nhân viên mẫu này, và chúng không tính vào số liệu.', samplesShops: 'Quán mẫu', samplesWorkers: 'Nhân viên mẫu', samplesJobsN: '{n} tin', samplesAppsN: '{n} đơn ứng tuyển',
