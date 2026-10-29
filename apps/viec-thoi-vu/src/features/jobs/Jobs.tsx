@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Ic } from '../../components/Ic'
 import { Banners } from '../../components/Banners'
 import { JobCard } from './JobCard'
@@ -10,7 +10,6 @@ import { capy } from '../../lib/capy'
 import { km, locate, type Coords } from '../../lib/geo'
 import { useI18n, type TKey } from '../../lib/i18n'
 import { fitScore, isFit, useQuizAnswers } from '../../lib/quiz'
-import { useSaved } from '../../lib/saved'
 import { useSession } from '../../lib/session'
 import type { AppStatus, Category, Job, PayUnit, Reputation } from '../../lib/types'
 import { useBp } from '../../lib/useBp'
@@ -52,7 +51,6 @@ export default function Jobs() {
   const [single, setSingle] = useState<Job | null | undefined>(undefined)
   const searchRef = useRef<HTMLInputElement>(null)
   const quiz = useQuizAnswers()
-  const saved = useSaved()
 
   const load = useCallback(() => {
     setError(null)
@@ -167,12 +165,9 @@ export default function Jobs() {
   const sortLine = (
     <div className="sortline">
       {jobs && <span className="jcount"><b>{shown.length}</b> {t('jobsOpen')}</span>}
-      <span className="row" style={{ gap: 8 }}>
-      {saved.ids.length > 0 && <Link className="chip" to="/app/da-luu" aria-label={t('savedCount', { n: saved.ids.length })}><Ic n="bookmark" size={16} />{saved.ids.length}</Link>}
       <Chip on={!!coords} onClick={coords ? () => setCoords(null) : findMe} disabled={loc === 'busy'}>
         <Ic n="pin" size={16} />{loc === 'busy' ? t('locating') : t('nearMe')}
       </Chip>
-      </span>
     </div>
   )
   const chips = FILTERS.map((f) => <Chip key={f.id} on={filter === f.id} onClick={() => setFilter(f.id)}>{f.id === 'urgent' && <Ic n="zap" size={14} />}{t(f.key)}</Chip>)

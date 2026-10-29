@@ -139,7 +139,7 @@ export const en: Dict = {
   quizDoneEmployer: 'Posting takes 1 minute and people apply the same day.', quizPostJob: 'Post a job', quizSeeJobs: 'Look at jobs first', quizSeeFit: 'See jobs for you',
   quizAdminTitle: 'Quick questions (admin only)', quizAdminHint: 'Take the questions new people see when they open the app, to try the wording. Your answers replace this account’s earlier ones.', quizAdminBtn: 'Try the questions',
   fitTag: 'Good fit',
-  saveJob: 'Save job', unsaveJob: 'Remove from saved', savedTab: 'Saved', savedTitle: 'Saved jobs', savedCount: 'Saved jobs ({n})',
+  saveJob: 'Save job', unsaveJob: 'Remove from saved', savedTab: 'Saved', savedTitle: 'Saved jobs',
   savedEmpty: 'No saved jobs yet', savedEmptySub: 'Tap the save icon on a job to look at it again, compare, and apply to several at once.',
   savedGuestNote: 'This list is kept on this device. Sign in to keep it in your account and see it on other devices.', jobClosed: 'Post closed',
   applyAll: 'Apply to all ({n})', compareBtn: 'Compare ({n})', compareHint: 'Tick 2–3 jobs to compare.', comparePick: 'Compare', compareTitle: 'Compare jobs',

@@ -12,7 +12,6 @@ import { useSession } from '../../lib/session'
 import type { Job, Profile, Reputation } from '../../lib/types'
 import { useAction } from '../../lib/useAction'
 import { Rep } from '../shifts/escrow'
-import { ShiftTabs } from '../shifts/ShiftTabs'
 import { Pay } from './JobCard'
 
 const isOpen = (j: Job | null | undefined): boolean => !!j && j.status === 'open' && j.slots - j.filled > 0
@@ -58,7 +57,6 @@ export default function Saved() {
   return (
     <div className="page-scroll"><div className="pg wide">
       <h1 className="ptitle" style={{ marginBottom: 16 }}>{t('savedTitle')}</h1>
-      {profile && <ShiftTabs />}
       {!profile && ids.length > 0 && <div className="notice info">{t('savedGuestNote')}</div>}
       {!saved.ready && <Skel n={2} />}
       {saved.ready && ids.length === 0 && <Empty pose="empty" title={t('savedEmpty')} sub={t('savedEmptySub')}><Btn onClick={() => nav('/app')}>{t('findJobs')}</Btn></Empty>}

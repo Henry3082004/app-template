@@ -517,3 +517,8 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 .cmp td{min-width:110px}.cmp .pay{font-size:16px}
 .cmp thead th{font-family:var(--font-head);font-size:15px}
 .cmp tbody th{color:var(--tx2);font-weight:600;width:76px}
+.navbadge.cart{background:var(--p)}
+.ic.bump{animation:cartbump .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes cartbump{0%{transform:scale(1)}40%{transform:scale(1.28)}100%{transform:scale(1)}}
+.flydot{position:fixed;z-index:1000;width:28px;height:28px;border-radius:50%;background:var(--p);box-shadow:0 4px 12px rgba(143,69,25,.35);pointer-events:none}
+.flydot::after{content:"+";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font:800 18px/1 var(--font-sans)}

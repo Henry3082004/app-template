@@ -41,7 +41,7 @@ export default function MyApplications() {
     return (
       <div className="page-scroll"><div className="pg">
         <h1 className="ptitle">{t('appliedTitlePage')}</h1>
-        <Empty pose="wave" title={t('loginToSee')}><Btn onClick={() => askAuth({ role: 'seeker' })}>{t('login')}</Btn><Btn v="ghost" onClick={() => nav('/app/da-luu')}>{t('savedTitle')}</Btn></Empty>
+        <Empty pose="wave" title={t('loginToSee')}><Btn onClick={() => askAuth({ role: 'seeker' })}>{t('login')}</Btn></Empty>
       </div></div>
     )
   }

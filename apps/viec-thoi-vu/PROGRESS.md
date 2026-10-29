@@ -179,7 +179,7 @@ Tuyển người (Tin đăng | Ứng viên, đăng lại tin cũ) · Ca làm (C�
 
 ## 01/11/2026 — Việc đã lưu (giống giỏ hàng)
 - Nút lưu (biểu tượng đánh dấu) trên mỗi thẻ việc và trong trang chi tiết. Chưa đăng nhập: lưu trên máy; đăng nhập: tự chuyển vào tài khoản (bảng `saved_jobs`), xem được trên máy khác.
-- Nút "đã lưu (n)" cạnh "Việc gần tôi" mở trang **Việc đã lưu** (`/app/da-luu`, cũng là tab "Đã lưu" cạnh Chấm công / Đơn ứng tuyển).
+- Nút lưu là dấu + (đã lưu thành ✓); bấm lưu có chấm bay vào biểu tượng giỏ "Đã lưu" trên menu (có số đếm, nảy lên khi nhận). Menu "Đã lưu" mở trang **Việc đã lưu** (`/app/da-luu`).
 - Trang Việc đã lưu: đánh dấu 2–3 việc → **So sánh** (lương, ngày, giờ làm, địa điểm, quán + uy tín, chỗ còn, gấp); **Ứng tuyển tất cả** gửi ngay mọi việc còn mở, chỉ tự bỏ qua việc đã ứng tuyển / đã đóng / hết chỗ (theo yêu cầu: không hỏi lại, không giới hạn số lượng, không cảnh báo trùng giờ).
 - Chính sách bảo mật thêm mục "Việc đã lưu". 96 test đạt.
 - AI (tìm việc bằng một câu, viết tin giúp quán): để sau khi ra mắt.

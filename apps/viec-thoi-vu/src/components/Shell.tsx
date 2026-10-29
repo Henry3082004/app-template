@@ -5,13 +5,15 @@ import { api } from '../lib/api'
 import { LOGO } from '../lib/capy'
 import { needsAction } from '../lib/hires'
 import { useI18n, type TKey } from '../lib/i18n'
+import { useSaved } from '../lib/saved'
 import { useSession } from '../lib/session'
 import { Ic, type IconName } from './Ic'
 import { Avatar, Btn } from './ui'
 
 /** Title shown in the desktop top bar for the page at `path`. */
 function pageTitle(path: string): TKey {
-  if (path.startsWith('/app/da-ung-tuyen') || path.startsWith('/app/cham-cong') || path.startsWith('/app/da-luu')) return 'navShifts'
+  if (path.startsWith('/app/da-luu')) return 'savedTitle'
+  if (path.startsWith('/app/da-ung-tuyen') || path.startsWith('/app/cham-cong')) return 'navShifts'
   if (path.startsWith('/app/thu-nhap')) return 'navIncome'
   if (path.startsWith('/app/tai-khoan')) return 'navAccount'
   if (path.startsWith('/app/dang-tin')) return 'postTitle'
@@ -24,7 +26,7 @@ function pageTitle(path: string): TKey {
   return 'navJobs'
 }
 
-interface Item { to: string; ico: IconName; label: string; end?: boolean; match?: string[]; badge?: number }
+interface Item { to: string; ico: IconName; label: string; end?: boolean; match?: string[]; badge?: number; cart?: boolean }
 
 /** Phone: bottom bar · tablet: left rail · desktop (≥1280px): top bar. Visibility is pure CSS. */
 export function Shell({ children }: { children: ReactNode }) {
@@ -45,6 +47,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   // unread notifications → red number on the bell (refreshed when you move around, every minute, and when one is opened)
   const [unread, setUnread] = useState(0)
+  const saved = useSaved()
   const refreshUnread = useCallback(() => {
     if (!profile) { setUnread(0); return }
     api.unreadCount().then(setUnread).catch(() => undefined)
@@ -71,13 +74,15 @@ export function Shell({ children }: { children: ReactNode }) {
     : profile
       ? [
           { to: '/app', ico: 'briefcase', label: t('navJobs'), end: true, match: ['/app/viec'] },
-          { to: '/app/cham-cong', ico: 'clipboard', label: t('navShifts'), match: ['/app/da-ung-tuyen', '/app/da-luu'] },
+          { to: '/app/cham-cong', ico: 'clipboard', label: t('navShifts'), match: ['/app/da-ung-tuyen'] },
+          { to: '/app/da-luu', ico: 'cart', label: t('savedTab'), badge: saved.ids.length, cart: true },
           { to: '/app/thu-nhap', ico: 'wallet', label: t('navIncome') },
           { to: '/app/tai-khoan', ico: 'user', label: t('navAccount'), match: ['/app/bang-gia'] },
         ]
       : [
           { to: '/app', ico: 'briefcase', label: t('navJobs'), end: true, match: ['/app/viec'] },
-          { to: '/app/da-ung-tuyen', ico: 'clipboard', label: t('navApplied'), match: ['/app/da-luu'] },
+          { to: '/app/da-ung-tuyen', ico: 'clipboard', label: t('navApplied') },
+          { to: '/app/da-luu', ico: 'cart', label: t('savedTab'), badge: saved.ids.length, cart: true },
           { to: '/app/tai-khoan', ico: 'user', label: t('navAccount'), match: ['/app/bang-gia'] },
         ]
   if (profile?.is_admin) items.push({ to: '/app/quan-tri', ico: 'sparkles', label: t('navAdmin') })
@@ -87,7 +92,7 @@ export function Shell({ children }: { children: ReactNode }) {
     <>
       {items.map((i) => (
         <NavLink key={i.to} to={i.to} end={i.end} className={isOn(i) ? 'on' : ''} aria-current={isOn(i) ? 'page' : undefined}>
-          <span className="ic"><Ic n={i.ico} size={22} />{!!i.badge && <i className="navbadge" aria-label={String(i.badge)}>{i.badge}</i>}</span>{i.label}
+          <span className="ic" data-cart={i.cart || undefined}><Ic n={i.ico} size={22} />{!!i.badge && <i className={'navbadge' + (i.cart ? ' cart' : '')} aria-label={String(i.badge)}>{i.badge > 99 ? '99+' : i.badge}</i>}</span>{i.label}
         </NavLink>
       ))}
     </>

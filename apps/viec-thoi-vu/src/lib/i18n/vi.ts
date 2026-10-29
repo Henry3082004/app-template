@@ -151,7 +151,7 @@ export const vi = {
   quizDoneEmployer: 'Đăng tin chỉ mất 1 phút, người làm nhận đơn ngay trong ngày.', quizPostJob: 'Đăng tin tuyển', quizSeeJobs: 'Xem việc trước đã', quizSeeFit: 'Xem việc hợp với bạn',
   quizAdminTitle: 'Bộ câu hỏi nhanh (chỉ admin)', quizAdminHint: 'Làm lại bộ câu hỏi người mới thấy khi mở app, để thử cách hỏi. Câu trả lời ghi đè câu trả lời trước của tài khoản này.', quizAdminBtn: 'Làm thử bộ câu hỏi',
   fitTag: 'Hợp với bạn',
-  saveJob: 'Lưu việc', unsaveJob: 'Bỏ lưu', savedTab: 'Đã lưu', savedTitle: 'Việc đã lưu', savedCount: 'Việc đã lưu ({n})',
+  saveJob: 'Lưu việc', unsaveJob: 'Bỏ lưu', savedTab: 'Đã lưu', savedTitle: 'Việc đã lưu',
   savedEmpty: 'Bạn chưa lưu việc nào', savedEmptySub: 'Bấm biểu tượng lưu trên mỗi việc để xem lại, so sánh và ứng tuyển cùng lúc.',
   savedGuestNote: 'Danh sách đang lưu trên máy này. Đăng nhập để lưu vào tài khoản và xem trên máy khác.', jobClosed: 'Tin đã đóng',
   applyAll: 'Ứng tuyển tất cả ({n})', compareBtn: 'So sánh ({n})', compareHint: 'Đánh dấu 2–3 việc để so sánh.', comparePick: 'So sánh', compareTitle: 'So sánh việc',

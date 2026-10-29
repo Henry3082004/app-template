@@ -10,8 +10,10 @@ test('a visitor saves jobs, compares two, removes one, then applies to all at on
   for (const title of ['Phụ bếp ca tối', 'Pha chế ca sáng', 'Soạn hàng kho mùa cao điểm']) {
     await saveOn(p, title).click(); await expect(saveOn(p, title)).toHaveAttribute('aria-pressed', 'true')
   }
-  // the "cart" next to the near-me button shows how many are saved
-  await p.getByRole('link', { name: 'Việc đã lưu (3)' }).click(); await h.see('Việc đã lưu')
+  // the cart in the menu counts them (a dot flies there on each save)
+  const cart = p.locator('nav a', { hasText: 'Đã lưu' }).locator('visible=true').first()
+  await expect(cart.locator('.navbadge')).toHaveText('3')
+  await cart.click(); await h.see('Việc đã lưu')
   await h.see('Danh sách đang lưu trên máy này'); await h.noHScroll()
   // compare two of them side by side
   await row(p, 'Phụ bếp ca tối').getByLabel('So sánh').check(); await row(p, 'Soạn hàng kho mùa cao điểm').getByLabel('So sánh').check()
@@ -26,6 +28,6 @@ test('a visitor saves jobs, compares two, removes one, then applies to all at on
   await h.see('Đã gửi 1 đơn ứng tuyển.'); await h.see('1 việc được bỏ qua')
   await expect(row(p, 'Phụ bếp ca tối')).toContainText('Đang chờ'); await expect(row(p, 'Pha chế ca sáng')).toContainText('Đang chờ')
   await expect(p.getByRole('button', { name: 'Ứng tuyển tất cả (0)' })).toBeDisabled()
-  // signed in, the list now lives in the account and the page sits with the other worker tabs
-  await expect(p.locator('nav.seg a', { hasText: 'Đã lưu' })).toHaveClass(/on/)
+  // signed in, the list now lives in the account; the cart menu item is the current page and still counts 2
+  await expect(cart).toHaveClass(/on/); await expect(cart.locator('.navbadge')).toHaveText('2')
 })
