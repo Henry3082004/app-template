@@ -66,7 +66,7 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
       <div className="dscroll fade-in" key={job.id}>
         {onBack && <button type="button" className="back" onClick={onBack}>{t('backJobs')}</button>}
         <div className="card">
-          <div className="hrow"><h2 style={{ fontSize: 20 }}>{job.title}</h2><span className="row" style={{ gap: 8 }}>{job.is_urgent && <Tag tone="urgent">{t('urgent')}</Tag>}{!isEmployer && <SaveButton jobId={job.id} />}</span></div>
+          <div className="hrow"><h2 style={{ fontSize: 20 }}>{job.title}</h2>{job.is_urgent && <Tag tone="urgent">{t('urgent')}</Tag>}</div>
           <div style={{ marginTop: 8 }}><Pay job={job} xl /></div>
           {job.business_name && (
             <div className="shopbox">
@@ -97,9 +97,13 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
       </div>
       {!isEmployer && (
         <div className="cta">
-          {mine ? <Btn block disabled>{mine === 'withdrawn' ? t('stwithdrawn') : t('applied')}</Btn>
-            : full ? <Btn block disabled>{t('full')}</Btn>
-            : <Btn block onClick={onApply} disabled={busy}>{busy ? '…' : t('applyNow')}</Btn>}
+          {/* "+" (save for later) sits right beside the main button */}
+          <div className="ctarow">
+            <SaveButton jobId={job.id} large />
+            {mine ? <Btn block disabled>{mine === 'withdrawn' ? t('stwithdrawn') : t('applied')}</Btn>
+              : full ? <Btn block disabled>{t('full')}</Btn>
+              : <Btn block onClick={onApply} disabled={busy}>{busy ? '…' : t('applyNow')}</Btn>}
+          </div>
         </div>
       )}
     </>
