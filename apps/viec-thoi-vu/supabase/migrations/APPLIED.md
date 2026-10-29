@@ -58,3 +58,6 @@ Nhắc việc: tối hôm trước (từ 17:00), sáng ngày làm (từ 06:00), 
 Đổi tin tức trên banner (không cần code): sửa dòng `home_news` trong `app_settings`, là một mảng JSON `[{"title","sub","url","source"}]`; chỉ nhận link https, tối đa 6 tin, tiêu đề không được trống.
 
 01/11/2026: `20261104_saved_jobs.sql` áp dụng thành `saved_jobs` (bảng "Việc đã lưu": mỗi người chỉ đọc/thêm/xóa của mình; khách chưa đăng nhập không truy cập được). Test: `supabase/tests/160_saved_jobs.sql`.
+
+01/11/2026: `20261105_capy_ai.sql` áp dụng thành `capy_ai` (bảng `ai_usage` đếm lượt hỏi Capy, hàm `ai_hit` chỉ máy chủ gọi được, `app_config` thêm `ai_assistant`, cài `ai_assistant='off'`, giới hạn `ai_cap_guest=15`, `ai_cap_user=40`, `ai_cap_total=3000` lượt/ngày). Test: `supabase/tests/170_capy_ai.sql`.
+Edge function `capy-assistant` (Claude Haiku 5.5, `supabase/functions/capy-assistant/index.ts`) đã triển khai. Cần secret `ANTHROPIC_API_KEY`; bật bằng `update app_settings set value='on' where key='ai_assistant'`.

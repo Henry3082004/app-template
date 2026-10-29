@@ -1,5 +1,5 @@
 // The contract every backend (Supabase or the in-memory mock) implements.
-import type { Highlights, Role, JobStatus, AppStatus, Attendance, Profile, Job, MyApplication, MyJob, Applicant, Hire, Reputation, AppNotification, ChatMessage, ReportReason, AdminReport, DeletionRequest, AdminDeletion, SentInvite, FoundWorker, WorkerSearch, BankAccount, AdminDispute, AdminPayout, AdminFlag, AdminStats, AdminSamples, AppConfig, CompleteProfileInput, PendingProfile, Quote, ReceivedReview, SignUpInput, JobInput, ZaloLoginResult, ProfileUpdate } from './types'
+import type { CapyMsg, CapyReply, Highlights, Role, JobStatus, AppStatus, Attendance, Profile, Job, MyApplication, MyJob, Applicant, Hire, Reputation, AppNotification, ChatMessage, ReportReason, AdminReport, DeletionRequest, AdminDeletion, SentInvite, FoundWorker, WorkerSearch, BankAccount, AdminDispute, AdminPayout, AdminFlag, AdminStats, AdminSamples, AppConfig, CompleteProfileInput, PendingProfile, Quote, ReceivedReview, SignUpInput, JobInput, ZaloLoginResult, ProfileUpdate } from './types'
 import type { QuizAnswers } from './quiz'
 
 export interface Api {
@@ -86,6 +86,8 @@ export interface Api {
   /** invite a worker who already did a shift for me to one of my open posts */
   inviteWorker(jobId: string, workerId: string): Promise<void>
   mySentInvites(): Promise<SentInvite[]>
+  /** chat with Capy (needs the AI helper switched on) */
+  capyChat(messages: CapyMsg[], ctx: { device: string; city?: string }): Promise<CapyReply>
   /** "Việc đã lưu" of the signed-in person (newest first) */
   savedJobIds(): Promise<string[]>
   saveJobs(jobIds: string[]): Promise<void>

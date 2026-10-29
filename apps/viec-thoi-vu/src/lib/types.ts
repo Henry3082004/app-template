@@ -141,6 +141,17 @@ export interface AdminReport { id: string; reporter_name: string; target_id: str
 export interface DeletionRequest { status: 'open'; requested_at: string }
 export interface AdminDeletion { id: string; user_id: string; name: string; email: string | null; reason: string | null; status: 'open' | 'done' | 'cancelled'; requested_at: string }
 export interface SentInvite { job_id: string; worker_id: string }
+/** Capy, the AI helper. A job seeker's request becomes a search (filters the app applies to the real list); a shop's becomes a draft post. */
+export interface CapyMsg { role: 'user' | 'assistant'; text: string }
+export interface CapySearch {
+  keywords: string[]; category: Category | ''; city: string; urgent: boolean; min_pay: number | null; pay_unit: PayUnit | ''
+  near: { name: string; lat: number; lng: number } | null; radius_km: number
+}
+export interface CapyDraft {
+  title: string; description: string; category: Category; pay_amount: number | null; pay_unit: PayUnit; slots: number
+  start_date: string; end_date: string; shift_note: string; address: string; city: string; is_urgent: boolean
+}
+export interface CapyReply { role: Role; reply: string; search?: CapySearch; draft?: CapyDraft }
 /** Numbers and news for the home banner: counts only, plus links an admin chose. */
 export interface Highlights {
   open_jobs: number; new_jobs_7d: number; urgent_jobs: number; ready_workers: number
@@ -182,7 +193,7 @@ export interface AdminSamples {
   workers: { id: string; name: string; city: string | null; birth_year: number | null; avatar_path: string | null; experience: string[] | null; availability: string[] | null; applications: number }[]
 }
 
-export interface AppConfig { payment_mode: 'off' | 'test' | 'live'; billing: 'on' | 'off'; google_login?: 'on' | 'off'; zalo_web_login?: 'on' | 'off'; zalo_published?: 'on' | 'off' }
+export interface AppConfig { payment_mode: 'off' | 'test' | 'live'; billing: 'on' | 'off'; google_login?: 'on' | 'off'; zalo_web_login?: 'on' | 'off'; zalo_published?: 'on' | 'off'; ai_assistant?: 'on' | 'off' }
 
 export interface CompleteProfileInput { role: Role; full_name: string; phone: string; locale: Locale; business_name?: string; address?: string; city?: string; bio?: string }
 export interface PendingProfile { email: string | null; name: string | null }

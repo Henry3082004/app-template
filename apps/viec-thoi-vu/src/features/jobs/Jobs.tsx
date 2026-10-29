@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Ic } from '../../components/Ic'
 import { Banners } from '../../components/Banners'
 import { JobCard } from './JobCard'
@@ -7,11 +7,12 @@ import { LegalLinks } from '../public/LegalLinks'
 import { Btn, Chip, Dialog, Empty, ErrorBox, Skel } from '../../components/ui'
 import { api } from '../../lib/api'
 import { capy } from '../../lib/capy'
+import { describeSearch, scoreJob } from '../../lib/capySearch'
 import { km, locate, type Coords } from '../../lib/geo'
 import { useI18n, type TKey } from '../../lib/i18n'
 import { fitScore, isFit, useQuizAnswers } from '../../lib/quiz'
 import { useSession } from '../../lib/session'
-import type { AppStatus, Category, Job, PayUnit, Reputation } from '../../lib/types'
+import type { AppStatus, CapySearch, Category, Job, PayUnit, Reputation } from '../../lib/types'
 import { useBp } from '../../lib/useBp'
 import { JobDetail } from './JobDetail'
 
@@ -46,6 +47,13 @@ export default function Jobs() {
   const [area, setArea] = useState('')
   const [minPay, setMinPay] = useState('')
   const [coords, setCoords] = useState<Coords | null>(cachedCoords)
+  const [capyFilter, setCapyFilter] = useState<CapySearch | null>(null)
+  const location = useLocation()
+  // Capy's "see all": the list is filtered the same way until the visitor clears it
+  useEffect(() => {
+    const c = (location.state as { capy?: CapySearch } | null)?.capy
+    if (c) { setCapyFilter(c); nav(location.pathname, { replace: true, state: null }) }
+  }, [location.state]) // eslint-disable-line react-hooks/exhaustive-deps
   const [loc, setLoc] = useState<'idle' | 'busy' | 'denied'>('idle')
   const [done, setDone] = useState(false)
   const [single, setSingle] = useState<Job | null | undefined>(undefined)
@@ -100,7 +108,8 @@ export default function Jobs() {
     setLoc(c ? 'idle' : 'denied')
   }
 
-  const distOf = useCallback((j: Job) => (coords && j.lat != null && j.lng != null ? km(coords, { lat: j.lat, lng: j.lng }) : null), [coords])
+  const here = capyFilter?.near ?? coords
+  const distOf = useCallback((j: Job) => (here && j.lat != null && j.lng != null ? km(here, { lat: j.lat, lng: j.lng }) : null), [here])
 
   const shown = useMemo(() => {
     if (!jobs) return []
@@ -108,16 +117,17 @@ export default function Jobs() {
     const [mu, ma] = minPay ? minPay.split(':') : ['', '']
     const list = jobs.filter((j) =>
       !(viewAsUser && j.is_sample) && // admins see the sample jobs; the normal view does not
+      (!capyFilter || scoreJob(j, capyFilter) !== null) &&
       (filter === 'all' || (filter === 'urgent' ? j.is_urgent : j.category === filter)) &&
       (!area || j.city === area) &&
       (!minPay || (j.pay_unit === (mu as PayUnit) && j.pay_amount >= Number(ma))) &&
       (!needle || strip(`${j.title} ${j.business_name ?? ''} ${j.city} ${j.address}`).includes(needle)))
     return list
       .map((j) => ({ j, d: distOf(j) }))
-      .sort((a, b) => (coords
+      .sort((a, b) => (here
         ? (a.d ?? 1e9) - (b.d ?? 1e9)
         : fitScore(b.j, quiz) - fitScore(a.j, quiz) || Number(b.j.is_urgent) - Number(a.j.is_urgent) || b.j.created_at.localeCompare(a.j.created_at)))
-  }, [jobs, q, filter, area, minPay, coords, distOf, quiz, viewAsUser])
+  }, [jobs, q, filter, area, minPay, here, capyFilter, distOf, quiz, viewAsUser])
 
   // businesses live on "My posts"; one that can also work may still open a shared job link (and switch to apply)
   if (profile?.role === 'employer' && !(id && profile.roles.includes('seeker'))) return <Navigate to="/app/tin-cua-toi" replace />
@@ -126,7 +136,7 @@ export default function Jobs() {
   const activeId = id ?? (big ? shown[0]?.j.id : undefined)
   const selected = activeId ? (jobs?.find((j) => j.id === activeId) ?? single ?? null) : null
   const open = (jid: string) => nav(`/app/viec/${jid}`)
-  const clear = () => { setFilter('all'); setQ(''); setArea(''); setMinPay('') }
+  const clear = () => { setFilter('all'); setQ(''); setArea(''); setMinPay(''); setCapyFilter(null) }
 
   const detail = selected && (
     <JobDetail
@@ -227,6 +237,7 @@ export default function Jobs() {
                 {sortLine}
               </div>
               {loc === 'denied' && <div className="notice warn">{t('locDenied')}</div>}
+              {capyFilter && <div className="capychip"><span>{t('capyFiltering', { s: describeSearch(capyFilter) })}</span><button type="button" onClick={() => setCapyFilter(null)}>{t('capyClear')}</button></div>}
               {body}
               <LegalLinks />
             </section>

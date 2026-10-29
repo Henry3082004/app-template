@@ -5,6 +5,7 @@ import { api } from '../lib/api'
 import { LOGO } from '../lib/capy'
 import { needsAction } from '../lib/hires'
 import { useI18n, type TKey } from '../lib/i18n'
+import { CapyChat } from '../features/capy/CapyChat'
 import { useSaved } from '../lib/saved'
 import { useSession } from '../lib/session'
 import { Ic, type IconName } from './Ic'
@@ -135,6 +136,7 @@ export function Shell({ children }: { children: ReactNode }) {
       </nav>
       {bell('fab')}
       <main className="main">{children}</main>
+      <CapyChat />
       <nav className="bnav" aria-label="Chính"><Items /></nav>
     </div>
   )

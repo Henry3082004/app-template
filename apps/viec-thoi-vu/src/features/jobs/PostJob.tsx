@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Ic } from '../../components/Ic'
 import { JobCard } from './JobCard'
 import { Btn, Chip, Dialog, ErrorBox, Fld, Tag } from '../../components/ui'
@@ -13,7 +13,7 @@ import { useI18n, type TKey } from '../../lib/i18n'
 import { report } from '../../lib/sentry'
 import { isProFor, useAppConfig } from '../../lib/config'
 import { useSession } from '../../lib/session'
-import type { Category, Job, JobInput, PayUnit } from '../../lib/types'
+import type { CapyDraft, Category, Job, JobInput, PayUnit } from '../../lib/types'
 import { useBp } from '../../lib/useBp'
 
 const CATS: Category[] = ['service', 'warehouse', 'event', 'farm', 'retail', 'other']
@@ -23,15 +23,22 @@ export default function PostJob() {
   const { t } = useI18n()
   const nav = useNavigate()
   const [qs] = useSearchParams()
+  const { state } = useLocation() as { state: { capyDraft?: CapyDraft; capyNote?: string } | null }
+  const draft = state?.capyDraft ?? null
   const bp = useBp()
   const { profile, ready } = useSession()
   const cfg = useAppConfig()
   const start = addDays(today(), 1)
-  const [f, setF] = useState<JobInput>({
+  const [f, setF] = useState<JobInput>(() => ({
     title: '', description: '', category: 'service', pay_amount: 30000, pay_unit: 'hour',
     start_date: start, end_date: addDays(start, 6), shift_note: '', address: profile?.address ?? '',
     city: profile?.city && CITIES[profile.city] ? profile.city : 'TP.HCM', lat: null, lng: null, slots: 2, is_urgent: false,
-  })
+    ...(draft ? {
+      title: draft.title, description: draft.description, category: draft.category, pay_amount: draft.pay_amount ?? 0, pay_unit: draft.pay_unit,
+      slots: draft.slots, start_date: draft.start_date, end_date: draft.end_date, shift_note: draft.shift_note,
+      address: draft.address || profile?.address || '', city: draft.city && CITIES[draft.city] ? draft.city : profile?.city && CITIES[profile.city] ? profile.city : 'TP.HCM', is_urgent: draft.is_urgent,
+    } : {}),
+  }))
   const [prefilled, setPrefilled] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<unknown>(null)
@@ -40,7 +47,7 @@ export default function PostJob() {
   const isPro = isProFor(profile, cfg)
 
   useEffect(() => {
-    if (profile?.role !== 'employer') return
+    if (profile?.role !== 'employer' || draft) return // a draft from Capy is not overwritten by the previous post
     api.myJobs().then((list) => {
       const last = list.find((j) => j.id === qs.get('lai')) ?? list[0]
       if (!last) return
@@ -64,6 +71,7 @@ export default function PostJob() {
     setFormErr(null)
     setError(null)
     if (!f.title.trim() || !f.address.trim()) return setFormErr('required')
+    if (!f.pay_amount || f.pay_amount < 1000) return setFormErr('payRequired')
     if (f.end_date < f.start_date) return setFormErr('endBeforeStart')
     const c = CITIES[f.city] ?? CITIES['Khác']
     const input: JobInput = {
@@ -92,6 +100,7 @@ export default function PostJob() {
 
   const form = (
     <div className="stack">
+      {draft && <div className="plan ok"><span><Ic n="sparkles" size={16} /> {t('capyDraftNote')}</span></div>}
       {prefilled && <div className="plan ok"><span><Ic n="sparkles" size={16} /> {t('prefilled')}</span></div>}
       <div className="formgrid">
         <div className="span"><Fld label={t('jobTitle')} htmlFor="p-title"><input id="p-title" className="inp" value={f.title} onChange={(e) => set('title', e.target.value)} placeholder={t('jobTitlePh')} maxLength={120} required /></Fld></div>
