@@ -8,6 +8,7 @@ export function ShiftTabs() {
     <nav className="seg pills" aria-label={t('navShifts')}>
       <NavLink to="/app/cham-cong" end className={({ isActive }) => (isActive ? 'on' : '')}>{t('shiftsTab')}</NavLink>
       <NavLink to="/app/da-ung-tuyen" className={({ isActive }) => (isActive ? 'on' : '')}>{t('applicationsTab')}</NavLink>
+      <NavLink to="/app/da-luu" className={({ isActive }) => (isActive ? 'on' : '')}>{t('savedTab')}</NavLink>
     </nav>
   )
 }

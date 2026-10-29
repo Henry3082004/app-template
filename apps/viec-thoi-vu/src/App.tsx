@@ -17,6 +17,7 @@ import Admin from './features/admin/Admin'
 import Account from './features/account/Account'
 import EmployerCandidates from './features/hiring/EmployerCandidates'
 import FindWorkers from './features/hiring/FindWorkers'
+import Saved from './features/jobs/Saved'
 import EmployerJobs from './features/jobs/EmployerJobs'
 import EmployerShifts from './features/shifts/EmployerShifts'
 import Income from './features/shifts/Income'
@@ -51,6 +52,7 @@ function AppPages() {
         <Route path="thong-bao" element={<Notifications />} />
         <Route path="ung-vien" element={<EmployerCandidates />} />
         <Route path="tim-nguoi" element={<FindWorkers />} />
+        <Route path="da-luu" element={<Saved />} />
         <Route path="ca-lam" element={<EmployerShifts />} />
         <Route path="chi-phi" element={<Spend />} />
         <Route path="dang-tin" element={<PostJob />} />

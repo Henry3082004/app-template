@@ -253,8 +253,8 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 .job .meta{display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--tx2);border-top:1px solid var(--gray-100);padding-top:10px;margin-top:4px}
 .job .meta>span:last-child{margin-left:auto}
 .job .meta .low{color:var(--errfg);font-weight:600}
-.sortline{justify-content:space-between;flex-wrap:nowrap}
-.jcount{font-size:15px;color:var(--tx2)}.jcount b{font-family:var(--font-head);font-size:20px;font-weight:900;color:var(--tx)}
+.sortline{justify-content:space-between;flex-wrap:wrap;row-gap:8px}
+.jcount{font-size:15px;color:var(--tx2);white-space:nowrap}.jcount b{font-family:var(--font-head);font-size:20px;font-weight:900;color:var(--tx)}
 .sortline .chip{min-height:40px;gap:6px}
 
 /* Escrow + reputation */
@@ -501,3 +501,19 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 .bubble small{font-size:11px;opacity:.65;align-self:flex-end}.bubble.me{align-self:flex-end;background:var(--p);color:#fff;border-bottom-right-radius:4px}
 .bubble.them{align-self:flex-start;background:var(--bg);color:var(--tx);border-bottom-left-radius:4px}
 .chatform{display:flex;gap:8px;align-items:center}.chatform .inp{flex:1}
+/* ---------- Việc đã lưu ---------- */
+.jobwrap{position:relative}.jobwrap .job .meta{padding-right:44px}
+.savebtn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--brand-600);display:inline-grid;place-items:center;cursor:pointer;flex:none;transition:.15s}
+.savebtn:hover{border-color:var(--brand-300)}.savebtn.on{background:var(--p);border-color:var(--p);color:#fff}.savebtn.on svg{fill:currentColor}
+.jobwrap>.savebtn{position:absolute;right:12px;bottom:10px}
+.cards.wide .jobwrap>.savebtn{bottom:12px;right:16px}
+.savedbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:4px 0 14px}
+.savedrow.picked{border-color:var(--p);box-shadow:0 0 0 2px var(--brand-100, rgba(179,90,36,.15))}
+.pick{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;cursor:pointer;min-height:40px}
+.pick input{width:18px;height:18px;accent-color:var(--p)}
+.cmpwrap{overflow-x:auto;margin:8px 0 12px;width:100%}
+.cmp{border-collapse:collapse;width:100%;font-size:14px}
+.cmp th,.cmp td{padding:10px 8px;border-bottom:1px solid var(--gray-100);text-align:left;vertical-align:top}
+.cmp td{min-width:110px}.cmp .pay{font-size:16px}
+.cmp thead th{font-family:var(--font-head);font-size:15px}
+.cmp tbody th{color:var(--tx2);font-weight:600;width:76px}

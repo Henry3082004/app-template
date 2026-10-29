@@ -1,7 +1,28 @@
 import { type Api, type Highlights, type Applicant, type Hire, type JobInput, type MyApplication, type MyJob } from '../types'
 import { sb, JOB_COLS, fail, rpc, toJob, uid, WORKER_COLS, toWorker, phonesOf, ESCROW_COLS, otherReviewed, reviewedSet, payoutsOf, toEscrow } from './core'
 
-export const jobsApi: Pick<Api, 'homeHighlights' | 'listOpenJobs' | 'getJob' | 'myApplicationStatus' | 'apply' | 'myApplications' | 'withdraw' | 'myJobs' | 'createJob' | 'setJobStatus' | 'applicantsFor' | 'myHires' | 'decide'> = {
+export const jobsApi: Pick<Api, 'savedJobIds' | 'saveJobs' | 'unsaveJob' | 'jobsByIds' | 'homeHighlights' | 'listOpenJobs' | 'getJob' | 'myApplicationStatus' | 'apply' | 'myApplications' | 'withdraw' | 'myJobs' | 'createJob' | 'setJobStatus' | 'applicantsFor' | 'myHires' | 'decide'> = {
+  async savedJobIds() {
+    const { data, error } = await sb.from('saved_jobs').select('job_id').order('created_at', { ascending: false })
+    if (error) fail(error)
+    return (data ?? []).map((r) => r.job_id)
+  },
+  async saveJobs(jobIds) {
+    if (!jobIds.length) return
+    const id = await uid()
+    const { error } = await sb.from('saved_jobs').upsert(jobIds.map((job_id) => ({ user_id: id, job_id })), { onConflict: 'user_id,job_id', ignoreDuplicates: true })
+    if (error) fail(error)
+  },
+  async unsaveJob(jobId) {
+    const { error } = await sb.from('saved_jobs').delete().eq('job_id', jobId)
+    if (error) fail(error)
+  },
+  async jobsByIds(ids) {
+    if (!ids.length) return []
+    const { data, error } = await sb.from('jobs').select(JOB_COLS).in('id', ids)
+    if (error) fail(error)
+    return (data ?? []).map(toJob)
+  },
   async homeHighlights() {
     // tolerate an odd answer: the banner then just shows the fixed tips
     const r = ((await rpc('home_highlights')) ?? {}) as Partial<Highlights>

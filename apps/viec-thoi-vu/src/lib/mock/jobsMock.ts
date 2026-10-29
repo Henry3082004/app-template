@@ -1,7 +1,22 @@
 import { AppError, type Api, type Job } from '../types'
-import { CFG, discoverable, isPro, NEW_PAY, now, nid, notify, users, jobs, apps, payouts, current, wait, me, jobOf, bizOf, escrowOf } from './core'
+import { CFG, discoverable, saved, isPro, NEW_PAY, now, nid, notify, users, jobs, apps, payouts, current, wait, me, jobOf, bizOf, escrowOf } from './core'
 
-export const jobsMock: Pick<Api, 'homeHighlights' | 'listOpenJobs' | 'getJob' | 'myApplicationStatus' | 'apply' | 'myApplications' | 'withdraw' | 'myJobs' | 'createJob' | 'setJobStatus' | 'applicantsFor' | 'myHires' | 'decide'> = {
+export const jobsMock: Pick<Api, 'savedJobIds' | 'saveJobs' | 'unsaveJob' | 'jobsByIds' | 'homeHighlights' | 'listOpenJobs' | 'getJob' | 'myApplicationStatus' | 'apply' | 'myApplications' | 'withdraw' | 'myJobs' | 'createJob' | 'setJobStatus' | 'applicantsFor' | 'myHires' | 'decide'> = {
+  async savedJobIds() { return wait([...(saved[me().id] ?? [])].reverse()) },
+  async saveJobs(jobIds) {
+    const list = (saved[me().id] ??= [])
+    jobIds.forEach((j) => { if (jobs.some((x) => x.id === j) && !list.includes(j)) list.push(j) })
+    return wait(undefined)
+  },
+  async unsaveJob(jobId) {
+    const id = me().id
+    saved[id] = (saved[id] ?? []).filter((j) => j !== jobId)
+    return wait(undefined)
+  },
+  async jobsByIds(ids) {
+    const mineOf = (j: Job) => current != null && apps.some((a) => a.job_id === j.id && a.seeker_id === current)
+    return wait(jobs.filter((j) => ids.includes(j.id) && (j.status === 'open' || mineOf(j))))
+  },
   async homeHighlights() {
     const open = jobs.filter((j) => j.status === 'open')
     const top = (key: 'city' | 'category') => {

@@ -31,6 +31,7 @@ export const chat: (ChatMessage & { application_id: string })[] = []
 export const reports: (AdminReport & { reporter_id: string })[] = []
 export const deletions: (AdminDeletion & { user_id: string })[] = []
 export const invites: (SentInvite & { employer_id: string })[] = []
+export const saved: Record<string, string[]> = {} // "Việc đã lưu" per user, oldest first
 export const discoverable = new Set<string>() // workers who chose "let shops find me"
 
 export const users: Record<string, User> = {}

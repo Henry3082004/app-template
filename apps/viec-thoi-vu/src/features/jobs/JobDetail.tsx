@@ -13,6 +13,7 @@ import { report } from '../../lib/sentry'
 import { useSession } from '../../lib/session'
 import type { AppStatus, Job, Profile, Reputation } from '../../lib/types'
 import { avatarUrl, introNudgeDue } from '../../lib/worker'
+import { SaveButton } from './SaveButton'
 
 /** Job detail: a page on phones, the right-hand column on tablet/desktop. */
 export function JobDetail({ job, distance, mine, onApplied, onBack }: {
@@ -65,7 +66,7 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
       <div className="dscroll fade-in" key={job.id}>
         {onBack && <button type="button" className="back" onClick={onBack}>{t('backJobs')}</button>}
         <div className="card">
-          <div className="hrow"><h2 style={{ fontSize: 20 }}>{job.title}</h2>{job.is_urgent && <Tag tone="urgent">{t('urgent')}</Tag>}</div>
+          <div className="hrow"><h2 style={{ fontSize: 20 }}>{job.title}</h2><span className="row" style={{ gap: 8 }}>{job.is_urgent && <Tag tone="urgent">{t('urgent')}</Tag>}{!isEmployer && <SaveButton jobId={job.id} />}</span></div>
           <div style={{ marginTop: 8 }}><Pay job={job} xl /></div>
           {job.business_name && (
             <div className="shopbox">

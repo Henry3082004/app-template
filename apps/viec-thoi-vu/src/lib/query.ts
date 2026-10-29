@@ -10,6 +10,7 @@ export const queryClient = new QueryClient({
 export const qk = {
   config: ['config'] as const,
   highlights: ['highlights'] as const,
+  saved: (uid: string | undefined) => ['saved', uid ?? 'device'] as const,
   hires: (uid: string | undefined) => ['hires', uid] as const,
   mine: (uid: string | undefined) => ['mine', uid] as const,
   sentInvites: (uid: string | undefined) => ['sentInvites', uid] as const,

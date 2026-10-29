@@ -176,3 +176,10 @@ Tuyển người (Tin đăng | Ứng viên, đăng lại tin cũ) · Ca làm (C�
 - Bỏ giọng Capy và biểu tượng cảm xúc khỏi chữ (giữ hình Capy làm nhân vật): "Capy tìm được 14 việc nè 🍊" → "14 việc đang tuyển"; lời chào, thông báo gửi đơn, lỗi, câu hỏi nhanh... viết lại trung tính, lịch sự (vi + en).
 - Bỏ nhãn phím "/" trong ô tìm kiếm; dòng ngày ở thanh trên chỉ còn "Thứ Năm, 29/10/2026"; ô lương ghi rõ "Từ 25.000đ / giờ"; danh sách chọn luôn nền sáng; "Mọi mức lương" thay "Không giới hạn".
 - "Capy hỏi nhanh" đổi tên thành "Gợi ý việc phù hợp" (cả trong chính sách bảo mật). 92 test đạt.
+
+## 01/11/2026 — Việc đã lưu (giống giỏ hàng)
+- Nút lưu (biểu tượng đánh dấu) trên mỗi thẻ việc và trong trang chi tiết. Chưa đăng nhập: lưu trên máy; đăng nhập: tự chuyển vào tài khoản (bảng `saved_jobs`), xem được trên máy khác.
+- Nút "đã lưu (n)" cạnh "Việc gần tôi" mở trang **Việc đã lưu** (`/app/da-luu`, cũng là tab "Đã lưu" cạnh Chấm công / Đơn ứng tuyển).
+- Trang Việc đã lưu: đánh dấu 2–3 việc → **So sánh** (lương, ngày, giờ làm, địa điểm, quán + uy tín, chỗ còn, gấp); **Ứng tuyển tất cả** gửi ngay mọi việc còn mở, chỉ tự bỏ qua việc đã ứng tuyển / đã đóng / hết chỗ (theo yêu cầu: không hỏi lại, không giới hạn số lượng, không cảnh báo trùng giờ).
+- Chính sách bảo mật thêm mục "Việc đã lưu". 96 test đạt.
+- AI (tìm việc bằng một câu, viết tin giúp quán): để sau khi ra mắt.

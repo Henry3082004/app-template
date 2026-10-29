@@ -30,6 +30,8 @@ const P: Record<string, ReactNode> = {
   arrow: <><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></>,
   chevL: <path d="m15 18-6-6 6-6" />,
   chevR: <path d="m9 18 6-6-6-6" />,
+  bookmark: <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />,
+  compare: <><path d="M8 3v18" /><path d="M16 3v18" /><rect x="3" y="3" width="18" height="18" rx="2" /></>,
   target: <><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></>,
 }
 

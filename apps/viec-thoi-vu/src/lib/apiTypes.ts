@@ -86,6 +86,12 @@ export interface Api {
   /** invite a worker who already did a shift for me to one of my open posts */
   inviteWorker(jobId: string, workerId: string): Promise<void>
   mySentInvites(): Promise<SentInvite[]>
+  /** "Việc đã lưu" of the signed-in person (newest first) */
+  savedJobIds(): Promise<string[]>
+  saveJobs(jobIds: string[]): Promise<void>
+  unsaveJob(jobId: string): Promise<void>
+  /** the jobs with these ids that I may see (open ones, or ones I applied to) */
+  jobsByIds(ids: string[]): Promise<Job[]>
   /** counts + news for the home banner (anyone can read) */
   homeHighlights(): Promise<Highlights>
   /** shops: workers who switched "let shops find me" on */
