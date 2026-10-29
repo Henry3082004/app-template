@@ -1,11 +1,12 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-// Capy, the AI helper. The browser sends the last few chat messages; this function asks Claude to turn them into
+// Capy, the AI helper. The browser sends the last few chat messages; this function asks Google Gemini to turn them into
 //   · a SEARCH (for job seekers): filters the app applies to the real job list, or
 //   · a DRAFT job post (for shops): fields the app puts into the post form for the shop to check and publish.
 // The model never sees accounts, phones or the job list, never writes to the database and never posts or applies by itself.
-// Needs the Edge Function secret ANTHROPIC_API_KEY. Switched on/off by app_settings.ai_assistant; daily limits by ai_hit().
-const MODEL = "claude-haiku-5-5";
+// Needs the Edge Function secret GEMINI_API_KEY (Google AI Studio). The model name is app_settings.ai_model (default below), so it can be
+// changed without redeploying. Switched on/off by app_settings.ai_assistant; daily limits by ai_hit().
+const DEFAULT_MODEL = "gemini-2.5-flash";
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -40,56 +41,58 @@ function systemFor(role: "seeker" | "employer", city: string, today: { iso: stri
   const when = `Hôm nay là ${today.weekday}, ngày ${today.iso} (giờ Việt Nam). "Mai" là ngày kế tiếp, "cuối tuần" là thứ Bảy và Chủ nhật gần nhất.`;
   const where = city ? ` Thành phố của người dùng: ${city} (dùng khi họ không nói rõ thành phố).` : "";
   if (role === "employer") {
-    return `${RULES_COMMON}\n${when}${where}\nNgười dùng là CHỦ QUÁN. Từ lời kể của họ hãy soạn bản nháp tin tuyển dụng bằng công cụ respond (trường draft): tiêu đề ngắn rõ ràng, mô tả 2-4 câu nêu việc phải làm, số người (slots), ngày bắt đầu/kết thúc (YYYY-MM-DD), giờ làm (shift_note), nhóm việc, mức lương nếu họ nói (pay_amount là số đồng VND, pay_unit hour/day/shift/job; "200k" = 200000).
+    return `${RULES_COMMON}\n${when}${where}\nNgười dùng là CHỦ QUÁN. Từ lời kể của họ hãy soạn bản nháp tin tuyển dụng, đặt trong trường draft của JSON trả về: tiêu đề ngắn rõ ràng, mô tả 2-4 câu nêu việc phải làm, số người (slots), ngày bắt đầu/kết thúc (YYYY-MM-DD), giờ làm (shift_note), nhóm việc, mức lương nếu họ nói (pay_amount là số đồng VND, pay_unit hour/day/shift/job; "200k" = 200000).
 Không biết lương thì để pay_amount = null và nói trong reply rằng bạn chưa điền lương để họ nhập. Không biết ngày thì để ngày bắt đầu là ngày mai, kết thúc cùng ngày hoặc theo ca họ nói.
 QUAN TRỌNG: luật lao động và điều khoản ứng dụng cấm phân biệt đối xử. KHÔNG đưa vào bản nháp yêu cầu về giới tính, tuổi, ngoại hình, tôn giáo, dân tộc, tình trạng hôn nhân. Giữ lại các yêu cầu về kỹ năng, thái độ (ví dụ nhanh nhẹn, chăm chỉ, đúng giờ). Nếu người dùng nêu yêu cầu bị cấm, hãy nói rõ ràng nhưng nhẹ nhàng trong reply rằng bạn đã bỏ phần đó.`;
   }
-  return `${RULES_COMMON}\n${when}${where}\nNgười dùng đang TÌM VIỆC. Từ yêu cầu của họ hãy tạo bộ lọc tìm việc bằng công cụ respond (trường search): keywords (tối đa 5 từ khóa ngắn về công việc/nơi làm như "phục vụ", "quán ăn", "phụ bếp"; không ghi tên thành phố trong keywords nếu đã có city), category, city, urgent, min_pay + pay_unit nếu họ nói mức lương tối thiểu ("30 nghìn" = 30000), near.
+  return `${RULES_COMMON}\n${when}${where}\nNgười dùng đang TÌM VIỆC. Từ yêu cầu của họ hãy tạo bộ lọc tìm việc, đặt trong trường search của JSON trả về: keywords (tối đa 5 từ khóa ngắn về công việc/nơi làm như "phục vụ", "quán ăn", "phụ bếp"; không ghi tên thành phố trong keywords nếu đã có city), category, city, urgent, min_pay + pay_unit nếu họ nói mức lương tối thiểu ("30 nghìn" = 30000), near.
 near: chỉ điền khi họ nêu một địa danh cụ thể (trường học, bệnh viện, khu phố, bến xe...) và bạn biết tọa độ gần đúng ở Việt Nam; đặt name là tên địa danh, radius_km thường 2-4. Nếu địa danh có nhiều cơ sở ở nhiều thành phố và không rõ, hãy hỏi lại họ ở thành phố nào (không điền near). Không chắc tọa độ thì để near = null và đưa tên địa danh vào keywords.
 Nếu họ chỉ chào hoặc hỏi chung chung, trả lời ngắn và hỏi họ muốn tìm việc gì, ở đâu (không điền search).`;
 }
 
+// Gemini response schema (an OpenAPI subset). Allowed values are listed in the descriptions and enforced again in cleanSearch/cleanDraft.
 function schemaFor(role: "seeker" | "employer") {
-  const reply = { type: "string", description: "Lời nhắn của Capy cho người dùng, tiếng Việt, tối đa 3 câu." };
+  const reply = { type: "STRING", description: "Lời nhắn của Capy cho người dùng, tiếng Việt, tối đa 3 câu." };
   if (role === "employer") {
     return {
-      type: "object", required: ["reply"], additionalProperties: false,
+      type: "OBJECT", required: ["reply"],
       properties: {
         reply,
         draft: {
-          type: "object", additionalProperties: false,
+          type: "OBJECT", nullable: true,
           required: ["title", "description", "category", "pay_amount", "pay_unit", "slots", "start_date", "end_date", "shift_note", "address", "city", "is_urgent"],
           properties: {
-            title: { type: "string" }, description: { type: "string" },
-            category: { type: "string", enum: CATEGORIES },
-            pay_amount: { type: ["integer", "null"], description: "VND, null nếu chưa biết" },
-            pay_unit: { type: "string", enum: UNITS },
-            slots: { type: "integer", minimum: 1, maximum: 50 },
-            start_date: { type: "string", description: "YYYY-MM-DD" }, end_date: { type: "string", description: "YYYY-MM-DD" },
-            shift_note: { type: "string", description: "ví dụ 17:00-22:00, để trống nếu chưa biết" },
-            address: { type: "string", description: "để trống nếu chưa biết" },
-            city: { type: "string", enum: [...CITIES, ""] }, is_urgent: { type: "boolean" },
+            title: { type: "STRING" }, description: { type: "STRING" },
+            category: { type: "STRING", description: CATEGORIES.join(" | ") },
+            pay_amount: { type: "INTEGER", nullable: true, description: "VND, null nếu chưa biết" },
+            pay_unit: { type: "STRING", description: UNITS.join(" | ") },
+            slots: { type: "INTEGER", description: "1 đến 50" },
+            start_date: { type: "STRING", description: "YYYY-MM-DD" }, end_date: { type: "STRING", description: "YYYY-MM-DD" },
+            shift_note: { type: "STRING", description: "ví dụ 17:00-22:00, để trống nếu chưa biết" },
+            address: { type: "STRING", description: "để trống nếu chưa biết" },
+            city: { type: "STRING", description: [...CITIES, "(để trống nếu không rõ)"].join(" | ") }, is_urgent: { type: "BOOLEAN" },
           },
         },
       },
     };
   }
   return {
-    type: "object", required: ["reply"], additionalProperties: false,
+    type: "OBJECT", required: ["reply"],
     properties: {
       reply,
       search: {
-        type: "object", additionalProperties: false,
+        type: "OBJECT", nullable: true,
         required: ["keywords", "category", "city", "urgent", "min_pay", "pay_unit", "near", "radius_km"],
         properties: {
-          keywords: { type: "array", items: { type: "string" }, maxItems: 5 },
-          category: { type: "string", enum: [...CATEGORIES, ""] }, city: { type: "string", enum: [...CITIES, ""] },
-          urgent: { type: "boolean" }, min_pay: { type: ["integer", "null"] }, pay_unit: { type: "string", enum: [...UNITS, ""] },
+          keywords: { type: "ARRAY", items: { type: "STRING" }, description: "tối đa 5" },
+          category: { type: "STRING", description: [...CATEGORIES, "(để trống nếu không rõ)"].join(" | ") },
+          city: { type: "STRING", description: [...CITIES, "(để trống nếu không rõ)"].join(" | ") },
+          urgent: { type: "BOOLEAN" }, min_pay: { type: "INTEGER", nullable: true }, pay_unit: { type: "STRING", description: [...UNITS, "(để trống nếu không rõ)"].join(" | ") },
           near: {
-            type: ["object", "null"], additionalProperties: false, required: ["name", "lat", "lng"],
-            properties: { name: { type: "string" }, lat: { type: "number" }, lng: { type: "number" } },
+            type: "OBJECT", nullable: true, required: ["name", "lat", "lng"],
+            properties: { name: { type: "STRING" }, lat: { type: "NUMBER" }, lng: { type: "NUMBER" } },
           },
-          radius_km: { type: "number" },
+          radius_km: { type: "NUMBER" },
         },
       },
     },
@@ -123,11 +126,11 @@ function cleanDraft(d: Record<string, unknown>, today: string) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "BAD_REQUEST" }, 405);
-  const url = Deno.env.get("SUPABASE_URL"), service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"), apiKey = Deno.env.get("ANTHROPIC_API_KEY");
+  const url = Deno.env.get("SUPABASE_URL"), service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"), apiKey = Deno.env.get("GEMINI_API_KEY");
   if (!url || !service) return json({ error: "AI_FAILED" }, 500);
   const admin = createClient(url, service, { auth: { persistSession: false } });
 
-  const { data: settings } = await admin.from("app_settings").select("key, value").in("key", ["ai_assistant", "ai_cap_guest", "ai_cap_user", "ai_cap_total"]);
+  const { data: settings } = await admin.from("app_settings").select("key, value").in("key", ["ai_assistant", "ai_cap_guest", "ai_cap_user", "ai_cap_total", "ai_model"]);
   const cfg = Object.fromEntries((settings ?? []).map((r) => [r.key, r.value]));
   if (cfg.ai_assistant !== "on") return json({ error: "AI_OFF" }, 403);
   if (!apiKey) return json({ error: "AI_NOT_CONFIGURED" }, 503);
@@ -136,7 +139,7 @@ Deno.serve(async (req) => {
   try { body = await req.json(); } catch { return json({ error: "BAD_REQUEST" }, 400); }
   const raw = Array.isArray(body.messages) ? body.messages.slice(-8) : [];
   const messages = raw
-    .map((m: Record<string, unknown>) => ({ role: m?.role === "assistant" ? "assistant" : "user", content: str(m?.text, 600) }))
+    .map((m: Record<string, unknown>) => ({ role: m?.role === "assistant" ? "model" : "user", content: str(m?.text, 600) }))
     .filter((m) => m.content);
   while (messages.length && messages[0].role !== "user") messages.shift();
   if (!messages.length || messages[messages.length - 1].role !== "user") return json({ error: "BAD_REQUEST" }, 400);
@@ -158,24 +161,43 @@ Deno.serve(async (req) => {
   if (!allowed) return json({ error: "AI_RATE_LIMIT" }, 429);
 
   const today = vnToday();
-  const ctl = new AbortController();
-  const timer = setTimeout(() => ctl.abort(), 25_000);
+  const model = /^[a-z0-9.\-]{3,40}$/.test(cfg.ai_model ?? "") ? cfg.ai_model : DEFAULT_MODEL;
+  const system = systemFor(role, city, today);
+  const contents = messages.map((m) => ({ role: m.role, parts: [{ text: m.content }] }));
+  const schema = schemaFor(role);
+  // First try with a response schema; if the model rejects an option (400), retry once with plain JSON mode and the shape described in words.
+  const call = async (strict: boolean) => {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 25_000);
+    try {
+      return await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        method: "POST", signal: ctl.signal,
+        headers: { "x-goog-api-key": apiKey, "content-type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: strict ? system : `${system}\nTrả về DUY NHẤT một đối tượng JSON theo mẫu: ${JSON.stringify(schema)}` }] },
+          contents,
+          generationConfig: {
+            responseMimeType: "application/json", maxOutputTokens: 1000, temperature: 0.3,
+            ...(strict ? { responseSchema: schema, thinkingConfig: { thinkingBudget: 0 } } : {}),
+          },
+        }),
+      });
+    } finally { clearTimeout(timer); }
+  };
   let res: Response;
   try {
-    res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST", signal: ctl.signal,
-      headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-      body: JSON.stringify({
-        model: MODEL, max_tokens: 900, system: systemFor(role, city, today), messages,
-        tools: [{ name: "respond", description: "Trả lời người dùng và (nếu đủ thông tin) kèm bộ lọc tìm việc hoặc bản nháp tin.", input_schema: schemaFor(role) }],
-        tool_choice: { type: "tool", name: "respond" },
-      }),
-    });
-  } catch { return json({ error: "AI_FAILED" }, 502); } finally { clearTimeout(timer); }
-  if (!res.ok) { console.error("anthropic", res.status, (await res.text()).slice(0, 300)); return json({ error: "AI_FAILED" }, 502); }
+    res = await call(true);
+    if (res.status === 400) res = await call(false);
+  } catch { return json({ error: "AI_FAILED" }, 502); }
+  if (!res.ok) { console.error("gemini", res.status, (await res.text()).slice(0, 300)); return json({ error: "AI_FAILED" }, 502); }
 
   const out = await res.json();
-  const input = (out.content ?? []).find((b: Record<string, unknown>) => b.type === "tool_use")?.input as Record<string, unknown> | undefined;
+  let input: Record<string, unknown> | undefined;
+  try {
+    const raw = String(out?.candidates?.[0]?.content?.parts?.map((p: { text?: string }) => p.text ?? "").join("") ?? "").trim();
+    const parsed = JSON.parse(raw.replace(/^```(?:json)?\s*|\s*```$/g, ""));
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) input = parsed;
+  } catch { /* handled below */ }
   if (!input) return json({ error: "AI_FAILED" }, 502);
   const reply = str(input.reply, 500) || "Mình chưa hiểu ý bạn, bạn nói rõ hơn giúp mình nhé.";
   if (role === "employer" && input.draft && typeof input.draft === "object") return json({ role, reply, draft: cleanDraft(input.draft as Record<string, unknown>, today.iso) });
