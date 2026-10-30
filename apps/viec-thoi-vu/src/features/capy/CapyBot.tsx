@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useI18n } from '../../lib/i18n'
-import { CapyFigure } from './CapyFigure'
+import { CapyFigure, type CapyAct } from './CapyFigure'
 
 const POS_KEY = 'vtv-capy-pos'
 const HI_KEY = 'vtv-capy-hi'
 const SIZE = 72
+const SLEEP_AFTER = 30_000 // no touch for this long: Capy dozes off until the next touch
 const EDGE = 8
 
 type Pos = { fx: number; fy: number } // place on screen as fractions of the free width / height, so it survives rotation and resizing
@@ -38,6 +39,31 @@ export function CapyBot({ onOpen }: { onOpen: () => void }) {
   const drag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null)
   const justDragged = useRef(false)
   const [live, setLive] = useState<{ x: number; y: number } | null>(null)
+  // what Capy is doing: hello on the first visit, then a short wave every few seconds; drag, drop, tap and dozing play over it
+  const [act, setAct] = useState<CapyAct>(hello ? 'hello' : 'wave')
+  const actTimer = useRef(0)
+  const play = (a: CapyAct, ms = 0) => {
+    window.clearTimeout(actTimer.current)
+    setAct(a)
+    if (ms) actTimer.current = window.setTimeout(() => setAct('wave'), ms)
+  }
+
+  useEffect(() => {
+    if (hello) actTimer.current = window.setTimeout(() => setAct('wave'), 4100)
+    return () => window.clearTimeout(actTimer.current)
+  }, [hello])
+  useEffect(() => {
+    let id = 0
+    const awake = () => {
+      window.clearTimeout(id)
+      setAct((a) => (a === 'sleepy' ? 'wave' : a))
+      id = window.setTimeout(() => setAct((a) => (a === 'wave' ? 'sleepy' : a)), SLEEP_AFTER)
+    }
+    awake()
+    const opts = { passive: true }
+    window.addEventListener('pointerdown', awake, opts); window.addEventListener('scroll', awake, opts); window.addEventListener('keydown', awake)
+    return () => { window.clearTimeout(id); window.removeEventListener('pointerdown', awake); window.removeEventListener('scroll', awake); window.removeEventListener('keydown', awake) }
+  }, [])
 
   useEffect(() => {
     if (!bubble) return
@@ -69,21 +95,25 @@ export function CapyBot({ onOpen }: { onOpen: () => void }) {
       d.moved = true
       e.currentTarget.setPointerCapture(e.pointerId)
       setBubble(false)
+      play('dragged')
     }
     setLive({ x: clamp(d.ox + dx, W - SIZE), y: clamp(d.oy + dy, H - SIZE) })
   }
   const up = (e: React.PointerEvent<HTMLButtonElement>) => {
     const d = drag.current
     drag.current = null
-    if (!d || d.id !== e.pointerId || !d.moved || !live) return
+    if (!d || d.id !== e.pointerId || !d.moved) return
+    if (!live) { play('wave'); return }
     justDragged.current = true
+    play('drop', 1500)
     const p = { fx: (live.x) / Math.max(1, W - SIZE), fy: (live.y) / Math.max(1, H - SIZE) }
     setPos(p); setLive(null)
     try { localStorage.setItem(POS_KEY, JSON.stringify(p)) } catch { /* private mode: the place is kept until reload */ }
   }
   const click = () => {
     if (justDragged.current) { justDragged.current = false; return }
-    onOpen()
+    play('tap', 800)
+    window.setTimeout(onOpen, 280) // let the little start show before the chat covers it
   }
 
   return (
@@ -95,7 +125,7 @@ export function CapyBot({ onOpen }: { onOpen: () => void }) {
       )}
       <button type="button" className="capyme" aria-label={t('capyFab')}
         onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onClick={click}>
-        <CapyFigure />
+        <CapyFigure act={act} />
       </button>
     </div>
   )

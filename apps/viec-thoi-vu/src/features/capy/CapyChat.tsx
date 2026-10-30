@@ -67,7 +67,7 @@ export function CapyChat() {
         <div className="capyscrim" onClick={() => setOpen(false)}>
           <section className="capypanel" role="dialog" aria-label={t('capyName')} onClick={(e) => e.stopPropagation()}>
             <header>
-              <span className="capyav"><CapyFigure /></span>
+              <span className="capyav"><CapyFigure act={busy ? 'think' : undefined} /></span>
               <div><b>{t('capyName')}</b><small>{t('capyWho')}</small></div>
               <button type="button" className="capyx" onClick={() => setOpen(false)} aria-label={t('capyClose')}>×</button>
             </header>
