@@ -508,9 +508,13 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 .jobwrap>.savebtn{position:absolute;right:12px;bottom:10px}
 .cards.wide .jobwrap>.savebtn{bottom:12px;right:16px}
 .savedbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:4px 0 14px}
+@media(max-width:599px){.savedbar>.btn{flex:1 1 0;min-width:0;width:auto;padding-left:10px;padding-right:10px}.savedbar>span{flex-basis:100%}}
 .savedrow.picked{border-color:var(--p);box-shadow:0 0 0 2px var(--brand-100, rgba(179,90,36,.15))}
-.pick{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;cursor:pointer;min-height:40px}
-.pick input{width:18px;height:18px;accent-color:var(--p)}
+.pick{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;cursor:pointer;min-height:40px;padding:0 14px 0 10px;border:1.5px solid var(--line);border-radius:999px;background:#fff;user-select:none}
+.savedrow.picked .pick{border-color:var(--p);background:var(--brand-50);color:var(--brand-600)}
+.savedrow .acts{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:12px;border-top:1px solid var(--line)}
+.savedrow .acts .pick{margin-right:auto}
+.pick input{width:18px;height:18px;margin:0;accent-color:var(--p)}
 .cmpwrap{overflow-x:auto;margin:8px 0 12px;width:100%}
 .cmp{border-collapse:collapse;width:100%;font-size:14px}
 .cmp th,.cmp td{padding:10px 8px;border-bottom:1px solid var(--gray-100);text-align:left;vertical-align:top}
