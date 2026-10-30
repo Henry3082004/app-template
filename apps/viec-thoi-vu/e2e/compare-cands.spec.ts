@@ -1,0 +1,26 @@
+import { expect, helpers, test } from './fixtures'
+
+test('shop compares candidates side by side: big photo + rating on each card, tick 2, open the table, accept from it', async ({ page: p }) => {
+  const h = helpers(p)
+  await p.goto('/app'); await h.see('Phụ bếp ca tối')
+  await h.asEmployer(); await h.postJob('Phục vụ khai trương'); await h.signOut()
+  await h.asSeeker(); await h.go('/app'); await h.see('Phục vụ khai trương')
+  await p.locator('button.job', { hasText: 'Phục vụ khai trương' }).first().click()
+  await p.getByRole('button', { name: 'Ứng tuyển ngay' }).first().click(); await h.see('Đã gửi đơn!')
+  await h.signOut(); await h.asEmployer()
+  await h.go('/app/ung-vien'); await h.see('Minh Anh')
+  await expect(p.locator('.chbadge').first()).toBeVisible() // the rating (or "Người mới") sits under every photo
+  await expect(p.getByRole('button', { name: /So sánh \(0\)/ })).toBeDisabled()
+  await p.locator('.pick').nth(0).click(); await expect(p.getByRole('button', { name: /So sánh \(1\)/ })).toBeDisabled()
+  await p.locator('.pick').nth(1).click()
+  await p.getByRole('button', { name: /So sánh \(2\)/ }).click()
+  const dlg = p.getByRole('dialog', { name: 'So sánh ứng viên' })
+  await expect(dlg).toContainText('Đánh giá'); await expect(dlg).toContainText('Ca đã làm'); await expect(dlg).toContainText('Phục vụ khai trương'); await expect(dlg).toContainText('Pha chế ca sáng')
+  await h.noHScroll()
+  await dlg.getByRole('button', { name: 'Nhận', exact: true }).first().click()
+  await expect(p.getByRole('dialog', { name: 'So sánh ứng viên' })).toHaveCount(0)
+  // right after choosing someone, the payment step opens from the same screen (no hunting for the button later)
+  await h.see('Nạp tiền giữ chỗ để người làm thấy số liên hệ'); await p.getByRole('button', { name: 'Nạp tiền giữ chỗ' }).click()
+  await p.getByRole('button', { name: 'Xác nhận nạp tiền' }).click()
+  await h.go('/app/ca-lam'); await h.see('Đã giữ')
+})

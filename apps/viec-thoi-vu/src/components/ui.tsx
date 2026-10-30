@@ -37,7 +37,7 @@ export function Fld({ label, hint, htmlFor, children }: { label: string; hint?: 
 }
 
 /** Bottom sheet on phones, centred dialog from 600px. `full` = full-screen on phones (success screens). */
-export function Dialog({ children, onClose, full, label }: { children: ReactNode; onClose?: () => void; full?: boolean; label: string }) {
+export function Dialog({ children, onClose, full, wide, label }: { children: ReactNode; onClose?: () => void; full?: boolean; wide?: boolean; label: string }) {
   useEffect(() => {
     const f = (e: KeyboardEvent) => e.key === 'Escape' && onClose?.()
     window.addEventListener('keydown', f)
@@ -47,7 +47,7 @@ export function Dialog({ children, onClose, full, label }: { children: ReactNode
   }, [onClose])
   return (
     <div className="scrim" onClick={onClose}>
-      <div className={'dlg' + (full ? ' full' : '')} role="dialog" aria-modal="true" aria-label={label} onClick={(e) => e.stopPropagation()}>
+      <div className={'dlg' + (full ? ' full' : '') + (wide ? ' wide' : '')} role="dialog" aria-modal="true" aria-label={label} onClick={(e) => e.stopPropagation()}>
         <div className="grab" />
         {children}
       </div>

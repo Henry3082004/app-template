@@ -1,36 +1,32 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { ChatDialog } from '../collab/ChatDialog'
 import { ContactButtons } from '../../components/ContactButtons'
 import { Ic } from '../../components/Ic'
 import { ReportDialog } from '../collab/ReportDialog'
 import { EmployerPay } from './escrow'
-import { Avatar, Btn, Empty, ErrorBox, Skel, Tag } from '../../components/ui'
+import { Btn, Empty, ErrorBox, Skel, Tag } from '../../components/ui'
+import { CandHead } from '../hiring/CandHead'
+import { api } from '../../lib/api'
 import { dateRange, vnClock } from '../../lib/format'
 import { hireShifts, useHires, type HireShift, type HireWhen } from '../../lib/hires'
 import { useI18n, type TKey } from '../../lib/i18n'
 import { displayPhone } from '../../lib/phone'
 import { useSession } from '../../lib/session'
-import { avatarUrl } from '../../lib/worker'
+import type { Reputation } from '../../lib/types'
 
 const TITLES: Record<HireWhen, TKey> = { confirm: 'hireShiftsConfirm', today: 'shiftsToday', soon: 'shiftsSoon', done: 'shiftsDone' }
 
-function Card({ s, onChanged }: { s: HireShift; onChanged(): void }) {
+function Card({ s, rep, onChanged }: { s: HireShift; rep?: Reputation; onChanged(): void }) {
   const { t } = useI18n()
   const h = s.hire
   const nav = useNavigate()
   const [dlg, setDlg] = useState<null | 'chat' | 'report'>(null)
   return (
     <article className="card shiftcard">
-      <div className="row">
-        <Avatar name={h.full_name} src={avatarUrl(h.avatar_path)} size={48} />
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <b>{h.full_name}</b>
-          <div className="sub" style={{ fontSize: 14, cursor: 'pointer' }} onClick={() => nav(`/app/tin/${h.job.id}`)}>{h.job.title}</div>
-        </div>
-        {s.when === 'confirm' && <Tag tone="urgent">{t('hireShiftsConfirm')}</Tag>}
-        {s.when === 'today' && <Tag tone="sun">{t('shiftOnToday')}</Tag>}
-      </div>
+      <CandHead name={h.full_name} avatar={h.avatar_path} rep={rep}
+        sub={<span style={{ cursor: 'pointer' }} onClick={() => nav(`/app/tin/${h.job.id}`)}>{h.job.title}</span>}
+        tag={<>{s.when === 'confirm' && <Tag tone="urgent">{t('hireShiftsConfirm')}</Tag>}{s.when === 'today' && <Tag tone="sun">{t('shiftOnToday')}</Tag>}</>} />
       <div className="shiftmeta">
         <span><Ic n="calendar" size={15} /> {dateRange(h.job.start_date, h.job.end_date)}{h.job.shift_note ? ` · ${h.job.shift_note}` : ''}</span>
         {h.phone && <span><Ic n="phone" size={15} /> {displayPhone(h.phone)}</span>}
@@ -64,6 +60,11 @@ export default function EmployerShifts() {
   const nav = useNavigate()
   const { profile, ready } = useSession()
   const { list, error, reload } = useHires()
+  const [reps, setReps] = useState<Record<string, Reputation>>({})
+  useEffect(() => {
+    const ids = [...new Set((list ?? []).filter((h) => h.status === 'accepted').map((h) => h.seeker_id))]
+    if (ids.length) api.reputations(ids, 'seeker').then(setReps).catch(() => undefined)
+  }, [list])
   if (!ready) return <div className="pg"><Skel n={2} /></div>
   if (profile?.role !== 'employer') return <Navigate to="/app" replace />
   const shifts = hireShifts(list)
@@ -78,7 +79,7 @@ export default function EmployerShifts() {
         return rows.length === 0 ? null : (
           <section key={w} className="stack">
             <h2 className="sechead">{t(TITLES[w])} <span className="count">{rows.length}</span></h2>
-            <div className="g2">{rows.map((s) => <Card key={s.hire.id} s={s} onChanged={reload} />)}</div>
+            <div className="g2">{rows.map((s) => <Card key={s.hire.id} s={s} rep={reps[s.hire.seeker_id]} onChanged={reload} />)}</div>
           </section>
         )
       })}

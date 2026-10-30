@@ -2,13 +2,17 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ContactButtons } from '../../components/ContactButtons'
 import { Ic } from '../../components/Ic'
-import { EmployerPay, Rep } from '../shifts/escrow'
-import { PersonRow } from '../../components/PersonRow'
+import { EmployerPay } from '../shifts/escrow'
+import { FundDialog } from '../shifts/escrow/dialogs'
+import type { JobTerms } from '../shifts/escrow/shared'
+import { CandHead } from '../hiring/CandHead'
+import { CompareBar, CompareCands, MAX_COMPARE, PickCand } from '../hiring/CompareCands'
 import { Btn, Dialog, Empty, ErrorBox, Skel, Tag } from '../../components/ui'
 import { WorkerFacts } from '../account/WorkerFields'
 import { api } from '../../lib/api'
+import { useAppConfig } from '../../lib/config'
 import { capy } from '../../lib/capy'
-import { dateRange } from '../../lib/format'
+import { dateRange, today } from '../../lib/format'
 import { tap } from '../../lib/haptics'
 import { useI18n, type TKey } from '../../lib/i18n'
 import { displayPhone } from '../../lib/phone'
@@ -23,7 +27,10 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
   const [reps, setReps] = useState<Record<string, Reputation>>({})
   const [error, setError] = useState<unknown>(null)
   const act = useAction()
-  const [accepted, setAccepted] = useState<{ name: string; phone: string | null } | null>(null)
+  const [chosen, setChosen] = useState<string[]>([])
+  const [comparing, setComparing] = useState(false)
+  const cfg = useAppConfig()
+  const [accepted, setAccepted] = useState<AcceptedInfo | null>(null)
 
   const load = () => {
     setError(null)
@@ -34,11 +41,13 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
   }
   useEffect(() => { setList(null); load() }, [job.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const pick = (id: string) => setChosen((c) => (c.includes(id) ? c.filter((x) => x !== id) : c.length >= MAX_COMPARE ? c : [...c, id]))
   const decide = (a: Applicant, d: 'accepted' | 'rejected') => {
     tap()
     return act.run(a.id, async () => {
       const r = await api.decide(a.id, d)
-      if (d === 'accepted') setAccepted({ name: a.full_name, phone: r.phone })
+      if (d === 'accepted') setAccepted({ name: a.full_name, phone: r.phone, fund: cfg && cfg.payment_mode !== 'off' && job.end_date >= today() ? { app: { ...a, status: 'accepted' }, job } : undefined })
+      setComparing(false)
       load()
     })
   }
@@ -63,14 +72,15 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
         {act.error != null && <div style={{ marginBottom: 12 }}><ErrorBox error={act.error} where="Applicants.action" /></div>}
         {!list && !error && <Skel n={2} />}
         {list && list.length === 0 && <Empty pose="empty" title={t('noApplicants')} />}
+        {list && list.length > 1 && <CompareBar n={chosen.length} onOpen={() => setComparing(true)} />}
         <div className="g2">
           {list?.map((a) => (
             <div key={a.id} className="card cand">
-              <PersonRow name={a.full_name} avatar={a.avatar_path} sub={a.bio}
+              <CandHead name={a.full_name} avatar={a.avatar_path} rep={reps[a.seeker_id]} sub={a.bio}
                 tag={a.status !== 'pending' && <Tag tone={a.status === 'accepted' ? 'ok' : ''}>{t(`st${a.status}` as TKey)}</Tag>} />
               <WorkerFacts w={a} />
-              <Rep rep={reps[a.seeker_id]} />
               {a.message && <div className="tag" style={{ borderRadius: 12, whiteSpace: 'normal' }}><Ic n="message" size={14} /> “{a.message}”</div>}
+              {(list?.length ?? 0) > 1 && <div className="acts"><PickCand on={chosen.includes(a.id)} disabled={chosen.length >= MAX_COMPARE} onChange={() => pick(a.id)} /></div>}
               {a.status === 'accepted' && a.phone && (
                 <>
                   <div className="phone"><Ic n="phone" size={20} /> {displayPhone(a.phone)}</div>
@@ -89,14 +99,19 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
         </div>
         <div className="center mt24 acts"><Btn v="text" onClick={() => nav(`/app/dang-tin?lai=${job.id}`)}>{t('repostJob')}</Btn><Btn v="text" onClick={toggle}>{job.status === 'open' ? t('closeJob') : t('reopenJob')}</Btn></div>
       </div>
-      {accepted && <AcceptedDialog accepted={accepted} onClose={() => setAccepted(null)} />}
+      {comparing && list && <CompareCands people={chosen.map((id) => list.find((x) => x.id === id)!).filter(Boolean).map((x) => ({ ...x, job }))} reps={reps} busy={act.busy} onDecide={decide} onClose={() => setComparing(false)} />}
+      {accepted && <AcceptedDialog accepted={accepted} onFunded={load} onClose={() => setAccepted(null)} />}
     </div>
   )
 }
 
-/** "Đã nhận X" — the worker's phone right after accepting. */
-export function AcceptedDialog({ accepted, onClose }: { accepted: { name: string; phone: string | null }; onClose(): void }) {
+export type AcceptedInfo = { name: string; phone: string | null; fund?: { app: Applicant; job: JobTerms } }
+
+/** "Đã nhận X" — the worker's phone right after accepting, and (when deposits are on) the next step: put the money on hold. */
+export function AcceptedDialog({ accepted, onClose, onFunded }: { accepted: AcceptedInfo; onClose(): void; onFunded?(): void }) {
   const { t } = useI18n()
+  const [paying, setPaying] = useState(false)
+  if (paying && accepted.fund) return <FundDialog app={accepted.fund.app} job={accepted.fund.job} onClose={() => setPaying(false)} onDone={() => { onFunded?.(); onClose() }} />
   return (
     <Dialog full label={t('acceptedTitle', { name: accepted.name })} onClose={onClose}>
       <img className="capy sm hop" src={capy('cheer')} alt="" />
@@ -106,6 +121,12 @@ export function AcceptedDialog({ accepted, onClose }: { accepted: { name: string
         <>
           <div className="phone">{displayPhone(accepted.phone)}</div>
           <div className="row" style={{ gap: 10, width: '100%' }}><ContactButtons phone={accepted.phone} block /></div>
+        </>
+      )}
+      {accepted.fund && (
+        <>
+          <div className="notice warn" style={{ width: '100%', textAlign: 'left' }}>{t('fundWaitingEmp')}</div>
+          <Btn block onClick={() => setPaying(true)}>{t('fundCta')}</Btn>
         </>
       )}
       <Btn v="text" onClick={onClose}>{t('done')}</Btn>

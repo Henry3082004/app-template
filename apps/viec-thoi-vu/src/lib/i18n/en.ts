@@ -145,6 +145,7 @@ export const en: Dict = {
   applyAll: 'Apply to all ({n})', compareBtn: 'Compare ({n})', compareHint: 'Tick 2–3 jobs to compare.', comparePick: 'Compare', compareTitle: 'Compare jobs',
   applyAllSent: '{n} applications sent.', applyAllSkipped: '{n} jobs skipped: already applied, closed or full.', applyAllFailed: '{n} jobs could not be sent. Please try again.',
   cmpPay: 'Pay', cmpDates: 'Dates', cmpShift: 'Hours', cmpPlace: 'Place', cmpShop: 'Shop', cmpSlots: 'Places left', cmpUrgent: 'Urgent', yes: 'Yes', no: 'No', openJob: 'View job',
+  candCompareHint: 'Tick 2–3 candidates to compare.', candCompareTitle: 'Compare candidates', cmpRating: 'Rating', cmpShiftsDone: 'Shifts done', cmpOnTime: 'On time', cmpLateNoshow: 'Late · no-show', cmpStrengths: 'Strengths', cmpAge: 'Age', cmpExp: 'Experience', cmpAvail: 'Free time', cmpApplied: 'Applied for', cmpMessage: 'Message',
   capyFab: 'Ask Capy', capyGreet: 'Hi there! I\'m Capy 👋 How can I help you?', capyName: 'Capy', capyWho: 'Job assistant', capyClose: 'Close', capySend: 'Send', capyPh: 'Type your request…', capyThinking: 'Capy is thinking…',
   capyHelloSeeker: "Hi, I'm Capy. What kind of job are you looking for, and where? Just write it like a message and I'll filter for you.",
   capyHelloEmployer: "Hi, I'm Capy. How many people do you need, for what, and when? I'll draft the post so you only check and publish.",

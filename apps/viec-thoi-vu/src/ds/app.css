@@ -722,3 +722,18 @@ svg.cfx{overflow:visible}
 .capydraft{display:flex;flex-direction:column;gap:6px;background:var(--bg);border-radius:14px;padding:12px;font-size:14px}.capydraft .btn{align-self:flex-start;margin-top:4px}
 .capychip{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--brand-50);border:1px solid var(--brand-300);border-radius:14px;padding:8px 12px;font-size:14px;margin-bottom:10px}
 .capychip button{border:0;background:none;color:var(--brand-600);font-weight:700;cursor:pointer;min-height:32px}
+/* candidate cards (shop side): big photo with its star rating pinned underneath */
+.chead{display:flex;gap:14px;align-items:flex-start}
+.chav{position:relative;flex:none;width:84px;padding-bottom:12px}
+.chav .avatar{border:3px solid #fff;box-shadow:0 2px 8px rgba(80,45,20,.18)}
+.chbadge{position:absolute;left:50%;bottom:0;transform:translateX(-50%);display:inline-flex;align-items:center;gap:3px;white-space:nowrap;padding:2px 9px;border-radius:999px;background:#2A1D14;color:#fff;font-size:13px;font-weight:800;line-height:1.3;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.chbadge svg{fill:var(--sun);color:var(--sun)}.chbadge.new{background:var(--pbg);color:var(--p2);font-size:12px;font-weight:700;border:1px solid var(--brand-300)}
+.chtxt{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}.chname{font-size:18px;line-height:1.2}
+.chtxt .rep.sm{margin-top:2px}.chtxt .stars-n{font-size:16px}.chtxt .stars-n b{font-size:17px}.chtxt .stars-n svg{width:18px;height:18px}
+.cand .acts .pick{margin-right:auto}
+.cmpc th[scope=col]{vertical-align:bottom}.cmphead{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}.cmphead b{font-size:15px}
+.cmpc td.best{background:var(--okbg);font-weight:700;color:var(--okfg)}.cmpstar{display:inline-flex;align-items:center;gap:4px}.cmpstar svg{fill:var(--sun);color:var(--sun)}
+.cmpc td{min-width:132px}.cmpacts{display:flex;gap:6px;flex-wrap:wrap}
+@media(min-width:700px){.dlg.full.wide{max-width:min(960px,94vw);width:100%;height:auto;max-height:92vh;border-radius:28px;margin:auto}.dlg.full.wide .cmpwrap{width:100%}}
+.dlg.full.wide{justify-content:flex-start}.dlg.full.wide .cmp{text-align:left}
+.shiftcard>.acts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
