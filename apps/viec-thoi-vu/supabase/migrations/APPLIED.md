@@ -64,3 +64,5 @@ Edge function `capy-assistant` (Google Gemini, mặc định `gemini-2.5-flash`,
 
 31/10/2026: `20261106_zalo_links.sql` áp dụng thành `zalo_links` (bảng `zalo_links`: mã người dùng Zalo ↔ tài khoản, ghi bởi `zalo-login` mỗi lần đăng nhập Zalo; bảng `zalo_revokes`: nhật ký sự kiện rút đồng ý; cả hai chỉ máy chủ đọc/ghi). Test: `supabase/tests/180_zalo_links.sql`.
 Edge function `zalo-webhook` (Webhook URL của Mini App: `https://niscqjczfvipxxgdslqs.supabase.co/functions/v1/zalo-webhook`) đã triển khai: kiểm tra chữ ký `X-ZEvent-Signature` (sha256 các giá trị theo thứ tự tên khóa + API Key), sự kiện `user.revoke.consent` → tạo yêu cầu xóa tài khoản (quản trị xử lý trong 7 ngày). Cần secret `ZALO_API_KEY` (API Key của Open API Mini App). `zalo-login` v6 ghi mã Zalo vào `zalo_links`. `signup` v5: đăng ký SĐT + mật khẩu (SĐT chưa xác thực).
+
+31/10/2026: `20261107_zalo_revokes_verified.sql` thêm cột `zalo_revokes.verified`. `zalo-webhook` v2: chưa có secret `ZALO_API_KEY` (Zalo chưa cấp key Open API) thì vẫn nhận sự kiện nhưng đánh dấu CHƯA kiểm tra chữ ký (cả yêu cầu xóa lẫn nhật ký) — quản trị liên hệ người dùng trước khi xóa; có key thì sai chữ ký bị từ chối (401).

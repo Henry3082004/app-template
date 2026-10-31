@@ -8,6 +8,8 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 //   { "event": "user.revoke.consent", "appId": "…", "userId": "<Zalo id>", "timestamp": 1670553442564 }
 // The account linked to that Zalo id (zalo_links, written at every Zalo sign-in) gets an account-deletion request, which the admin
 // carries out within 7 days as the privacy policy says. Every event is logged in zalo_revokes. Other events are acknowledged and ignored.
+// Until ZALO_API_KEY is set (Zalo has to issue the Open API key) signatures cannot be checked: events are still taken, but the request
+// and the log are marked unverified, and the admin confirms with the person before deleting anything. With the key set, a bad signature is refused.
 const APP_ID = Deno.env.get("ZALO_APP_ID") ?? "2847107362388346804";
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 
@@ -32,7 +34,6 @@ function sameText(a: string, b: string): boolean {
 Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ error: "METHOD_NOT_ALLOWED" }, 405);
   const apiKey = Deno.env.get("ZALO_API_KEY");
-  if (!apiKey) return json({ error: "NOT_CONFIGURED" }, 503);
 
   let data: Record<string, unknown>;
   try {
@@ -43,8 +44,11 @@ Deno.serve(async (req) => {
     return json({ error: "BAD_REQUEST" }, 400);
   }
 
-  const given = (req.headers.get("x-zevent-signature") ?? "").trim().toLowerCase();
-  if (!given || !sameText(given, await zaloSignature(data, apiKey))) return json({ error: "BAD_SIGNATURE" }, 401);
+  const verified = !!apiKey;
+  if (apiKey) {
+    const given = (req.headers.get("x-zevent-signature") ?? "").trim().toLowerCase();
+    if (!given || !sameText(given, await zaloSignature(data, apiKey))) return json({ error: "BAD_SIGNATURE" }, 401);
+  }
   if (String(data.appId ?? "") !== APP_ID) return json({ error: "WRONG_APP" }, 403);
   if (data.event !== "user.revoke.consent") return json({ ok: true, ignored: true });
 
@@ -57,11 +61,13 @@ Deno.serve(async (req) => {
 
   let outcome: "request_created" | "request_open" | "no_account" = "no_account";
   if (link) {
-    const { error } = await admin.from("deletion_requests").insert({ user_id: link.user_id, reason: "Zalo: người dùng rút lại sự đồng ý và yêu cầu xoá dữ liệu (user.revoke.consent)" });
+    const reason = "Zalo: người dùng rút lại sự đồng ý và yêu cầu xoá dữ liệu (user.revoke.consent)"
+      + (verified ? "" : " — CHƯA kiểm tra chữ ký, hãy liên hệ người dùng trước khi xoá");
+    const { error } = await admin.from("deletion_requests").insert({ user_id: link.user_id, reason });
     if (!error) outcome = "request_created";
     else if (error.code === "23505") outcome = "request_open"; // a request for this account is already open
     else return json({ error: "FAILED" }, 500);
   }
-  await admin.from("zalo_revokes").insert({ zalo_id: zaloId, user_id: link?.user_id ?? null, outcome });
+  await admin.from("zalo_revokes").insert({ zalo_id: zaloId, user_id: link?.user_id ?? null, outcome, verified });
   return json({ ok: true });
 });
