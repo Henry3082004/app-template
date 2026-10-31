@@ -681,3 +681,12 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 .dlg.full.wide{justify-content:flex-start}.dlg.full.wide .cmp{text-align:left}
 .shiftcard>.acts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .capybot.hi .cfx.act-hello .cf-root,.capybot.hi .cfx.act-hello .cf-head,.capybot.hi .cfx.act-hello .cf-arm-r{animation-delay:.85s}
+/* job card footer: dates + hours on the left, places left as a pill on the right */
+.job .meta{align-items:center;gap:8px 12px}.jinfo{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;min-width:0;font-weight:500;color:var(--tx)}
+.jinfo>span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.jinfo svg{color:var(--tx2);flex:none}.jshift{overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.job .meta>.jslots{margin-left:auto;padding:3px 10px;border-radius:999px;background:var(--gray-100);color:var(--tx2);font-size:12.5px;font-weight:700;white-space:nowrap}
+.jslots::first-letter{text-transform:uppercase}.job .meta>.jslots.low{background:var(--errbg);color:var(--errfg)}.job .meta>.jslots.full{background:var(--gray-100);color:var(--tx2);font-weight:600}
+.job .bname{display:flex;align-items:center;gap:8px;min-width:0}.job .bname b{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.jrate{display:inline-flex;align-items:center;gap:3px;flex:none;font-size:13px;font-weight:700;color:var(--tx)}.jrate svg{fill:var(--sun);color:var(--sun)}.jrate small{font-weight:500;color:var(--tx2);font-size:12px}
+.jnew{flex:none;padding:1px 8px;border-radius:999px;background:var(--pbg);color:var(--p2);font-size:11.5px;font-weight:700;letter-spacing:.02em}
+.jdone{flex:none;font-size:12.5px;color:var(--tx2);white-space:nowrap}

@@ -1,9 +1,9 @@
-import { dateRange, money, payUnitKey } from '../../lib/format'
+import { dateSpan, money, payUnitKey } from '../../lib/format'
 import { fmtKm } from '../../lib/geo'
 import { useI18n } from '../../lib/i18n'
 import type { Job, Reputation } from '../../lib/types'
 import { avatarUrl } from '../../lib/worker'
-import { Rep } from '../shifts/escrow'
+import { Ic } from '../../components/Ic'
 import { Avatar, Tag } from '../../components/ui'
 import { SaveButton } from './SaveButton'
 
@@ -16,6 +16,7 @@ export function JobCard({ job, distance, sel, rep, fit, save, onOpen }: { job: J
   const { t, locale } = useI18n()
   const left = job.slots - job.filled
   const full = left <= 0 || job.status !== 'open'
+  const rated = !!rep && rep.ratings > 0 && rep.avg_stars != null
   const card = (
     <button type="button" className={'card job' + (sel ? ' sel' : '') + (full ? ' full' : '')} onClick={onOpen}>
       <div className="hrow"><h3>{job.title}</h3>{job.is_urgent && <Tag tone="urgent">{t('urgent')}</Tag>}</div>
@@ -25,15 +26,18 @@ export function JobCard({ job, distance, sel, rep, fit, save, onOpen }: { job: J
         <div className="bizrow">
           <Avatar square size={36} name={job.business_name} src={avatarUrl(job.business_logo)} />
           <div className="biz">
-            <b>{job.business_name}</b>
+            <span className="bname"><b>{job.business_name}</b>{rep && (rated ? <span className="jrate"><Ic n="star" size={13} /> {rep.avg_stars!.toFixed(1)} <small>({rep.ratings})</small></span> : rep.shifts_done === 0 && <span className="jnew">{t('jobNewShop')}</span>)}
+              {rep && rep.shifts_done > 0 && <span className="jdone">{t('repShifts', { n: rep.shifts_done })}</span>}</span>
             <span>{job.city}{distance != null ? ` · ${fmtKm(distance, locale)}` : ''}</span>
           </div>
         </div>
       )}
       <div className="meta">
-        <Rep rep={rep} employer size="sm" />
-        <span>{dateRange(job.start_date, job.end_date)}</span>
-        <span className={full || left <= 3 ? 'low' : ''}>{full ? t('full') : t('slotsLeft', { n: left })}</span>
+        <div className="jinfo">
+          <span><Ic n="calendar" size={15} /> {dateSpan(job.start_date, job.end_date)}</span>
+          {job.shift_note && <span className="jshift"><Ic n="clock" size={15} /> {job.shift_note}</span>}
+        </div>
+        <span className={'jslots' + (full ? ' full' : left <= 3 ? ' low' : '')}>{full ? t('full') : t('slotsLeft', { n: left })}</span>
       </div>
     </button>
   )

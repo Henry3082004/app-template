@@ -25,11 +25,13 @@ export function AuthDialog() {
   // Inside Zalo the default is "continue with Zalo" (no typing, no password); the old form stays as a fallback.
   const [viaZalo, setViaZalo] = useState(IN_ZALO)
   const [zalo, setZalo] = useState<{ ticket: string; phone: string; name: string | null } | null>(null)
+  // the real site starts with Zalo / Google; "use a phone number" opens the same phone + password form the demo builds show at once
+  const [viaPhone, setViaPhone] = useState(false)
   // Every time the dialog opens it starts fresh (no leftover signup ticket / error from last time).
   // the role a new account starts with: pre-selected from the button pressed, changeable on the sign-up form
   const [pick, setPick] = useState<Role | null>(null)
   useEffect(() => {
-    if (authRequest) { setViaZalo(IN_ZALO); setZalo(null); setError(null); setPick(null) }
+    if (authRequest) { setViaZalo(IN_ZALO); setViaPhone(false); setZalo(null); setError(null); setPick(null) }
   }, [authRequest])
   if (!authRequest) return null
   const role: Role = pick ?? authRequest.role
@@ -116,7 +118,7 @@ export function AuthDialog() {
   }
 
   const d = DEMO[role === 'seeker' ? 'seeker' : 'employer']
-  if (!IN_ZALO && !ALLOW_PASSWORD) {
+  if (!IN_ZALO && !ALLOW_PASSWORD && !viaPhone) {
     return (
       <Dialog onClose={closeAuth} label={t('loginTitle')}>
         <img className="wavecorner" src={capy('wave')} alt="" />
@@ -137,6 +139,12 @@ export function AuthDialog() {
             {googleBtn}
           </div>
         )}
+        <div className="card stack" style={{ boxShadow: 'none' }}>
+          <b>{t('authPhoneTitle')}</b>
+          <div className="sub" style={{ fontSize: 14 }}>{t('authPhoneText')}</div>
+          <Btn block onClick={() => { setMode('signup'); setViaPhone(true); setError(null) }}>{t('authPhoneSignup')}</Btn>
+          <Btn v="ghost" block onClick={() => { setMode('login'); setViaPhone(true); setError(null) }}>{t('authPhoneLogin')}</Btn>
+        </div>
         {error != null && <ErrorBox error={error} where="AuthDialog.web" />}
       </Dialog>
     )
@@ -203,7 +211,7 @@ export function AuthDialog() {
             </div>
           </>
         )}
-        <Fld label={t('phone')} htmlFor="a-phone"><input id="a-phone" className="inp" type="tel" inputMode="tel" value={f.phone} onChange={set('phone')} autoComplete="tel" required placeholder="0901 234 567" /></Fld>
+        <Fld label={t('phone')} htmlFor="a-phone" hint={!ALLOW_PASSWORD && mode === 'signup' ? t('phoneUnverifiedHint') : undefined}><input id="a-phone" className="inp" type="tel" inputMode="tel" value={f.phone} onChange={set('phone')} autoComplete="tel" required placeholder="0901 234 567" /></Fld>
         <Fld label={t('password')} htmlFor="a-pass" hint={mode === 'signup' ? t('passwordHint') : undefined}>
           <input id="a-pass" className="inp" type="password" value={f.password} onChange={set('password')} autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} required minLength={mode === 'signup' ? 8 : 1} />
         </Fld>
@@ -216,6 +224,7 @@ export function AuthDialog() {
         {mode === 'signup' ? t('haveAccount') : t('noAccount')}
       </Btn>
       {IN_ZALO && <Btn v="text" block onClick={() => { setViaZalo(true); setError(null) }}>{t('zaloBack')}</Btn>}
+      {viaPhone && !ALLOW_PASSWORD && <Btn v="text" block onClick={() => { setViaPhone(false); setError(null) }}>{t('authPhoneBack')}</Btn>}
       {IS_DEMO && <Btn v="text" block disabled={busy} onClick={() => run(() => api.signIn(d.phone, d.password))}>{role === 'seeker' ? t('demoSeeker') : t('demoEmployer')}</Btn>}
     </Dialog>
   )

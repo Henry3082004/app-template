@@ -189,3 +189,10 @@ Tuyển người (Tin đăng | Ứng viên, đăng lại tin cũ) · Ca làm (C�
 - Capy KHÔNG tự đăng tin hay ứng tuyển. Không đưa yêu cầu giới tính, tuổi, ngoại hình... vào bản nháp (cấm phân biệt đối xử) và nói rõ với quán.
 - Chạy qua edge function `capy-assistant` (Google Gemini, mặc định `gemini-2.5-flash`, đổi bằng `app_settings.ai_model`; khóa API chỉ nằm trong secret `GEMINI_API_KEY` của Supabase). Giới hạn lượt hỏi mỗi ngày (khách 15, người đăng nhập 40, tổng 3000). Công tắc `app_settings.ai_assistant` đang **tắt**; bản test/demo dùng bộ giả lập luật đơn giản.
 - Chính sách bảo mật thêm mục "Trò chuyện với Capy". 100 test đạt.
+
+## 31/10/2026 — Đăng ký / đăng nhập bằng số điện thoại + mật khẩu trên web thật
+- Hộp đăng nhập có thêm thẻ "Dùng số điện thoại" (Tạo tài khoản / Đăng nhập). SĐT chỉ là gõ tay nên lưu là liên hệ CHƯA xác thực (contacts.verified = false), giống cách nhập SĐT sau khi đăng nhập Google. Chỉ Zalo mới xác thực được SĐT.
+- Edge function `signup` (đã triển khai, thay bản "410 đã tắt"): tạo tài khoản + hồ sơ bằng service role; email đăng nhập dùng đuôi `@pw.viecthoivu.app`, KHÁC đuôi `@phone.viecthoivu.app` của tài khoản Zalo, nên số gõ tay không bao giờ đụng hay chiếm chỗ số đã xác thực qua Zalo (số đã xác thực bị từ chối: PHONE_TAKEN). Giới hạn 20 lượt/ngày mỗi địa chỉ mạng (dùng `ai_hit`, khoá `su:<ip>`) và 6000/ngày toàn hệ thống.
+- Đăng nhập thử đuôi `@pw` trước, rồi đuôi cũ `@phone` (tài khoản tạo từ thời trước).
+- Hạn chế đã biết: người khác có thể gõ số của bạn khi tạo tài khoản mật khẩu (như đường Google hiện nay); số đó hiện "chưa xác thực" và chủ số vẫn tạo được tài khoản Zalo riêng của mình. Muốn chặn hẳn thì thêm OTP qua SMS.
+- Thẻ việc làm: chân thẻ gọn lại (lịch, giờ làm, "còn n chỗ" dạng nhãn), quán chưa có đánh giá hiện nhãn "Mới" thay cho "Quán mới".

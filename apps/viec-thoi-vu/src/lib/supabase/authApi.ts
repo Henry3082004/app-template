@@ -1,6 +1,6 @@
 import { AppError, type Api, type AppConfig, type ProfileUpdate, type SignUpInput } from '../types'
 import type { QuizAnswers } from '../quiz'
-import { normalizePhone, phoneEmail } from '../phone'
+import { normalizePhone, passwordEmail, phoneEmail } from '../phone'
 import { sb, fail, rpc, uid, WORKER_KEYS, loadProfile, requireProfile, callFunction, sessionFromHash } from './core'
 
 export const authApi: Pick<Api, 'me' | 'signUp' | 'signIn' | 'signInWithGoogle' | 'pendingProfile' | 'completeProfile' | 'zaloLogin' | 'zaloSignUp' | 'signOut' | 'updateProfile' | 'addRole' | 'switchRole' | 'uploadAvatar' | 'appConfig' | 'saveQuiz' | 'myQuiz'> = {
@@ -20,7 +20,9 @@ export const authApi: Pick<Api, 'me' | 'signUp' | 'signIn' | 'signInWithGoogle' 
   async signIn(phone, password) {
     const digits = normalizePhone(phone)
     if (!digits) throw new AppError('INVALID_PHONE')
-    const { data, error } = await sb.auth.signInWithPassword({ email: phoneEmail(digits), password })
+    let { data, error } = await sb.auth.signInWithPassword({ email: passwordEmail(digits), password })
+    // accounts made before phone + password got its own domain use the Zalo-style e-mail
+    if (error && /invalid login/i.test(error.message)) ({ data, error } = await sb.auth.signInWithPassword({ email: phoneEmail(digits), password }))
     if (error || !data.user) {
       if (error && /invalid login/i.test(error.message)) throw new AppError('INVALID_LOGIN')
       fail(error)

@@ -9,7 +9,10 @@ export function normalizePhone(raw: string): string | null {
   return d
 }
 
+/** Login e-mail of Zalo (and older) accounts. */
 export const phoneEmail = (digits: string) => `${digits}@phone.viecthoivu.app`
+/** Login e-mail of phone + password accounts: a different domain, so a typed phone can never collide with a phone proven by Zalo. */
+export const passwordEmail = (digits: string) => `${digits}@pw.viecthoivu.app`
 
 /** +84901234567 → 0901 234 567 for display */
 export function displayPhone(p: string | null): string {

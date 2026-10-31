@@ -42,7 +42,7 @@ test('a business adds the worker role: asked about themselves, then can apply el
   await h.asEmployer(); await h.go('/app/tai-khoan'); await h.section('Vai trò')
   await p.getByRole('button', { name: 'Tạo thêm hồ sơ tìm việc' }).click()
   await h.see('Giúp quán biết về bạn'); await h.see('Vài chạm là xong')
-  await p.getByLabel('Năm sinh').selectOption('1995'); await p.getByRole('button', { name: 'Pha chế' }).click()
+  await p.getByLabel('Năm sinh').selectOption('1995'); await p.getByRole('button', { name: 'Pha chế', exact: true }).click()
   await p.getByRole('button', { name: 'Xong', exact: true }).click(); await h.notSee('Giúp quán biết về bạn')
   await p.locator('button.job', { hasText: 'Phụ bếp ca tối' }).first().click()
   await p.getByRole('button', { name: 'Ứng tuyển ngay' }).first().click(); await h.see('Đã gửi đơn!')

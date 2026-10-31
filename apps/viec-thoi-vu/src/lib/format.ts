@@ -17,6 +17,12 @@ export function dateRange(start: string, end: string): string {
   return `${a.day}/${a.m}–${b.day}/${b.m}`
 }
 
+/** For cards: "23/10" for one day, "23/10 – 5/11" for a range (always the full day/month on both ends). */
+export function dateSpan(start: string, end: string): string {
+  const a = d(start), b = d(end)
+  return start === end ? `${a.day}/${a.m}` : `${a.day}/${a.m} – ${b.day}/${b.m}`
+}
+
 export function payUnitKey(u: PayUnit) {
   return `per${u}` as const
 }
