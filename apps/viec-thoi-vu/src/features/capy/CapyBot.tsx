@@ -6,6 +6,8 @@ const POS_KEY = 'vtv-capy-pos'
 const HI_KEY = 'vtv-capy-hi'
 const SIZE = 72
 const SLEEP_AFTER = 30_000 // no touch for this long: Capy dozes off until the next touch
+const HELLO_MS = 2800 // fly-in (0.9s) + the waving hello (1.8s)
+const WAVE_EVERY = 9000, WAVE_MS = 2400
 const EDGE = 8
 
 type Pos = { fx: number; fy: number } // place on screen as fractions of the free width / height, so it survives rotation and resizing
@@ -39,25 +41,28 @@ export function CapyBot({ onOpen }: { onOpen: () => void }) {
   const drag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null)
   const justDragged = useRef(false)
   const [live, setLive] = useState<{ x: number; y: number } | null>(null)
-  // what Capy is doing: hello on the first visit, then a short wave every few seconds; drag, drop, tap and dozing play over it
-  const [act, setAct] = useState<CapyAct>(hello ? 'hello' : 'wave')
+  // what Capy is doing: hello on the first visit, then idle with a short wave every few seconds; drag, drop, tap and dozing play over it
+  const [act, setAct] = useState<CapyAct | undefined>(hello ? 'hello' : undefined)
+  const actRef = useRef(act)
+  actRef.current = act
   const actTimer = useRef(0)
-  const play = (a: CapyAct, ms = 0) => {
+  const play = (a: CapyAct | undefined, ms = 0) => {
     window.clearTimeout(actTimer.current)
     setAct(a)
-    if (ms) actTimer.current = window.setTimeout(() => setAct('wave'), ms)
+    if (ms) actTimer.current = window.setTimeout(() => setAct(undefined), ms)
   }
 
   useEffect(() => {
-    if (hello) actTimer.current = window.setTimeout(() => setAct('wave'), 4100)
-    return () => window.clearTimeout(actTimer.current)
+    if (hello) actTimer.current = window.setTimeout(() => setAct(undefined), HELLO_MS)
+    const wave = window.setInterval(() => { if (actRef.current === undefined) play('wave', WAVE_MS) }, WAVE_EVERY)
+    return () => { window.clearTimeout(actTimer.current); window.clearInterval(wave) }
   }, [hello])
   useEffect(() => {
     let id = 0
     const awake = () => {
       window.clearTimeout(id)
-      setAct((a) => (a === 'sleepy' ? 'wave' : a))
-      id = window.setTimeout(() => setAct((a) => (a === 'wave' ? 'sleepy' : a)), SLEEP_AFTER)
+      setAct((a) => (a === 'sleepy' ? undefined : a))
+      id = window.setTimeout(() => setAct((a) => (a === undefined ? 'sleepy' : a)), SLEEP_AFTER)
     }
     awake()
     const opts = { passive: true }
@@ -103,7 +108,7 @@ export function CapyBot({ onOpen }: { onOpen: () => void }) {
     const d = drag.current
     drag.current = null
     if (!d || d.id !== e.pointerId || !d.moved) return
-    if (!live) { play('wave'); return }
+    if (!live) { play(undefined); return }
     justDragged.current = true
     play('drop', 1500)
     const p = { fx: (live.x) / Math.max(1, W - SIZE), fy: (live.y) / Math.max(1, H - SIZE) }
