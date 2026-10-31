@@ -37,7 +37,7 @@ const docs: Record<'vi' | 'en', Record<Kind, Doc>> = {
       sections: [
         ['1. Đơn vị xử lý dữ liệu', [OPERATOR_VI, `Liên hệ về dữ liệu cá nhân: ${CONTACT}`]],
         ['2. Dữ liệu chúng tôi thu thập và để làm gì', [
-          'Đăng nhập bằng Zalo: số điện thoại Zalo đã xác thực (Zalo hỏi bạn trước khi chia sẻ) và tên hiển thị. Dùng để tạo tài khoản, đăng nhập không cần mật khẩu và xác thực bạn là người thật.',
+          'Đăng nhập bằng Zalo: số điện thoại Zalo đã xác thực (Zalo hỏi bạn trước khi chia sẻ) và tên hiển thị. Dùng để tạo tài khoản, đăng nhập không cần mật khẩu và xác thực bạn là người thật. Chúng tôi cũng lưu mã người dùng Zalo của bạn để khi bạn rút lại sự đồng ý trong Zalo, yêu cầu xóa dữ liệu được gắn đúng tài khoản của bạn.',
           'Đăng nhập bằng Google (web): địa chỉ email và tên. Dùng để tạo tài khoản và đăng nhập.',
           'Người tìm việc: tên, giới thiệu ngắn, năm sinh, kinh nghiệm, giờ rảnh, ảnh đại diện (tùy chọn). Dùng để nhà tuyển dụng xem hồ sơ khi bạn ứng tuyển.',
           'Nhà tuyển dụng: tên cơ sở, địa chỉ, thành phố, logo (tùy chọn). Dùng để hiển thị trên tin tuyển.',
@@ -95,7 +95,7 @@ const docs: Record<'vi' | 'en', Record<Kind, Doc>> = {
       sections: [
         ['1. Who processes your data', [OPERATOR_EN, `Contact about personal data: ${CONTACT}`]],
         ['2. What we collect and why', [
-          'Sign-in with Zalo: your verified Zalo phone number (Zalo asks you before sharing it) and display name. Used to create your account, sign you in without a password and confirm you are a real person.',
+          'Sign-in with Zalo: your verified Zalo phone number (Zalo asks you before sharing it) and display name. Used to create your account, sign you in without a password and confirm you are a real person. We also keep your Zalo user id so that, if you withdraw consent in Zalo, the deletion request is matched to your account.',
           'Sign-in with Google (web): your email address and name. Used to create your account and sign you in.',
           'Job seekers: name, short intro, birth year, experience, free time, profile photo (optional). Used so employers can see your profile when you apply.',
           'Employers: business name, address, city, logo (optional). Shown on job posts.',

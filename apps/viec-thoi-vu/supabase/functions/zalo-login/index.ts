@@ -8,6 +8,8 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 //   2) { ticket, role, full_name, ... }       → creates the account, returns { token_hash, email }
 //
 // The ticket is an HMAC-signed, 15-minute proof that Zalo verified this phone (keyed with ZALO_APP_SECRET).
+// Every Zalo sign-in also records the account's Zalo id in zalo_links (asked from Zalo's server, never taken from the client), so the
+// zalo-webhook function can find the account when Zalo reports that the user withdrew consent (user.revoke.consent).
 // Needs the Edge Function secret ZALO_APP_SECRET (Zalo Mini App → Cài đặt → App Secret Key).
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -33,11 +35,11 @@ async function hmacHex(data: string, secret: string): Promise<string> {
 const b64 = (s: string) => btoa(s).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
 const unb64 = (s: string) => atob(s.replaceAll("-", "+").replaceAll("_", "/"));
 
-async function makeTicket(phone: string, secret: string): Promise<string> {
-  const body = b64(JSON.stringify({ phone, exp: Date.now() + 15 * 60_000 }));
+async function makeTicket(phone: string, zid: string | null, secret: string): Promise<string> {
+  const body = b64(JSON.stringify({ phone, zid, exp: Date.now() + 15 * 60_000 }));
   return `${body}.${await hmacHex(body, secret)}`;
 }
-async function readTicket(ticket: unknown, secret: string): Promise<string | null> {
+async function readTicket(ticket: unknown, secret: string): Promise<{ phone: string | null; zid: string | null } | null> {
   if (typeof ticket !== "string") return null;
   const [body, sig] = ticket.split(".");
   if (!body || !sig) return null;
@@ -47,7 +49,19 @@ async function readTicket(ticket: unknown, secret: string): Promise<string | nul
   if (diff !== 0) return null;
   try {
     const p = JSON.parse(unb64(body));
-    return p.exp > Date.now() ? normalizePhone(p.phone) : null;
+    return p.exp > Date.now() ? { phone: normalizePhone(p.phone), zid: typeof p.zid === "string" ? p.zid : null } : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Ask Zalo's server for the user's Zalo id (the userId Zalo's webhooks use). Best effort: sign-in never fails because of it. */
+async function zaloIdFromZalo(accessToken: string): Promise<string | null> {
+  try {
+    const r = await fetch("https://graph.zalo.me/v2.0/me?fields=id", { headers: { access_token: accessToken } });
+    const j = await r.json();
+    const id = String(j?.id ?? j?.data?.id ?? "");
+    return /^[0-9A-Za-z_-]{1,64}$/.test(id) ? id : null;
   } catch {
     return null;
   }
@@ -86,16 +100,25 @@ Deno.serve(async (req) => {
 
   // Who is this? Either a fresh Zalo verification, or a ticket from step 1.
   let digits: string | null;
+  let zid: string | null = null;
   const signingUp = typeof body.ticket === "string";
   if (signingUp) {
-    digits = await readTicket(body.ticket, secret);
+    const t = await readTicket(body.ticket, secret);
+    digits = t?.phone ?? null;
+    zid = t?.zid ?? null;
     if (!digits) return json({ error: "TICKET_INVALID" }, 401);
   } else {
     const at = text(body.access_token, 2000), pt = text(body.phone_token, 2000);
     if (!at || !pt) return json({ error: "BAD_REQUEST" }, 400);
     digits = await phoneFromZalo(at, pt, secret);
     if (!digits) return json({ error: "ZALO_VERIFY_FAILED" }, 401);
+    zid = await zaloIdFromZalo(at);
   }
+  // remember which Zalo id this account is (best effort; a failure here never blocks the sign-in)
+  const link = async (uid: string) => {
+    if (!zid) return;
+    try { await admin.from("zalo_links").upsert({ user_id: uid, zalo_id: zid, linked_at: new Date().toISOString() }, { onConflict: "user_id" }); } catch { /* best effort */ }
+  };
 
   const email = `${digits}@phone.viecthoivu.app`;
   const mint = async (uid: string) => {
@@ -110,10 +133,13 @@ Deno.serve(async (req) => {
 
   // Only phones VERIFIED by Zalo count as an account's identity (a typed phone can't take a verified one's place).
   const { data: existing } = await admin.from("contacts").select("user_id").eq("phone", "+" + digits).eq("verified", true).maybeSingle();
-  if (existing) return mint(existing.user_id); // the phone is verified by Zalo, so this is the same person
+  if (existing) { // the phone is verified by Zalo, so this is the same person
+    await link(existing.user_id);
+    return mint(existing.user_id);
+  }
 
   if (!signingUp) {
-    return json({ ok: true, needs_signup: true, ticket: await makeTicket(digits, secret), phone: digits });
+    return json({ ok: true, needs_signup: true, ticket: await makeTicket(digits, zid, secret), phone: digits });
   }
 
   // ── create the account ──
@@ -152,5 +178,6 @@ Deno.serve(async (req) => {
     await admin.auth.admin.deleteUser(uid);
     return json({ error: "SIGNUP_FAILED" }, 500);
   }
+  await link(uid);
   return mint(uid);
 });
