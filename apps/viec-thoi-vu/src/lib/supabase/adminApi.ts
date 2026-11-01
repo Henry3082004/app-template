@@ -1,9 +1,11 @@
-import { type Api, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type AdminDeletion, type AdminReport } from '../types'
+import { type Api, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type AdminDeletion, type AdminReport, type AdminHeldJob } from '../types'
 import { rpc, num } from './core'
 
-export const adminApi: Pick<Api, 'adminReports' | 'resolveReport' | 'adminDeletions' | 'resolveDeletion' | 'adminDisputes' | 'resolveDispute' | 'adminPayouts' | 'markPayoutPaid' | 'adminFlags' | 'adminStats' | 'adminSamples'> = {
+export const adminApi: Pick<Api, 'adminReports' | 'resolveReport' | 'adminDeletions' | 'resolveDeletion' | 'adminDisputes' | 'resolveDispute' | 'adminPayouts' | 'markPayoutPaid' | 'adminFlags' | 'adminStats' | 'adminSamples' | 'adminHeldJobs' | 'adminReviewJob'> = {
   async adminReports() {
-    return ((await rpc('admin_reports')) ?? []) as AdminReport[]
+    // "lost property" travels as reason 'other' with a [lost_property] prefix (the database list of reasons stays as it was)
+    return (((await rpc('admin_reports')) ?? []) as AdminReport[]).map((r) => r.reason === 'other' && r.detail?.startsWith('[lost_property]')
+      ? { ...r, reason: 'lost_property' as const, detail: r.detail.slice('[lost_property]'.length).trim() || null } : r)
   },
   async resolveReport(id, note) {
     await rpc('resolve_report', { p_id: id, p_note: note })
@@ -39,6 +41,13 @@ export const adminApi: Pick<Api, 'adminReports' | 'resolveReport' | 'adminDeleti
 
   async adminStats() {
     return (await rpc('admin_stats')) as AdminStats
+  },
+
+  async adminHeldJobs() {
+    return ((await rpc('admin_held_jobs')) ?? []) as AdminHeldJob[]
+  },
+  async adminReviewJob(jobId, ok, note) {
+    await rpc('admin_review_job', { p_job: jobId, p_ok: ok, p_note: note ?? null })
   },
 
   async adminSamples() {

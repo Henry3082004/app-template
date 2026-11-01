@@ -66,6 +66,8 @@ export interface Job {
   business_name: string | null
   /** the shop's logo (storage path), if it has one */
   business_logo?: string | null
+  /** held for the admin (suspicious words, or many workers said it was not as posted); starts with REJECTED once refused */
+  held_reason?: string | null
   /** sample job: only admins can see it */
   is_sample?: boolean
 }
@@ -154,8 +156,11 @@ export interface TrustSignals {
 /** In-app notification (named so it does not clash with the browser's own Notification). */
 export interface AppNotification { id: string; kind: string; title: string; body: string | null; link: string | null; created_at: string; read_at: string | null }
 
+/** A comment another shop left about a worker (shown on the candidate card). */
+export interface WorkerNote { user_id: string; stars: number; comment: string; shop_name: string; created_at: string }
+export interface AdminHeldJob { id: string; title: string; business: string; held_reason: string; created_at: string }
 export interface ChatMessage { id: string; sender_id: string; body: string; created_at: string }
-export const REPORT_REASONS = ['scam', 'fee', 'no_show', 'harassment', 'fake_info', 'other'] as const
+export const REPORT_REASONS = ['scam', 'fee', 'no_show', 'harassment', 'fake_info', 'lost_property', 'other'] as const
 export type ReportReason = (typeof REPORT_REASONS)[number]
 export interface AdminReport { id: string; reporter_name: string; target_id: string; target_name: string; reason: ReportReason; detail: string | null; job_title: string | null; status: 'open' | 'resolved'; note: string | null; created_at: string }
 export interface DeletionRequest { status: 'open'; requested_at: string }

@@ -6,6 +6,7 @@ import { CancelHire, EmployerPay, TrustLine, useTrust } from '../shifts/escrow'
 import { FundDialog } from '../shifts/escrow/dialogs'
 import type { JobTerms } from '../shifts/escrow/shared'
 import { CandHead } from '../hiring/CandHead'
+import { WorkerNotes, useWorkerNotes } from '../hiring/WorkerNotes'
 import { CompareBar, CompareCands, MAX_COMPARE, PickCand } from '../hiring/CompareCands'
 import { Btn, Dialog, Empty, ErrorBox, Skel, Tag } from '../../components/ui'
 import { WorkerFacts } from '../account/WorkerFields'
@@ -32,6 +33,7 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
   const cfg = useAppConfig()
   const [accepted, setAccepted] = useState<AcceptedInfo | null>(null)
   const trust = useTrust((list ?? []).map((a) => a.seeker_id))
+  const notes = useWorkerNotes((list ?? []).map((a) => a.seeker_id))
 
   const load = () => {
     setError(null)
@@ -80,6 +82,7 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
               <CandHead name={a.full_name} avatar={a.avatar_path} rep={reps[a.seeker_id]} sub={a.bio}
                 tag={<>{a.is_backup && <Tag tone="sun">{t('backupTag')}</Tag>}{a.status !== 'pending' && <Tag tone={a.status === 'accepted' ? 'ok' : ''}>{a.cancelled_at ? t('cancelledTag') : t(`st${a.status}` as TKey)}</Tag>}</>} />
               <TrustLine sig={trust[a.seeker_id]} />
+              <WorkerNotes notes={notes[a.seeker_id]} />
               <WorkerFacts w={a} />
               {a.message && <div className="tag" style={{ borderRadius: 12, whiteSpace: 'normal' }}><Ic n="message" size={14} /> “{a.message}”</div>}
               {(list?.length ?? 0) > 1 && <div className="acts"><PickCand on={chosen.includes(a.id)} disabled={chosen.length >= MAX_COMPARE} onChange={() => pick(a.id)} /></div>}

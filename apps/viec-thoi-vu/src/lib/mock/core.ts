@@ -32,6 +32,9 @@ export const reports: (AdminReport & { reporter_id: string })[] = []
 export const deletions: (AdminDeletion & { user_id: string })[] = []
 export const invites: (SentInvite & { employer_id: string })[] = []
 export const saved: Record<string, string[]> = {} // "Việc đã lưu" per user, oldest first
+export const holds: Record<string, number> = {} // accounts on hold after a "lost property" report (until, ms)
+// posts with these phrases are held for the admin (the database reads the same list from app_settings)
+export const SUSPICIOUS = ['đặt cọc', 'dat coc', 'tiền cọc', 'tien coc', 'phí hồ sơ', 'phi ho so', 'phí giữ chỗ', 'phí đồng phục', 'nộp phí', 'đóng phí', 'dong phi', 'nạp tiền', 'chuyển khoản trước', 'chuyen khoan truoc', 'việc nhẹ lương cao', 'viec nhe luong cao', 'ứng tiền trước']
 export const discoverable = new Set<string>() // workers who chose "let shops find me"
 
 export const users: Record<string, User> = {}

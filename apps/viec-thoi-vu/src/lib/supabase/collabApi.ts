@@ -33,7 +33,8 @@ export const collabApi: Pick<Api, 'notifications' | 'unreadCount' | 'markNotific
     await rpc('send_message', { p_application: applicationId, p_body: body })
   },
   async report(target, reason: ReportReason, detail, jobId) {
-    await rpc('report_user', { p_target: target, p_reason: reason, p_detail: detail ?? null, p_job: jobId ?? null })
+    const lost = reason === 'lost_property' // sent as 'other' + a prefix the database recognises
+    await rpc('report_user', { p_target: target, p_reason: lost ? 'other' : reason, p_detail: lost ? `[lost_property] ${detail ?? ''}`.trim() : detail ?? null, p_job: jobId ?? null })
   },
   async myDeletionRequest() {
     const rows = ((await rpc('my_deletion_request')) ?? []) as DeletionRequest[]

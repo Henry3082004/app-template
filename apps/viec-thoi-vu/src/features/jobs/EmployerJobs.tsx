@@ -66,7 +66,7 @@ export default function EmployerJobs() {
       <div className="cards">
         {list?.map((j) => (
           <button key={j.id} type="button" className={'card job' + (wide && j.id === id ? ' sel' : '')} onClick={() => nav(`/app/tin/${j.id}`)}>
-            <div className="hrow"><h3>{j.title}</h3>{j.status === 'closed' ? <Tag>{t('closed')}</Tag> : j.is_urgent ? <Tag tone="urgent">{t('urgent')}</Tag> : null}</div>
+            <div className="hrow"><h3>{j.title}</h3>{j.held_reason ? <Tag tone="urgent">{j.held_reason.startsWith('REJECTED') ? t('jobRejectedTag') : t('jobHeldTag')}</Tag> : j.status === 'closed' ? <Tag>{t('closed')}</Tag> : j.is_urgent ? <Tag tone="urgent">{t('urgent')}</Tag> : null}</div>
             <div className="tags">
               <Tag><Ic n="calendar" size={14} /> {dateRange(j.start_date, j.end_date)}</Tag>
               <Tag><Ic n="users" size={14} /> {t('filledOf', { filled: j.filled, slots: j.slots })}</Tag>

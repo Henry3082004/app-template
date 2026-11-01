@@ -6,6 +6,7 @@ import { Btn, Empty, ErrorBox, Skel, Tag } from '../../components/ui'
 import { TrustLine, useTrust } from '../shifts/escrow'
 import { WorkerFacts } from '../account/WorkerFields'
 import { CandHead } from './CandHead'
+import { WorkerNotes, useWorkerNotes } from './WorkerNotes'
 import { CompareBar, CompareCands, MAX_COMPARE, PickCand } from './CompareCands'
 import { AcceptedDialog, type AcceptedInfo } from '../jobs/Applicants'
 import { api } from '../../lib/api'
@@ -33,6 +34,7 @@ export default function EmployerCandidates() {
 
   const pending = pendingOf(list)
   const trust = useTrust(pending.map((h) => h.seeker_id))
+  const notes = useWorkerNotes(pending.map((h) => h.seeker_id))
   useEffect(() => {
     const ids = pending.map((h) => h.seeker_id)
     if (ids.length) api.reputations(ids, 'seeker').then(setReps).catch(() => undefined)
@@ -75,6 +77,7 @@ export default function EmployerCandidates() {
           <div key={a.id} className="card cand">
             <CandHead name={a.full_name} avatar={a.avatar_path} rep={reps[a.seeker_id]} sub={<><Ic n="briefcase" size={14} /> {a.job.title} · {dateRange(a.job.start_date, a.job.end_date)}</>} tag={a.is_backup && <Tag tone="sun">{t('backupTag')}</Tag>} />
             <TrustLine sig={trust[a.seeker_id]} />
+            <WorkerNotes notes={notes[a.seeker_id]} />
             <WorkerFacts w={a} />
             {a.message && <div className="tag" style={{ borderRadius: 12, whiteSpace: 'normal' }}><Ic n="message" size={14} /> “{a.message}”</div>}
             <div className="acts">

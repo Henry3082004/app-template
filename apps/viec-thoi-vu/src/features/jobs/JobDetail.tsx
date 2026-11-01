@@ -87,6 +87,7 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
           <div><Ic n="users" size={18} /><span>{left > 0 ? t('slotsOf', { left, total: job.slots }) : t('full')}</span></div>
         </div>
         {job.description && <div className="card"><b>{t('about')}</b><p style={{ marginTop: 6, whiteSpace: 'pre-line' }}>{job.description}</p></div>}
+        {!isEmployer && <div className="notice info small">{t('noFeeWarn')}</div>}
         {!full && !mine && !isEmployer && (
           <Fld label={t('messageOpt')} htmlFor="msg"><textarea id="msg" className="inp" maxLength={300} value={msg} onChange={(e) => setMsg(e.target.value)} placeholder={t('messagePh')} /></Fld>
         )}

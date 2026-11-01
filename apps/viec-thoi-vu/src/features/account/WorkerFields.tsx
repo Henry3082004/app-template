@@ -72,6 +72,7 @@ export function WorkerFacts({ w }: { w: WorkerInfo }) {
   if (!age && !w.experience.length && !w.availability.length) return null
   return (
     <div className="wfacts">
+      {age != null && age < 18 && <div className="notice warn" style={{ width: '100%' }}>{t('minorWarn')}</div>}
       {age && <span className="tag">{t('ageYears', { n: age })}</span>}
       {w.experience.map((k) => <span key={k} className="tag">{t(`exp_${k}` as TKey)}</span>)}
       {w.availability.length > 0 && <span className="muted"><Ic n="calendar" size={13} /> {w.availability.map((k) => t(`avail_${k}` as TKey)).join(' · ')}</span>}

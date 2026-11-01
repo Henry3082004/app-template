@@ -1,7 +1,19 @@
 import { AppError, type Api, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats } from '../types'
-import { now, reports, deletions, users, jobs, apps, reviews, payouts, banks, resolutions, wait, jobOf, release, admin, freeSlot } from './core'
+import { holds, notify, now, reports, deletions, users, jobs, apps, reviews, payouts, banks, resolutions, wait, jobOf, release, admin, freeSlot } from './core'
 
-export const adminMock: Pick<Api, 'adminReports' | 'resolveReport' | 'adminDeletions' | 'resolveDeletion' | 'adminDisputes' | 'resolveDispute' | 'adminPayouts' | 'markPayoutPaid' | 'adminFlags' | 'adminSamples' | 'adminStats'> = {
+export const adminMock: Pick<Api, 'adminReports' | 'resolveReport' | 'adminDeletions' | 'resolveDeletion' | 'adminDisputes' | 'resolveDispute' | 'adminPayouts' | 'markPayoutPaid' | 'adminFlags' | 'adminSamples' | 'adminStats' | 'adminHeldJobs' | 'adminReviewJob'> = {
+  async adminHeldJobs() {
+    admin()
+    return wait(jobs.filter((j) => j.held_reason && !j.held_reason.startsWith('REJECTED')).map((j) => ({ id: j.id, title: j.title, business: j.business_name ?? '—', held_reason: j.held_reason!, created_at: j.created_at })))
+  },
+  async adminReviewJob(id, ok, note) {
+    admin()
+    const j = jobs.find((x) => x.id === id)
+    if (!j || !j.held_reason) throw new AppError('NOT_FOUND')
+    if (ok) { j.held_reason = null; j.status = j.filled < j.slots ? 'open' : 'closed'; notify(j.employer_id, 'job_approved', 'Tin đã được duyệt', `"${j.title}" đã hiển thị cho người tìm việc`, '/app/viec-cua-toi') }
+    else { j.held_reason = 'REJECTED' + (note?.trim() ? `: ${note.trim().slice(0, 200)}` : ''); j.status = 'closed'; notify(j.employer_id, 'job_rejected', 'Tin không được duyệt', `"${j.title}"`, '/app/viec-cua-toi') }
+    return wait(undefined)
+  },
   async adminReports() {
     admin()
     return wait(reports.map(({ reporter_id: _r, ...r }) => r).sort((a, b) => Number(b.status === 'open') - Number(a.status === 'open') || b.created_at.localeCompare(a.created_at)))
@@ -9,7 +21,7 @@ export const adminMock: Pick<Api, 'adminReports' | 'resolveReport' | 'adminDelet
   async resolveReport(id, note) {
     admin()
     const r = reports.find((x) => x.id === id)
-    if (r) { r.status = 'resolved'; r.note = note.trim().slice(0, 300) }
+    if (r) { r.status = 'resolved'; r.note = note.trim().slice(0, 300); if (r.reason === 'lost_property') holds[r.target_id] = 0 }
     return wait(undefined)
   },
   async adminDeletions() {

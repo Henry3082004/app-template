@@ -318,6 +318,8 @@ export type Database = {
           start_date: string
           status: Database["public"]["Enums"]["job_status"]
           title: string
+          held_reason: string | null
+          vetted: boolean
         }
         Insert: {
           address: string
@@ -340,6 +342,8 @@ export type Database = {
           start_date: string
           status?: Database["public"]["Enums"]["job_status"]
           title: string
+          held_reason?: string | null
+          vetted?: boolean
         }
         Update: {
           address?: string
@@ -362,6 +366,8 @@ export type Database = {
           start_date?: string
           status?: Database["public"]["Enums"]["job_status"]
           title?: string
+          held_reason?: string | null
+          vetted?: boolean
         }
         Relationships: [
           {
@@ -877,6 +883,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_held_jobs: { Args: never; Returns: { id: string; title: string; business: string; held_reason: string; created_at: string }[] }
+      admin_review_job: { Args: { p_job: string; p_ok: boolean; p_note?: string }; Returns: undefined }
+      mark_as_posted: { Args: { p_application: string; p_ok: boolean }; Returns: undefined }
+      worker_notes: { Args: { p_users: string[] }; Returns: { user_id: string; stars: number; comment: string; shop_name: string; created_at: string }[] }
       confirm_attendance: { Args: { p_application: string }; Returns: Database["public"]["Tables"]["applications"]["Row"] }
       set_backup: { Args: { p_application: string; p_on: boolean }; Returns: Database["public"]["Tables"]["applications"]["Row"] }
       cancel_hire: { Args: { p_application: string }; Returns: Database["public"]["Tables"]["applications"]["Row"] }

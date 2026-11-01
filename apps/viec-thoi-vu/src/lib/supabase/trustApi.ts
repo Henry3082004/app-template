@@ -1,8 +1,8 @@
-import type { Api, TrustSignals } from '../types'
+import type { Api, TrustSignals, WorkerNote } from '../types'
 import { rpc } from './core'
 
 /** Keeping one's word: confirming arrival, backups, cancelling a hire, "not paid" reports, and the summary shown on the cards. */
-export const trustApi: Pick<Api, 'confirmAttendance' | 'setBackup' | 'cancelHire' | 'reportUnpaid' | 'trustSignals' | 'myApplyLock'> = {
+export const trustApi: Pick<Api, 'confirmAttendance' | 'setBackup' | 'cancelHire' | 'reportUnpaid' | 'trustSignals' | 'myApplyLock' | 'markAsPosted' | 'workerNotes'> = {
   async confirmAttendance(applicationId) {
     await rpc('confirm_attendance', { p_application: applicationId })
   },
@@ -19,6 +19,16 @@ export const trustApi: Pick<Api, 'confirmAttendance' | 'setBackup' | 'cancelHire
     if (!userIds.length) return {}
     const rows = ((await rpc('trust_signals', { p_users: userIds })) ?? []) as TrustSignals[]
     return Object.fromEntries(rows.map((r) => [r.user_id, { ...r, reply_hours: r.reply_hours == null ? null : Number(r.reply_hours) }]))
+  },
+  async markAsPosted(applicationId, ok) {
+    await rpc('mark_as_posted', { p_application: applicationId, p_ok: ok })
+  },
+  async workerNotes(userIds) {
+    if (!userIds.length) return {}
+    const rows = ((await rpc('worker_notes', { p_users: userIds })) ?? []) as WorkerNote[]
+    const out: Record<string, WorkerNote[]> = {}
+    rows.forEach((r) => { (out[r.user_id] ??= []).push(r) })
+    return out
   },
   async myApplyLock() {
     return ((await rpc('my_apply_lock')) as string | null) ?? null

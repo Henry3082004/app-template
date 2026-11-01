@@ -36,12 +36,17 @@ export function ReviewDialog({ appId, as, onClose, onDone }: { appId: string; as
   const [stars, setStars] = useState(0)
   const [tags, setTags] = useState<string[]>([])
   const [comment, setComment] = useState('')
+  const [posted, setPosted] = useState<boolean | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<unknown>(null)
   const title = t(as === 'employer' ? 'reviewTitleEmp' : 'reviewTitleSeeker')
   const send = async () => {
     setBusy(true); setError(null)
-    try { await api.submitReview(appId, stars, tags, comment); onDone() } catch (e) { setError(e); setBusy(false) }
+    try {
+      await api.submitReview(appId, stars, tags, comment)
+      if (as === 'seeker' && posted != null) await api.markAsPosted(appId, posted).catch(() => undefined) // the review itself already went through
+      onDone()
+    } catch (e) { setError(e); setBusy(false) }
   }
   return (
     <Dialog label={title} onClose={onClose}>
@@ -58,6 +63,15 @@ export function ReviewDialog({ appId, as, onClose, onDone }: { appId: string; as
             return <button key={k} type="button" className={'chip' + (on ? ' on' : '')} aria-pressed={on} onClick={() => setTags(on ? tags.filter((x) => x !== k) : [...tags, k])}>{t(`tag_${k}` as TKey)}</button>
           })}
         </div>
+        {as === 'seeker' && (
+          <div className="stack">
+            <b>{t('asPostedAsk')}</b>
+            <div className="chiprow">
+              <button type="button" className={'chip' + (posted === true ? ' on' : '')} aria-pressed={posted === true} onClick={() => setPosted(true)}>{t('asPostedYes')}</button>
+              <button type="button" className={'chip' + (posted === false ? ' on' : '')} aria-pressed={posted === false} onClick={() => setPosted(false)}>{t('asPostedNo')}</button>
+            </div>
+          </div>
+        )}
         <textarea className="inp" maxLength={300} value={comment} onChange={(e) => setComment(e.target.value)} placeholder={t('reviewPh')} aria-label={t('reviewPh')} />
         <div className="small muted">{t('reviewHint')}</div>
         {error != null && <ErrorBox error={error} where="ReviewDialog" />}

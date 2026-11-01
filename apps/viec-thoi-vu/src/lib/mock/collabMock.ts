@@ -1,6 +1,6 @@
 import { AppError, type Api, type FoundWorker, type ReportReason, type Job } from '../types'
 import { vnDate, vnToday } from '../format'
-import { now, nid, notes, notify, chat, reports, deletions, invites, discoverable, users, jobs, apps, current, wait, me, jobOf, bizOf, personOf, myApp } from './core'
+import { holds, now, nid, notes, notify, chat, reports, deletions, invites, discoverable, users, jobs, apps, current, wait, me, jobOf, bizOf, personOf, myApp } from './core'
 import { payMock } from './payMock'
 
 export const collabMock: Pick<Api, 'messages' | 'sendMessage' | 'report' | 'myDeletionRequest' | 'requestDeletion' | 'cancelDeletion' | 'inviteWorker' | 'searchWorkers' | 'myDiscoverable' | 'setDiscoverable' | 'mySentInvites' | 'markPaidCash' | 'notifications' | 'unreadCount' | 'markNotificationsRead' | 'checkIn' | 'checkOut' | 'ackCashReceived'> = {
@@ -29,13 +29,18 @@ export const collabMock: Pick<Api, 'messages' | 'sendMessage' | 'report' | 'myDe
   async report(target, reason: ReportReason, detail, jobId) {
     const p = me()
     if (target === p.id) throw new AppError('FORBIDDEN')
-    if (!['scam', 'fee', 'no_show', 'harassment', 'fake_info', 'other'].includes(reason)) throw new AppError('BAD_REASON')
+    if (!['scam', 'fee', 'no_show', 'harassment', 'fake_info', 'lost_property', 'other'].includes(reason)) throw new AppError('BAD_REASON')
     const dealt = apps.some((a) => (a.seeker_id === p.id && jobOf(a).employer_id === target) || (a.seeker_id === target && jobOf(a).employer_id === p.id))
     const viaJob = !!jobId && jobs.some((j) => j.id === jobId && j.employer_id === target)
     if (!dealt && !viaJob) throw new AppError('FORBIDDEN')
     if (reports.filter((r) => r.reporter_id === p.id && Date.now() - Date.parse(r.created_at) < 864e5).length >= 5) throw new AppError('TOO_MANY')
     reports.push({ id: nid(), reporter_id: p.id, reporter_name: p.business_name || p.full_name, target_id: target, target_name: bizOf({ employer_id: target } as Job) === 'Quán' ? personOf(target) : bizOf({ employer_id: target } as Job),
       reason, detail: (detail ?? '').trim().slice(0, 500) || null, job_title: jobs.find((j) => j.id === jobId)?.title ?? null, status: 'open', note: null, created_at: now() })
+    if (reason === 'lost_property') { // the person reported is put on hold for 3 days: open posts close, no applying or posting freely
+      holds[target] = Date.now() + 3 * 864e5
+      jobs.filter((x) => x.employer_id === target && x.status === 'open').forEach((x) => { x.status = 'closed' })
+      notify(target, 'account_hold', 'Tài khoản đang được xác minh', 'Có báo cáo cần kiểm tra. Quản trị sẽ liên hệ bạn trong 3 ngày.', '/app/tai-khoan')
+    }
     return wait(undefined)
   },
   async myDeletionRequest() {

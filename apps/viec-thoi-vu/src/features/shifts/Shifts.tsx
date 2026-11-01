@@ -24,6 +24,7 @@ function ShiftCard({ s, onChanged }: { s: Shift; onChanged(): void }) {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<unknown>(null)
   const [dlg, setDlg] = useState<null | 'chat' | 'report'>(null)
+  const [shared, setShared] = useState(false)
   const run = async (fn: () => Promise<unknown>) => {
     setBusy(true); setErr(null)
     try { await fn(); onChanged() } catch (e) { setErr(e) } finally { setBusy(false) }
@@ -32,6 +33,14 @@ function ShiftCard({ s, onChanged }: { s: Shift; onChanged(): void }) {
   const inToday = !!a.checked_in_at && vnDate(a.checked_in_at) === vnToday()
   const outToday = inToday && !!a.checked_out_at && a.checked_out_at >= a.checked_in_at!
   const doIn = () => run(async () => { const pos = await getPosition(); await api.checkIn(a.id, pos?.lat, pos?.lng) })
+  // a text for someone close: where, when, and "call me if I have not written" (the phone's own share sheet, else copied)
+  const share = async () => {
+    const text = t('shareShiftText', { title: job.title, shop: job.business_name ?? '', address: job.address, when: dateRange(job.start_date, job.end_date) + (job.shift_note ? ` · ${job.shift_note}` : '') })
+    try {
+      if (navigator.share) await navigator.share({ text })
+      else { await navigator.clipboard.writeText(text); setShared(true) }
+    } catch { /* the sheet was closed, or copying is not allowed here */ }
+  }
   const paid = s.app.pay_status === 'released' && s.app.escrow_amount != null
   const status: [string, '' | 'ok' | 'p' | 'sun' | 'urgent'] =
     s.app.pay_status === 'released' ? [t('shiftPaid'), 'ok']
@@ -93,7 +102,10 @@ function ShiftCard({ s, onChanged }: { s: Shift; onChanged(): void }) {
       <div className="acts">
         <Btn v="ghost" sm onClick={() => setDlg('chat')}><Ic n="message" size={16} /> {t('chat')}</Btn>
         <Btn v="text" sm onClick={() => setDlg('report')}>{t('report')}</Btn>
+        {s.when !== 'done' && <Btn v="text" sm onClick={share}>{t('shareShift')}</Btn>}
       </div>
+      {shared && <div className="notice ok small">{t('shareCopied')}</div>}
+      {s.when !== 'done' && <div className="muted small">{t('safetyTip')}</div>}
       {dlg === 'chat' && <ChatDialog applicationId={a.id} name={job.business_name ?? '—'} onClose={() => setDlg(null)} />}
       {dlg === 'report' && <ReportDialog target={job.employer_id} name={job.business_name ?? '—'} jobId={job.id} onClose={() => setDlg(null)} />}
       <div className="shiftfoot">

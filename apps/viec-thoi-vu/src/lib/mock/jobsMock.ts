@@ -1,6 +1,6 @@
 import { AppError, type Api, type Job } from '../types'
 import { applyLockOf } from './trustMock'
-import { CFG, discoverable, saved, isPro, NEW_PAY, now, nid, notify, users, jobs, apps, payouts, current, wait, me, jobOf, bizOf, escrowOf } from './core'
+import { CFG, SUSPICIOUS, holds, discoverable, saved, isPro, NEW_PAY, now, nid, notify, users, jobs, apps, payouts, current, wait, me, jobOf, bizOf, escrowOf } from './core'
 
 export const jobsMock: Pick<Api, 'savedJobIds' | 'saveJobs' | 'unsaveJob' | 'jobsByIds' | 'homeHighlights' | 'listOpenJobs' | 'getJob' | 'myApplicationStatus' | 'apply' | 'myApplications' | 'withdraw' | 'myJobs' | 'createJob' | 'setJobStatus' | 'applicantsFor' | 'myHires' | 'decide'> = {
   async savedJobIds() { return wait([...(saved[me().id] ?? [])].reverse()) },
@@ -83,6 +83,12 @@ export const jobsMock: Pick<Api, 'savedJobIds' | 'saveJobs' | 'unsaveJob' | 'job
     if (input.is_urgent && !isPro(p)) throw new AppError('URGENT_REQUIRES_PRO')
     if (!isPro(p) && jobs.filter((j) => j.employer_id === p.id && j.status === 'open').length >= 2) throw new AppError('FREE_PLAN_LIMIT')
     const job: Job = { ...input, id: nid(), employer_id: p.id, business_name: p.business_name || p.full_name, business_logo: p.logo_path ?? null, filled: 0, status: 'open', created_at: now() }
+    const text = `${input.title} ${input.description ?? ''} ${input.shift_note ?? ''}`.toLowerCase()
+    const hit = SUSPICIOUS.find((w) => text.includes(w))
+    if (hit || (holds[p.id] ?? 0) > Date.now()) {
+      job.held_reason = hit ? `Chứa cụm "${hit}"` : 'Tài khoản đang chờ xác minh'; job.status = 'closed'
+      notify(p.id, 'job_held', 'Tin đang chờ duyệt', `"${job.title}" — ${job.held_reason}. Quản trị sẽ xem trong 24 giờ.`, '/app/viec-cua-toi')
+    }
     jobs.unshift(job)
     return wait(job)
   },
@@ -92,6 +98,7 @@ export const jobsMock: Pick<Api, 'savedJobIds' | 'saveJobs' | 'unsaveJob' | 'job
     const j = jobs.find((x) => x.id === id && x.employer_id === p.id)
     if (!j) throw new AppError('NOT_FOUND')
     if (status === 'open' && !isPro(p) && jobs.filter((x) => x.employer_id === p.id && x.status === 'open').length >= 2) throw new AppError('FREE_PLAN_LIMIT')
+    if (status === 'open' && j.held_reason) return wait(undefined) // a held post stays closed
     j.status = status
     return wait(undefined)
   },

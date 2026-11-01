@@ -44,6 +44,7 @@ export default function PostJob() {
   const [error, setError] = useState<unknown>(null)
   const [formErr, setFormErr] = useState<TKey | null>(null)
   const [done, setDone] = useState(false)
+  const [held, setHeld] = useState<string | null>(null)
   const isPro = isProFor(profile, cfg)
 
   useEffect(() => {
@@ -80,7 +81,8 @@ export default function PostJob() {
     }
     setBusy(true)
     try {
-      await api.createJob(input)
+      const j = await api.createJob(input)
+      setHeld(j.held_reason ?? null)
       setDone(true)
     } catch (err) {
       if (errorCode(err) === 'UNKNOWN') report(err, { where: 'createJob' })
@@ -137,6 +139,7 @@ export default function PostJob() {
           {bp === 'm' && <button type="button" className="back" aria-label={t('back')} onClick={() => nav('/app/tin-cua-toi')}>←</button>}
           <h1 className="ptitle">{t('postTitle')}</h1>
         </div>
+        <div className="notice info small" style={{ marginBottom: 12 }}>{t('noFeePost')}</div>
         {bp === 'd'
           ? <div className="formwrap"><div>{form}<div style={{ marginTop: 20 }}>{submitBtn}</div></div><div className="preview"><div className="sub" style={{ marginBottom: 8 }}><Ic n="eye" size={16} /> {t('whoSees')}</div><JobCard job={preview} onOpen={() => undefined} /></div></div>
           : <div>{form}{bp !== 'm' && <div style={{ marginTop: 20 }}>{submitBtn}</div>}</div>}
@@ -145,8 +148,8 @@ export default function PostJob() {
       {done && (
         <Dialog full label={t('postedTitle')} onClose={() => nav('/app/tin-cua-toi')}>
           <img className="capy hop" src={capy('cheer')} alt="" />
-          <h2>{t('postedTitle')}</h2>
-          <div className="sub">{t('postedText')}</div>
+          <h2>{held ? t('jobHeldTitle') : t('postedTitle')}</h2>
+          <div className="sub">{held ? t('jobHeldText', { reason: held }) : t('postedText')}</div>
           <Btn block onClick={() => nav('/app/tin-cua-toi')}>{t('backToMyJobs')}</Btn>
         </Dialog>
       )}

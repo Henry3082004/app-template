@@ -4,15 +4,16 @@ import { api } from '../../lib/api'
 import { money } from '../../lib/format'
 import { useI18n, type TKey } from '../../lib/i18n'
 import { useSession } from '../../lib/session'
-import type { AdminDeletion, AdminDispute, AdminFlag, AdminReport, AdminPayout, AdminSamples, AdminStats } from '../../lib/types'
+import type { AdminDeletion, AdminDispute, AdminFlag, AdminHeldJob, AdminReport, AdminPayout, AdminSamples, AdminStats } from '../../lib/types'
 import { DeletionCard } from './cards/DeletionCard'
 import { DisputeCard } from './cards/DisputeCard'
 import { HealthCard, SentryCheck } from './cards/Health'
+import { HeldJobCard } from './cards/HeldJobCard'
 import { PayoutCard } from './cards/PayoutCard'
 import { ReportCard } from './cards/ReportCard'
 import { SamplesTab } from './cards/SamplesTab'
 
-type Tab = 'disputes' | 'payouts' | 'flags' | 'samples' | 'reports' | 'deletions'
+type Tab = 'disputes' | 'payouts' | 'flags' | 'samples' | 'reports' | 'deletions' | 'held'
 
 export default function Admin() {
   const { t, locale } = useI18n()
@@ -25,6 +26,7 @@ export default function Admin() {
   const [samples, setSamples] = useState<AdminSamples | null>(null)
   const [reports, setReports] = useState<AdminReport[] | null>(null)
   const [deletions, setDeletions] = useState<AdminDeletion[] | null>(null)
+  const [held, setHeld] = useState<AdminHeldJob[] | null>(null)
   const [error, setError] = useState<unknown>(null)
 
   const load = () => {
@@ -36,6 +38,7 @@ export default function Admin() {
     api.adminSamples().then(setSamples).catch(setError)
     api.adminReports().then(setReports).catch(setError)
     api.adminDeletions().then(setDeletions).catch(setError)
+    api.adminHeldJobs().then(setHeld).catch(setError)
   }
   useEffect(() => { if (profile?.is_admin) load() }, [profile?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -55,6 +58,7 @@ export default function Admin() {
         <button type="button" className={tab === 'flags' ? 'on' : ''} onClick={() => setTab('flags')}>{t('adminTabFlags')}{flags?.length ? ` (${flags.length})` : ''}</button>
         <button type="button" className={tab === 'reports' ? 'on' : ''} onClick={() => setTab('reports')}>{t('adminTabReports')}{openReports ? ` (${openReports})` : ''}</button>
         <button type="button" className={tab === 'deletions' ? 'on' : ''} onClick={() => setTab('deletions')}>{t('adminTabDeletions')}{openDeletions ? ` (${openDeletions})` : ''}</button>
+        <button type="button" className={tab === 'held' ? 'on' : ''} onClick={() => setTab('held')}>{t('adminTabHeld')}{held?.length ? ` (${held.length})` : ''}</button>
         <button type="button" className={tab === 'samples' ? 'on' : ''} onClick={() => setTab('samples')}>{t('adminTabSamples')}</button>
       </div>
       {error != null && <ErrorBox error={error} where="Admin.load" onRetry={load} />}
@@ -100,6 +104,13 @@ export default function Admin() {
           {!deletions && !error && <Skel n={2} />}
           {deletions?.length === 0 && <Empty pose="empty" title={t('noDeletions')} />}
           <div className="g2">{deletions?.map((d) => <DeletionCard key={d.id} d={d} onDone={load} />)}</div>
+        </>
+      )}
+      {tab === 'held' && (
+        <>
+          {!held && !error && <Skel n={2} />}
+          {held?.length === 0 && <Empty pose="empty" title={t('noHeldJobs')} />}
+          <div className="g2">{held?.map((j) => <HeldJobCard key={j.id} j={j} onDone={load} />)}</div>
         </>
       )}
       {tab === 'samples' && <SamplesTab s={samples} />}
