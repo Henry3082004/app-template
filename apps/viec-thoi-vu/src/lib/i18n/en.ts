@@ -300,4 +300,11 @@ export const en: Dict = {
   kpiReply: 'average shop reply time',
   kpiWeekly: 'Finished shifts per week (last 8 weeks)',
   kpiMore: 'Posts in review: {held} · Open reports: {reports} · Referrals (30 days): {refs}',
+  tasksLabel: 'Tasks in the shift (optional)',
+  tasksHint: 'Say what the worker will actually do so they know beforehand. Up to 12.',
+  tasksPh: 'e.g. Peel produce, Serve tables, Fillet fish',
+  tasksAdd: 'Add',
+  tasksIdeas: 'Task ideas',
+  tasksRemove: 'Remove "{x}"',
+  tasksTitle: 'Tasks in the shift',
 }

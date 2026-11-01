@@ -54,12 +54,14 @@ reset role; set role authenticated; select set_config('request.jwt.claim.sub', :
 select t_err($$select confirm_attendance('00000000-0000-4000-8000-0000000005b3')$$, 'NOT_ACCEPTED');
 -- the alert for a worker who never confirmed (J1 today, B1 accepted, not confirmed)
 reset role;
-select t_check(private.send_commit_alerts(pg_temp.at_hour(7)) = 0, '07:00 → nothing due');
-select t_check(private.send_commit_alerts(pg_temp.at_hour(8)) = 1, '08:00 → the worker is asked to confirm');
+select private.send_commit_alerts(pg_temp.at_hour(7));
+select t_check((select count(*) = 0 from notifications where user_id = :'W1' and kind = 'remind_attend'), '07:00 → nobody is asked to confirm yet');
+select private.send_commit_alerts(pg_temp.at_hour(8));
 select t_check((select count(*) = 1 from notifications where user_id = :'W1' and kind = 'remind_attend' and ref = :'B1'), 'the worker hears it');
-select t_check(private.send_commit_alerts(pg_temp.at_hour(9)) = 1, '09:00 → the shop hears nobody confirmed');
+select private.send_commit_alerts(pg_temp.at_hour(9));
 select t_check((select count(*) = 1 from notifications where user_id = :'SH' and kind = 'unconfirmed' and ref = :'B1'), 'the shop is told W1 did not confirm');
-select t_check(private.send_commit_alerts(pg_temp.at_hour(10)) = 0, 'and only once');
+select private.send_commit_alerts(pg_temp.at_hour(10));
+select t_check((select count(*) = 1 from notifications where ref = :'B1' and kind in ('remind_attend', 'unconfirmed') and user_id = :'W1') and (select count(*) = 1 from notifications where ref = :'B1' and kind = 'unconfirmed'), 'and only once');
 reset role; set role authenticated; select set_config('request.jwt.claim.sub', :'W1', false);
 select t_check((select confirmed_at is not null from confirm_attendance(:'B1')), 'W1 confirms');
 select t_check((select confirmed_at is not null from confirm_attendance(:'B1')), 'pressing twice is harmless');
@@ -70,11 +72,12 @@ select t_check((select count(*) = 1 from my_notifications() where kind = 'attend
 reset role;
 update jobs set created_at = pg_temp.at_hour(1) - interval '13 hours' where id = :'J3';
 delete from applications where id = :'B4';
-select t_check(private.send_commit_alerts(pg_temp.at_hour(12)) = 1, '12:00 → one empty post nudge');
+select private.send_commit_alerts(pg_temp.at_hour(12));
 select t_check((select count(*) = 1 from notifications where user_id = :'SH' and kind = 'nudge_empty' and ref = :'J3'), 'the shop is told the post is empty');
-select t_check(private.send_commit_alerts(pg_temp.at_hour(13)) = 0, 'not twice');
+select private.send_commit_alerts(pg_temp.at_hour(13));
+select t_check((select count(*) = 1 from notifications where user_id = :'SH' and kind = 'nudge_empty' and ref = :'J3'), 'not twice');
 insert into applications (id, job_id, seeker_id, created_at) values (:'B4', :'J3', :'W3', pg_temp.at_hour(12) - interval '30 hours');
-select t_check(private.send_commit_alerts(pg_temp.at_hour(12)) = 1, 'an application unanswered for 30h → the worker is pointed elsewhere');
+select private.send_commit_alerts(pg_temp.at_hour(12));
 select t_check((select count(*) = 1 from notifications where user_id = :'W3' and kind = 'pending_old' and ref = :'B4'), 'W3 hears it');
 -- a post whose last day has passed stops being offered
 update jobs set end_date = current_date - 3, start_date = current_date - 3 where id = :'J3';

@@ -205,3 +205,6 @@ Làm theo danh sách "việc 7–28" trong tài liệu chiến lược marketing
 - **Quản trị:** thẻ chỉ số tăng trưởng (tin có người ứng tuyển trong 24 giờ, quán quay lại, ca mỗi tuần, tỉ lệ vắng ca, thời gian trả lời).
 - Chính sách: Điều khoản mục 7b, Bảo mật mục 3c (cập nhật 01/11/2026). Chưa nhờ luật sư xem.
 - Việc cần người làm (không phải code): nhờ luật sư xem điều khoản; in poster; đi gặp quán; sổ tay mở quận; số liệu thị trường; khảo sát giá.
+
+## 02/11/2026 — Đầu việc trong ca
+Quán liệt kê các đầu việc của ca khi đăng tin ("Gọt hàng", "Bưng bê", "Lọc cá"…): bấm chip gợi ý theo loại việc hoặc tự gõ, tối đa 12 việc, mỗi việc 60 ký tự, trùng và rỗng bị bỏ. Người tìm việc thấy ở trang chi tiết tin và trên thẻ ca. Cột `jobs.tasks` (migration `20261112_job_tasks.sql`, áp thành `job_tasks`), trigger chuẩn hóa; lọc cụm đáng ngờ ("đặt cọc"…) đọc cả đầu việc. Test: `supabase/tests/230_job_tasks.sql`, e2e `hiring-tools`. Đăng lại tin cũ giữ nguyên đầu việc.

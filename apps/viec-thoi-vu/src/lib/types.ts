@@ -66,6 +66,8 @@ export interface Job {
   business_name: string | null
   /** the shop's logo (storage path), if it has one */
   business_logo?: string | null
+  /** what the worker will do in the shift (listed by the shop, public) */
+  tasks?: string[]
   /** held for the admin (suspicious words, or many workers said it was not as posted); starts with REJECTED once refused */
   held_reason?: string | null
   /** pushed to the top of the list until then (referral reward) */
@@ -253,6 +255,7 @@ export interface SignUpInput {
 
 export interface JobInput {
   title: string
+  tasks?: string[]
   description: string
   category: Category
   pay_amount: number

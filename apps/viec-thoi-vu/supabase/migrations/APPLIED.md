@@ -74,3 +74,4 @@ Edge function `zalo-webhook` (Webhook URL của Mini App: `https://niscqjczfvipx
 - `20261111_admin_kpis.sql` (`admin_kpis`): chỉ số cho trang quản trị (tin có người ứng tuyển trong 24 giờ, quán quay lại, ca hoàn thành mỗi tuần, tỉ lệ vắng ca, thời gian quán trả lời). Test: `220_admin_kpis.sql`.
 Lưu ý: công việc chưa có giờ trong ngày (chỉ có ngày bắt đầu/kết thúc), nên "Tôi vẫn đến" mở từ hôm trước và nhắc lúc 08:00; quán được báo lúc 09:00 ngày làm việc nếu người làm chưa xác nhận.
 
+02/11/2026: `20261112_job_tasks.sql` áp dụng thành `job_tasks` (cột `jobs.tasks text[]` công khai, cấp quyền ghi cho cột này, trigger `jobs_tasks` chuẩn hóa: cắt khoảng trắng, bỏ rỗng và trùng, 60 ký tự, tối đa 12; `jobs_screen` đọc cả đầu việc). Test: `supabase/tests/230_job_tasks.sql`.

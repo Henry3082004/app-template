@@ -312,6 +312,13 @@ export const vi = {
   kpiReply: 'quán trả lời trung bình',
   kpiWeekly: 'Ca hoàn thành mỗi tuần (8 tuần gần nhất)',
   kpiMore: 'Tin đang chờ duyệt: {held} · Báo cáo chưa xử lý: {reports} · Giới thiệu bạn bè (30 ngày): {refs}',
+  tasksLabel: 'Đầu việc trong ca (không bắt buộc)',
+  tasksHint: 'Ghi rõ người làm sẽ làm gì để họ biết trước. Tối đa 12 việc.',
+  tasksPh: 'Ví dụ: Gọt hàng, Bưng bê, Lọc cá',
+  tasksAdd: 'Thêm',
+  tasksIdeas: 'Gợi ý đầu việc',
+  tasksRemove: 'Bỏ "{x}"',
+  tasksTitle: 'Đầu việc trong ca',
 }
 
 export type Dict = typeof vi

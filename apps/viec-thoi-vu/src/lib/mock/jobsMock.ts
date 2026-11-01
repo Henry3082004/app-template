@@ -1,6 +1,7 @@
 import { AppError, type Api, type Job } from '../types'
 import { applyLockOf } from './trustMock'
 import { guides } from './hireToolsMock'
+import { cleanTasks } from '../tasks'
 import { CFG, SUSPICIOUS, holds, discoverable, saved, isPro, NEW_PAY, now, nid, notify, users, jobs, apps, payouts, current, wait, me, jobOf, bizOf, escrowOf } from './core'
 
 export const jobsMock: Pick<Api, 'savedJobIds' | 'saveJobs' | 'unsaveJob' | 'jobsByIds' | 'homeHighlights' | 'listOpenJobs' | 'getJob' | 'myApplicationStatus' | 'apply' | 'myApplications' | 'withdraw' | 'myJobs' | 'createJob' | 'setJobStatus' | 'applicantsFor' | 'myHires' | 'decide'> = {
@@ -84,8 +85,8 @@ export const jobsMock: Pick<Api, 'savedJobIds' | 'saveJobs' | 'unsaveJob' | 'job
     if (!p.roles.includes('employer')) throw new AppError('FORBIDDEN')
     if (input.is_urgent && !isPro(p)) throw new AppError('URGENT_REQUIRES_PRO')
     if (!isPro(p) && jobs.filter((j) => j.employer_id === p.id && j.status === 'open').length >= 2) throw new AppError('FREE_PLAN_LIMIT')
-    const job: Job = { ...input, id: nid(), employer_id: p.id, business_name: p.business_name || p.full_name, business_logo: p.logo_path ?? null, filled: 0, status: 'open', created_at: now() }
-    const text = `${input.title} ${input.description ?? ''} ${input.shift_note ?? ''}`.toLowerCase()
+    const job: Job = { ...input, tasks: cleanTasks(input.tasks ?? []), id: nid(), employer_id: p.id, business_name: p.business_name || p.full_name, business_logo: p.logo_path ?? null, filled: 0, status: 'open', created_at: now() }
+    const text = `${input.title} ${input.description ?? ''} ${input.shift_note ?? ''} ${(input.tasks ?? []).join(' ')}`.toLowerCase()
     const hit = SUSPICIOUS.find((w) => text.includes(w))
     if (hit || (holds[p.id] ?? 0) > Date.now()) {
       job.held_reason = hit ? `Chứa cụm "${hit}"` : 'Tài khoản đang chờ xác minh'; job.status = 'closed'

@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Ic } from '../../components/Ic'
 import { JobCard } from './JobCard'
+import { TasksField } from './TasksField'
 import { Btn, Chip, Dialog, ErrorBox, Fld, Tag } from '../../components/ui'
 import { api } from '../../lib/api'
 import { capy } from '../../lib/capy'
@@ -30,7 +31,7 @@ export default function PostJob() {
   const cfg = useAppConfig()
   const start = addDays(today(), 1)
   const [f, setF] = useState<JobInput>(() => ({
-    title: '', description: '', category: 'service', pay_amount: 30000, pay_unit: 'hour',
+    title: '', description: '', tasks: [], category: 'service', pay_amount: 30000, pay_unit: 'hour',
     start_date: start, end_date: addDays(start, 6), shift_note: '', address: profile?.address ?? '',
     city: profile?.city && CITIES[profile.city] ? profile.city : 'TP.HCM', lat: null, lng: null, slots: 2, is_urgent: false,
     ...(draft ? {
@@ -54,7 +55,7 @@ export default function PostJob() {
       const last = list.find((j) => j.id === qs.get('lai')) ?? list[0]
       if (!last) return
       setF((cur) => ({
-        ...cur, title: cur.title || last.title, description: last.description ?? '', category: last.category, pay_amount: last.pay_amount,
+        ...cur, title: cur.title || last.title, description: last.description ?? '', tasks: last.tasks ?? [], category: last.category, pay_amount: last.pay_amount,
         pay_unit: last.pay_unit, shift_note: last.shift_note ?? '', address: last.address, city: last.city,
         lat: last.lat, lng: last.lng, slots: last.slots,
       }))
@@ -117,6 +118,7 @@ export default function PostJob() {
         <Fld label={t('slotsNeed')} htmlFor="p-slots"><input id="p-slots" className="inp" type="number" inputMode="numeric" min={1} max={200} value={f.slots || ''} onChange={(e) => set('slots', Math.max(1, Math.min(200, Number(e.target.value) || 1)))} /></Fld>
         <Fld label={t('address')} htmlFor="p-addr"><input id="p-addr" className="inp" value={f.address} onChange={(e) => setF((c) => ({ ...c, address: e.target.value, lat: null, lng: null }))} maxLength={200} required /></Fld>
         <Fld label={t('city')} htmlFor="p-city"><select id="p-city" className="inp" value={f.city} onChange={(e) => setF((c) => ({ ...c, city: e.target.value, lat: null, lng: null }))}>{Object.keys(CITIES).map((c) => <option key={c}>{c}</option>)}</select></Fld>
+        <div className="span"><TasksField value={f.tasks ?? []} onChange={(v) => set('tasks', v)} category={f.category} /></div>
         <div className="span"><Fld label={t('guideLabel')} htmlFor="p-guide"><textarea id="p-guide" className="inp" value={guide} onChange={(e) => setGuide(e.target.value)} placeholder={t('guidePh')} maxLength={600} /></Fld></div>
         <div className="span"><Fld label={t('description')} htmlFor="p-desc"><textarea id="p-desc" className="inp" value={f.description} onChange={(e) => set('description', e.target.value)} placeholder={t('descriptionPh')} maxLength={2000} /></Fld></div>
         <div className="span sw">

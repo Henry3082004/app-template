@@ -327,6 +327,7 @@ export type Database = {
           held_reason: string | null
           vetted: boolean
           boosted_until: string | null
+          tasks: string[]
         }
         Insert: {
           address: string
@@ -352,6 +353,7 @@ export type Database = {
           held_reason?: string | null
           vetted?: boolean
           boosted_until?: string | null
+          tasks?: string[]
         }
         Update: {
           address?: string
@@ -377,6 +379,7 @@ export type Database = {
           held_reason?: string | null
           vetted?: boolean
           boosted_until?: string | null
+          tasks?: string[]
         }
         Relationships: [
           {

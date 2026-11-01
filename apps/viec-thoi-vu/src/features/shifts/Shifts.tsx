@@ -57,6 +57,7 @@ function ShiftCard({ s, onChanged }: { s: Shift; onChanged(): void }) {
         <span><Ic n="calendar" size={15} /> {dateRange(job.start_date, job.end_date)}{job.shift_note ? ` · ${job.shift_note}` : ''}</span>
         <span><Ic n="pin" size={15} /> {job.address}</span>
       </div>
+      {(job.tasks?.length ?? 0) > 0 && s.when !== 'done' && <div className="chiprow wrap" aria-label={t('tasksTitle')}>{job.tasks!.map((x) => <span key={x} className="tag">{x}</span>)}</div>}
       {s.when !== 'done' && ['none', 'held'].includes(a.pay_status) && (
         <>
           <ShiftAgreement appId={a.id} app={a} job={job} side="seeker" otherName={job.business_name ?? '—'} onChanged={onChanged} />

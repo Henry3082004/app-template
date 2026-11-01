@@ -29,6 +29,7 @@ test('the job page warns that nobody pays to get a job', async ({ page: p }) => 
 })
 
 test('after a shift the worker answers "as posted?", can share the shift, and a lost-property report puts the shop on hold', async ({ page: p }) => {
+  test.setTimeout(180_000) // a long flow that crosses five sign-ins
   const h = helpers(p)
   await p.goto(url(PORTS.free, '/app')); await h.see('Phụ bếp ca tối')
   await h.asEmployer(); await h.postJob('Ca đáng tin', true); await h.signOut()
