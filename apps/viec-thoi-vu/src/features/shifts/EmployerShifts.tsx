@@ -4,7 +4,7 @@ import { ChatDialog } from '../collab/ChatDialog'
 import { ContactButtons } from '../../components/ContactButtons'
 import { Ic } from '../../components/Ic'
 import { ReportDialog } from '../collab/ReportDialog'
-import { EmployerPay } from './escrow'
+import { CancelHire, EmployerPay, TrustLine, useTrust } from './escrow'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../../components/ui'
 import { CandHead } from '../hiring/CandHead'
 import { api } from '../../lib/api'
@@ -13,11 +13,11 @@ import { hireShifts, useHires, type HireShift, type HireWhen } from '../../lib/h
 import { useI18n, type TKey } from '../../lib/i18n'
 import { displayPhone } from '../../lib/phone'
 import { useSession } from '../../lib/session'
-import type { Reputation } from '../../lib/types'
+import type { Reputation, TrustSignals } from '../../lib/types'
 
 const TITLES: Record<HireWhen, TKey> = { confirm: 'hireShiftsConfirm', today: 'shiftsToday', soon: 'shiftsSoon', done: 'shiftsDone' }
 
-function Card({ s, rep, onChanged }: { s: HireShift; rep?: Reputation; onChanged(): void }) {
+function Card({ s, rep, sig, onChanged }: { s: HireShift; rep?: Reputation; sig?: TrustSignals; onChanged(): void }) {
   const { t } = useI18n()
   const h = s.hire
   const nav = useNavigate()
@@ -27,6 +27,7 @@ function Card({ s, rep, onChanged }: { s: HireShift; rep?: Reputation; onChanged
       <CandHead name={h.full_name} avatar={h.avatar_path} rep={rep}
         sub={<span style={{ cursor: 'pointer' }} onClick={() => nav(`/app/tin/${h.job.id}`)}>{h.job.title}</span>}
         tag={<>{s.when === 'confirm' && <Tag tone="urgent">{t('hireShiftsConfirm')}</Tag>}{s.when === 'today' && <Tag tone="sun">{t('shiftOnToday')}</Tag>}</>} />
+      <TrustLine sig={sig} />
       <div className="shiftmeta">
         <span><Ic n="calendar" size={15} /> {dateRange(h.job.start_date, h.job.end_date)}{h.job.shift_note ? ` · ${h.job.shift_note}` : ''}</span>
         {h.phone && <span><Ic n="phone" size={15} /> {displayPhone(h.phone)}</span>}
@@ -38,6 +39,7 @@ function Card({ s, rep, onChanged }: { s: HireShift; rep?: Reputation; onChanged
             </span>
           )
           : s.when === 'today' && <span className="muted"><Ic n="clock" size={15} /> {t('workerNotArrived')}</span>}
+        {h.confirmed_at && !h.checked_in_at && s.when !== 'done' && <span><Ic n="check" size={15} /> {t('attendConfirmed')}</span>}
       </div>
       {h.phone && s.when !== 'done' && (
         <div className="acts"><ContactButtons phone={h.phone} /></div>
@@ -47,6 +49,7 @@ function Card({ s, rep, onChanged }: { s: HireShift; rep?: Reputation; onChanged
       <div className="acts">
         <Btn v="ghost" sm onClick={() => setDlg('chat')}><Ic n="message" size={16} /> {t('chat')}</Btn>
         <Btn v="text" sm onClick={() => setDlg('report')}>{t('report')}</Btn>
+        {s.when !== 'done' && h.pay_status === 'none' && !h.checked_in_at && <CancelHire appId={h.id} name={h.full_name} onDone={onChanged} />}
       </div>
       {dlg === 'chat' && <ChatDialog applicationId={h.id} name={h.full_name} onClose={() => setDlg(null)} />}
       {dlg === 'report' && <ReportDialog target={h.seeker_id} name={h.full_name} jobId={h.job.id} onClose={() => setDlg(null)} />}
@@ -61,6 +64,7 @@ export default function EmployerShifts() {
   const { profile, ready } = useSession()
   const { list, error, reload } = useHires()
   const [reps, setReps] = useState<Record<string, Reputation>>({})
+  const trust = useTrust((list ?? []).filter((h) => h.status === 'accepted').map((h) => h.seeker_id))
   useEffect(() => {
     const ids = [...new Set((list ?? []).filter((h) => h.status === 'accepted').map((h) => h.seeker_id))]
     if (ids.length) api.reputations(ids, 'seeker').then(setReps).catch(() => undefined)
@@ -79,7 +83,7 @@ export default function EmployerShifts() {
         return rows.length === 0 ? null : (
           <section key={w} className="stack">
             <h2 className="sechead">{t(TITLES[w])} <span className="count">{rows.length}</span></h2>
-            <div className="g2">{rows.map((s) => <Card key={s.hire.id} s={s} rep={reps[s.hire.seeker_id]} onChanged={reload} />)}</div>
+            <div className="g2">{rows.map((s) => <Card key={s.hire.id} s={s} rep={reps[s.hire.seeker_id]} sig={trust[s.hire.seeker_id]} onChanged={reload} />)}</div>
           </section>
         )
       })}

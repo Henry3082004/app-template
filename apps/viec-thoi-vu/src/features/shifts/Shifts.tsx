@@ -6,7 +6,7 @@ import { ReportDialog } from '../collab/ReportDialog'
 import { ShiftTabs } from './ShiftTabs'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../../components/ui'
 import { api } from '../../lib/api'
-import { dateRange, money, vnClock, vnDate, vnToday } from '../../lib/format'
+import { addDays, dateRange, money, vnClock, vnDate, vnToday } from '../../lib/format'
 import { getPosition } from '../../lib/position'
 import { shiftsOf, type Shift, type ShiftWhen } from '../../lib/earnings'
 import { useI18n, type TKey } from '../../lib/i18n'
@@ -47,6 +47,18 @@ function ShiftCard({ s, onChanged }: { s: Shift; onChanged(): void }) {
         <span><Ic n="calendar" size={15} /> {dateRange(job.start_date, job.end_date)}{job.shift_note ? ` · ${job.shift_note}` : ''}</span>
         <span><Ic n="pin" size={15} /> {job.address}</span>
       </div>
+      {['none', 'held'].includes(a.pay_status) && !inToday && vnToday() >= addDays(job.start_date, -1) && vnToday() <= job.end_date && (
+        <div className="attend">
+          {a.confirmed_at
+            ? <Tag tone="ok">{t('attendConfirmed')}</Tag>
+            : (
+              <>
+                <Btn sm onClick={() => run(() => api.confirmAttendance(a.id))} disabled={busy}>{t('attendConfirm')}</Btn>
+                <span className="muted small">{t('attendConfirmHint')}</span>
+              </>
+            )}
+        </div>
+      )}
       {s.when === 'today' && ['none', 'held'].includes(a.pay_status) && (
         <div className="attend">
           {!inToday
@@ -70,6 +82,9 @@ function ShiftCard({ s, onChanged }: { s: Shift; onChanged(): void }) {
               <>
                 <span className="muted small">{t(a.paid_cash_at ? 'cashShopPaid' : 'cashWaitShop')}</span>
                 <Btn sm onClick={() => run(() => api.ackCashReceived(a.id))} disabled={busy}>{t('ackCash')}</Btn>
+                {a.unpaid_reported_at
+                  ? <Tag tone="urgent">{t('unpaidSent')}</Tag>
+                  : <Btn sm v="text" onClick={() => run(() => api.reportUnpaid(a.id))} disabled={busy}>{t('unpaidBtn')}</Btn>}
               </>
             )}
         </div>

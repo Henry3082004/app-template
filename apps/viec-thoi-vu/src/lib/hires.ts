@@ -33,7 +33,8 @@ export function hireShifts(list: Hire[] | null, now = new Date()): HireShift[] {
 
 /** Shifts waiting for the shop: to confirm, or confirmed but the cash payment is not recorded. */
 /** Applications still waiting for my answer, on posts that are still open. */
-export const pendingOf = (list: Hire[] | null) => (list ?? []).filter((h) => h.status === 'pending' && h.job.status === 'open')
+/** (a backup stays on the list even when its post is already full: it is who the shop turns to when someone does not show) */
+export const pendingOf = (list: Hire[] | null) => (list ?? []).filter((h) => h.status === 'pending' && (h.job.status === 'open' || h.is_backup))
 
 export const needsAction = (list: Hire[] | null) => hireShifts(list).filter((s) => s.when === 'confirm').length
 

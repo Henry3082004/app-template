@@ -13,7 +13,7 @@ export const KNOWN = ['FREE_PLAN_LIMIT', 'URGENT_REQUIRES_PRO', 'JOB_NOT_OPEN', 
   'NOT_ACCEPTED', 'JOB_ENDED', 'PAYMENT_NOT_AVAILABLE', 'CANNOT_DISPUTE', 'NOT_COMPLETED', 'ALREADY_REVIEWED', 'REVIEW_WINDOW_CLOSED',
   'BAD_PHONE', 'PROFILE_EXISTS', 'INVALID_ROLE', 'NAME_REQUIRED', 'BAD_HOURS', 'BAD_STARS', 'BAD_TAGS', 'BAD_ATTENDANCE', 'BAD_BANK', 'BAD_OUTCOME', 'NOT_DISPUTED', 'PAYOUT_DONE', 'REFERENCE_REQUIRED', 'ROLE_EXISTS', 'BUSINESS_REQUIRED', 'ROLE_NOT_OWNED',
   'ALREADY_CHECKED_IN', 'NOT_CHECKED_IN', 'ALREADY_CHECKED_OUT', 'BAD_LOCATION', 'NOT_CASH',
-  'BAD_MESSAGE', 'TOO_MANY', 'BAD_REASON', 'NOT_A_REGULAR', 'ALREADY_APPLIED']
+  'BAD_MESSAGE', 'TOO_MANY_BACKUPS', 'TOO_MANY', 'BAD_REASON', 'NOT_A_REGULAR', 'ALREADY_APPLIED', 'APPLY_LOCKED', 'ALREADY_STARTED', 'ALREADY_PAID']
 
 export function fail(e: PostgrestError | Error | null | undefined): never {
   const msg = e?.message ?? ''
@@ -80,7 +80,7 @@ export async function phonesOf(userIds: string[]): Promise<Record<string, string
   return Object.fromEntries((data ?? []).map((r) => [r.user_id, r.phone]))
 }
 
-export const ESCROW_COLS = 'pay_status, escrow_amount, platform_fee, attendance, funding_mode, paid_cash_at, cash_received_at, checked_in_at, checkin_distance_m, checked_out_at'
+export const ESCROW_COLS = 'pay_status, escrow_amount, platform_fee, attendance, funding_mode, paid_cash_at, cash_received_at, checked_in_at, checkin_distance_m, checked_out_at, confirmed_at, unpaid_reported_at, is_backup, cancelled_at, cancel_late, as_posted'
 
 /** Shifts where the other side already reviewed (content stays hidden until I review). */
 export async function otherReviewed(appIds: string[]): Promise<Set<string>> {
@@ -113,6 +113,12 @@ export const toEscrow = (r: any, reviewed: boolean, other: boolean): Escrow => (
   checked_in_at: r.checked_in_at ?? null,
   checkin_distance_m: r.checkin_distance_m ?? null,
   checked_out_at: r.checked_out_at ?? null,
+  confirmed_at: r.confirmed_at ?? null,
+  unpaid_reported_at: r.unpaid_reported_at ?? null,
+  is_backup: !!r.is_backup,
+  cancelled_at: r.cancelled_at ?? null,
+  cancel_late: r.cancel_late ?? null,
+  as_posted: r.as_posted ?? null,
 })
 
 /** POSTs to one of our Edge Functions; a non-2xx answer becomes an AppError with the function's error code. */

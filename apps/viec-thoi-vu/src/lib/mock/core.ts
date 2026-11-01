@@ -84,6 +84,7 @@ export const revealed = (appId: string) => {
 export const escrowOf = (a: App, viewer: string): Escrow => ({
   paid_cash_at: a.paid_cash_at ?? null, cash_received_at: a.cash_received_at ?? null,
   checked_in_at: a.checked_in_at ?? null, checkin_distance_m: a.checkin_distance_m ?? null, checked_out_at: a.checked_out_at ?? null,
+  confirmed_at: a.confirmed_at ?? null, unpaid_reported_at: a.unpaid_reported_at ?? null, is_backup: !!a.is_backup, cancelled_at: a.cancelled_at ?? null, cancel_late: a.cancel_late ?? null, as_posted: a.as_posted ?? null,
   pay_status: a.pay_status, escrow_amount: a.escrow_amount, platform_fee: a.platform_fee, attendance: a.attendance, funding_mode: a.funding_mode,
   reviewed: reviews.some((r) => r.application_id === a.id && r.reviewer_id === viewer),
   other_reviewed: reviews.some((r) => r.application_id === a.id && r.reviewer_id !== viewer),

@@ -1,5 +1,5 @@
 // The contract every backend (Supabase or the in-memory mock) implements.
-import type { CapyMsg, CapyReply, Highlights, Role, JobStatus, AppStatus, Attendance, Profile, Job, MyApplication, MyJob, Applicant, Hire, Reputation, AppNotification, ChatMessage, ReportReason, AdminReport, DeletionRequest, AdminDeletion, SentInvite, FoundWorker, WorkerSearch, BankAccount, AdminDispute, AdminPayout, AdminFlag, AdminStats, AdminSamples, AppConfig, CompleteProfileInput, PendingProfile, Quote, ReceivedReview, SignUpInput, JobInput, ZaloLoginResult, ProfileUpdate } from './types'
+import type { CapyMsg, CapyReply, Highlights, Role, JobStatus, AppStatus, Attendance, Profile, Job, MyApplication, MyJob, Applicant, Hire, Reputation, AppNotification, TrustSignals, ChatMessage, ReportReason, AdminReport, DeletionRequest, AdminDeletion, SentInvite, FoundWorker, WorkerSearch, BankAccount, AdminDispute, AdminPayout, AdminFlag, AdminStats, AdminSamples, AppConfig, CompleteProfileInput, PendingProfile, Quote, ReceivedReview, SignUpInput, JobInput, ZaloLoginResult, ProfileUpdate } from './types'
 import type { QuizAnswers } from './quiz'
 
 export interface Api {
@@ -103,6 +103,18 @@ export interface Api {
   setDiscoverable(on: boolean): Promise<void>
   /** finished shifts (last 30 days) I still have to review */
   pendingReviews(): Promise<number>
+  /** the worker confirms "I'm still coming" (the day before or on the work day) */
+  confirmAttendance(applicationId: string): Promise<void>
+  /** shop: keep a pending applicant as a backup (no slot used) or put them back in the list */
+  setBackup(applicationId: string, on: boolean): Promise<void>
+  /** shop: cancel an accepted worker (counted on the shop; the slot reopens) */
+  cancelHire(applicationId: string): Promise<void>
+  /** worker (free mode): "I have not been paid" */
+  reportUnpaid(applicationId: string): Promise<void>
+  /** no-shows / unpaid / cancels / reply time / verified phone, per user id */
+  trustSignals(userIds: string[]): Promise<Record<string, TrustSignals>>
+  /** until when I cannot apply (after repeated no-shows), or null */
+  myApplyLock(): Promise<string | null>
   /** settle overdue shifts for the signed-in user (also done hourly on the server) */
   sweep(): Promise<void>
 }

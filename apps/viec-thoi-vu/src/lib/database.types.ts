@@ -57,6 +57,12 @@ export type Database = {
           seeker_id: string
           seen_by_employer: boolean
           status: Database["public"]["Enums"]["application_status"]
+          confirmed_at: string | null
+          is_backup: boolean
+          unpaid_reported_at: string | null
+          cancelled_at: string | null
+          cancel_late: boolean | null
+          as_posted: boolean | null
         }
         Insert: {
           attendance?: string | null
@@ -84,6 +90,12 @@ export type Database = {
           seeker_id: string
           seen_by_employer?: boolean
           status?: Database["public"]["Enums"]["application_status"]
+          confirmed_at?: string | null
+          is_backup?: boolean
+          unpaid_reported_at?: string | null
+          cancelled_at?: string | null
+          cancel_late?: boolean | null
+          as_posted?: boolean | null
         }
         Update: {
           attendance?: string | null
@@ -111,6 +123,12 @@ export type Database = {
           seeker_id?: string
           seen_by_employer?: boolean
           status?: Database["public"]["Enums"]["application_status"]
+          confirmed_at?: string | null
+          is_backup?: boolean
+          unpaid_reported_at?: string | null
+          cancelled_at?: string | null
+          cancel_late?: boolean | null
+          as_posted?: boolean | null
         }
         Relationships: [
           {
@@ -859,6 +877,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      confirm_attendance: { Args: { p_application: string }; Returns: Database["public"]["Tables"]["applications"]["Row"] }
+      set_backup: { Args: { p_application: string; p_on: boolean }; Returns: Database["public"]["Tables"]["applications"]["Row"] }
+      cancel_hire: { Args: { p_application: string }; Returns: Database["public"]["Tables"]["applications"]["Row"] }
+      report_unpaid: { Args: { p_application: string }; Returns: Database["public"]["Tables"]["applications"]["Row"] }
+      my_apply_lock: { Args: never; Returns: string }
+      trust_signals: { Args: { p_users: string[] }; Returns: { user_id: string; noshow_30d: number; noshow_total: number; apply_locked_until: string | null; unpaid: number; cancels: number; late_cancels: number; hires: number; reply_hours: number | null; phone_verified: boolean; mismatch: number }[] }
       ack_cash_received: {
         Args: { p_application: string }
         Returns: {

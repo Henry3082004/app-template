@@ -88,6 +88,17 @@ export interface Escrow {
   checked_in_at?: string | null
   checkin_distance_m?: number | null
   checked_out_at?: string | null
+  /** the worker's "I'm still coming" for the work day */
+  confirmed_at?: string | null
+  /** free mode: the worker said they have not been paid yet */
+  unpaid_reported_at?: string | null
+  /** a pending applicant the shop keeps as a backup (uses no slot) */
+  is_backup?: boolean
+  /** the shop cancelled this worker (late = on the work day or after) */
+  cancelled_at?: string | null
+  cancel_late?: boolean | null
+  /** the worker's answer to "was it as posted?" after the shift */
+  as_posted?: boolean | null
 }
 
 export interface MyApplication extends Escrow {
@@ -129,6 +140,15 @@ export interface Reputation {
   ratings: number
   avg_stars: number | null
   top_tags: string[]
+}
+
+/** What the cards say about someone's word-keeping (no-shows of a worker; unpaid, cancels, reply time and mismatches of a shop). */
+export interface TrustSignals {
+  user_id: string
+  noshow_30d: number; noshow_total: number; apply_locked_until: string | null
+  unpaid: number; cancels: number; late_cancels: number; hires: number; reply_hours: number | null; mismatch: number
+  /** the phone number was verified by Zalo */
+  phone_verified: boolean
 }
 
 /** In-app notification (named so it does not clash with the browser's own Notification). */

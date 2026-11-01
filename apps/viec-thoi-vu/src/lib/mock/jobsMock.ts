@@ -1,4 +1,5 @@
 import { AppError, type Api, type Job } from '../types'
+import { applyLockOf } from './trustMock'
 import { CFG, discoverable, saved, isPro, NEW_PAY, now, nid, notify, users, jobs, apps, payouts, current, wait, me, jobOf, bizOf, escrowOf } from './core'
 
 export const jobsMock: Pick<Api, 'savedJobIds' | 'saveJobs' | 'unsaveJob' | 'jobsByIds' | 'homeHighlights' | 'listOpenJobs' | 'getJob' | 'myApplicationStatus' | 'apply' | 'myApplications' | 'withdraw' | 'myJobs' | 'createJob' | 'setJobStatus' | 'applicantsFor' | 'myHires' | 'decide'> = {
@@ -46,6 +47,7 @@ export const jobsMock: Pick<Api, 'savedJobIds' | 'saveJobs' | 'unsaveJob' | 'job
     if (!job || job.status !== 'open') throw new AppError('JOB_NOT_OPEN')
     if (job.employer_id === p.id) throw new AppError('FORBIDDEN')
     if (apps.some((a) => a.job_id === jobId && a.seeker_id === p.id)) throw new AppError('ALREADY_APPLIED')
+    if (applyLockOf(p.id)) throw new AppError('APPLY_LOCKED')
     apps.push({ id: nid(), job_id: jobId, seeker_id: p.id, status: 'pending', message: message.trim() || null, created_at: now(), seen: false, ...NEW_PAY })
     notify(job.employer_id, 'new_applicant', 'Có người ứng tuyển mới', `${p.full_name} ứng tuyển "${job.title}"`, '/app/ung-vien')
     return wait(undefined)

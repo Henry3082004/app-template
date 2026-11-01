@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Ic } from '../../components/Ic'
-import { Rep } from '../shifts/escrow'
+import { Rep, TrustLine, useTrust } from '../shifts/escrow'
 import { Pay } from './JobCard'
 import { Avatar, Btn, ErrorBox, Fld, Tag } from '../../components/ui'
 import { api } from '../../lib/api'
@@ -29,6 +29,8 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<unknown>(null)
   const [rep, setRep] = useState<Reputation>()
+  const trust = useTrust([job.employer_id])
+  const [lock, setLock] = useState<string | null>(null)
   const left = job.slots - job.filled
   const full = left <= 0 || job.status !== 'open'
   const own = !!profile && job.employer_id === profile.id
@@ -38,6 +40,10 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
     setRep(undefined)
     api.reputations([job.employer_id], 'employer').then((m) => setRep(m[job.employer_id])).catch(() => undefined)
   }, [job.employer_id])
+
+  useEffect(() => {
+    if (profile?.role === 'seeker') api.myApplyLock().then(setLock).catch(() => undefined)
+  }, [profile?.id, profile?.role])
 
   const send = async () => {
     setBusy(true)
@@ -71,7 +77,7 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
           {job.business_name && (
             <div className="shopbox">
               <Avatar square size={40} name={job.business_name} src={avatarUrl(job.business_logo)} />
-              <div><b>{job.business_name}</b><Rep rep={rep} employer /></div>
+              <div><b>{job.business_name}</b><Rep rep={rep} employer /><TrustLine sig={trust[job.employer_id]} shop /></div>
             </div>
           )}
         </div>
@@ -93,6 +99,7 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
             )}
           </div>
         )}
+        {lock && <div className="notice warn">{t('applyLockedNote', { date: new Date(lock).toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-GB') })}</div>}
         {error != null && <ErrorBox error={error} where="JobDetail.apply" />}
       </div>
       {!isEmployer && (
@@ -102,7 +109,7 @@ export function JobDetail({ job, distance, mine, onApplied, onBack }: {
             <SaveButton jobId={job.id} large />
             {mine ? <Btn block disabled>{mine === 'withdrawn' ? t('stwithdrawn') : t('applied')}</Btn>
               : full ? <Btn block disabled>{t('full')}</Btn>
-              : <Btn block onClick={onApply} disabled={busy}>{busy ? '…' : t('applyNow')}</Btn>}
+              : <Btn block onClick={onApply} disabled={busy || !!lock}>{busy ? '…' : t('applyNow')}</Btn>}
           </div>
         </div>
       )}

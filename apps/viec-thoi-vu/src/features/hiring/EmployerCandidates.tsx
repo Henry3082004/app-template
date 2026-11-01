@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { HireTabs } from './HireTabs'
 import { Ic } from '../../components/Ic'
-import { Btn, Empty, ErrorBox, Skel } from '../../components/ui'
+import { Btn, Empty, ErrorBox, Skel, Tag } from '../../components/ui'
+import { TrustLine, useTrust } from '../shifts/escrow'
 import { WorkerFacts } from '../account/WorkerFields'
 import { CandHead } from './CandHead'
 import { CompareBar, CompareCands, MAX_COMPARE, PickCand } from './CompareCands'
@@ -31,6 +32,7 @@ export default function EmployerCandidates() {
   const [accepted, setAccepted] = useState<AcceptedInfo | null>(null)
 
   const pending = pendingOf(list)
+  const trust = useTrust(pending.map((h) => h.seeker_id))
   useEffect(() => {
     const ids = pending.map((h) => h.seeker_id)
     if (ids.length) api.reputations(ids, 'seeker').then(setReps).catch(() => undefined)
@@ -71,7 +73,8 @@ export default function EmployerCandidates() {
       <div className="g2">
         {shown.map((a) => (
           <div key={a.id} className="card cand">
-            <CandHead name={a.full_name} avatar={a.avatar_path} rep={reps[a.seeker_id]} sub={<><Ic n="briefcase" size={14} /> {a.job.title} · {dateRange(a.job.start_date, a.job.end_date)}</>} />
+            <CandHead name={a.full_name} avatar={a.avatar_path} rep={reps[a.seeker_id]} sub={<><Ic n="briefcase" size={14} /> {a.job.title} · {dateRange(a.job.start_date, a.job.end_date)}</>} tag={a.is_backup && <Tag tone="sun">{t('backupTag')}</Tag>} />
+            <TrustLine sig={trust[a.seeker_id]} />
             <WorkerFacts w={a} />
             {a.message && <div className="tag" style={{ borderRadius: 12, whiteSpace: 'normal' }}><Ic n="message" size={14} /> “{a.message}”</div>}
             <div className="acts">
@@ -79,6 +82,7 @@ export default function EmployerCandidates() {
               <Btn v="ghost" disabled={act.busy === a.id} onClick={() => decide(a, 'rejected')}>{t('reject')}</Btn>
               <Btn disabled={act.busy === a.id} onClick={() => decide(a, 'accepted')}>{t('accept')}</Btn>
             </div>
+            <div className="acts"><Btn v="text" sm disabled={act.busy === a.id} onClick={() => act.run(a.id, async () => { await api.setBackup(a.id, !a.is_backup); reload() })}>{a.is_backup ? t('backupOff') : t('backupOn')}</Btn></div>
           </div>
         ))}
       </div>
