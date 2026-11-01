@@ -21,13 +21,13 @@ test('chat between the shop and the worker, a report, and the admin handles it',
   // the shop writes
   await h.asEmployer(); await nav(p, 'Ca làm').click(); await h.see('Ca nhắn tin')
   await p.getByRole('button', { name: 'Nhắn tin' }).first().click(); await h.see('Chưa có tin nhắn')
-  await p.getByLabel('Nhập tin nhắn…').fill('Chào em, mai 7h có mặt nhé'); await p.getByRole('button', { name: 'Gửi' }).click()
+  await p.getByLabel('Nhập tin nhắn…').fill('Chào em, mai 7h có mặt nhé'); await p.getByRole('button', { name: 'Gửi', exact: true }).click()
   await h.see('Chào em, mai 7h có mặt nhé'); await p.keyboard.press('Escape'); await h.signOut()
 
   // the worker is told, reads it and answers
   await h.asSeeker(); await bell(p).click(); await h.see('nhắn tin cho bạn')
   await h.go('/app/cham-cong'); await p.getByRole('button', { name: 'Nhắn tin' }).first().click(); await h.see('Chào em, mai 7h có mặt nhé')
-  await p.getByLabel('Nhập tin nhắn…').fill('Dạ em đến sớm ạ'); await p.getByRole('button', { name: 'Gửi' }).click(); await h.see('Dạ em đến sớm ạ')
+  await p.getByLabel('Nhập tin nhắn…').fill('Dạ em đến sớm ạ'); await p.getByRole('button', { name: 'Gửi', exact: true }).click(); await h.see('Dạ em đến sớm ạ')
   await h.noHScroll(); await p.keyboard.press('Escape')
   // ... and reports the shop
   await p.getByRole('button', { name: 'Báo cáo' }).first().click(); await p.getByLabel('Mô tả thêm (không bắt buộc)').fill('Quán đòi đặt cọc')

@@ -71,6 +71,9 @@ export default function MyApplications() {
                 <div className="row" style={{ gap: 10 }}><ContactButtons phone={a.employer_phone} /></div>
               </>
             )}
+            {a.status === 'pending' && Date.now() - Date.parse(a.created_at) > 864e5 && (
+              <div className="notice info small stack">{t('pendingOldHint')}<div><Btn v="ghost" sm onClick={() => nav('/app')}>{t('pendingOldCta')}</Btn></div></div>
+            )}
             {a.status === 'pending' && <div><Btn v="text" sm onClick={() => withdraw(a.id)}>{t('withdraw')}</Btn></div>}
           </article>
         ))}

@@ -75,6 +75,12 @@ export default function EmployerJobs() {
           </button>
         ))}
       </div>
+      {list?.filter((j) => j.status === 'open' && j.applicants === 0 && Date.now() - Date.parse(j.created_at) > 12 * 36e5).map((j) => (
+        <div key={j.id} className="notice info small stack">
+          <b>{j.title}</b>{t('emptyJobTip')}
+          <div><Btn v="ghost" sm onClick={() => nav(`/app/dang-tin?lai=${j.id}`)}>{t('repostBetter')}</Btn></div>
+        </div>
+      ))}
     </>
   )
 

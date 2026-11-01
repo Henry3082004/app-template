@@ -16,6 +16,10 @@ export function useAppConfig(): AppConfig | undefined {
   return useQuery({ queryKey: qk.config, queryFn: getConfig, staleTime: Infinity }).data
 }
 
+/** Until when the app is free for everyone (shown to shops and workers; anything we charge later is announced 30 days before). */
+export const FREE_UNTIL = '2027-06-30'
+export const freeUntilLabel = (locale: string) => new Date(FREE_UNTIL + 'T12:00:00').toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-GB')
+
 /** Pro features are free for everyone while billing is off. */
 export const isProFor = (profile: Profile | null | undefined, c: AppConfig | undefined) =>
   profile?.plan === 'pro' || c?.billing === 'off'

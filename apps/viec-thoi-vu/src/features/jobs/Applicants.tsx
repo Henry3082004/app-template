@@ -83,7 +83,7 @@ export function Applicants({ job, onBack, onChanged }: { job: MyJob; onBack?: ()
                 tag={<>{a.is_backup && <Tag tone="sun">{t('backupTag')}</Tag>}{a.status !== 'pending' && <Tag tone={a.status === 'accepted' ? 'ok' : ''}>{a.cancelled_at ? t('cancelledTag') : t(`st${a.status}` as TKey)}</Tag>}</>} />
               <TrustLine sig={trust[a.seeker_id]} />
               <WorkerNotes notes={notes[a.seeker_id]} />
-              <WorkerFacts w={a} />
+              <WorkerFacts w={a} category={job.category} />
               {a.message && <div className="tag" style={{ borderRadius: 12, whiteSpace: 'normal' }}><Ic n="message" size={14} /> “{a.message}”</div>}
               {(list?.length ?? 0) > 1 && <div className="acts"><PickCand on={chosen.includes(a.id)} disabled={chosen.length >= MAX_COMPARE} onChange={() => pick(a.id)} /></div>}
               {a.status === 'accepted' && a.phone && (

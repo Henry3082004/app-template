@@ -1,5 +1,6 @@
 import { AppError, type Api, type Job } from '../types'
 import { applyLockOf } from './trustMock'
+import { guides } from './hireToolsMock'
 import { CFG, SUSPICIOUS, holds, discoverable, saved, isPro, NEW_PAY, now, nid, notify, users, jobs, apps, payouts, current, wait, me, jobOf, bizOf, escrowOf } from './core'
 
 export const jobsMock: Pick<Api, 'savedJobIds' | 'saveJobs' | 'unsaveJob' | 'jobsByIds' | 'homeHighlights' | 'listOpenJobs' | 'getJob' | 'myApplicationStatus' | 'apply' | 'myApplications' | 'withdraw' | 'myJobs' | 'createJob' | 'setJobStatus' | 'applicantsFor' | 'myHires' | 'decide'> = {
@@ -32,7 +33,8 @@ export const jobsMock: Pick<Api, 'savedJobIds' | 'saveJobs' | 'unsaveJob' | 'job
       news: [{ title: 'Tuyển dụng TPHCM cận Tết 2026 dự kiến nhu cầu lên tới 30.000 vị trí', sub: 'Bài báo về nhu cầu tuyển dụng dịp cận Tết ở TP.HCM.', url: 'https://voh.com.vn/kinh-te/tuyen-dung-tphcm-can-tet-2026-du-kien-nhu-cau-len-toi-30000-vi-tri-630672.html', source: 'VOH' }],
     })
   },
-  async listOpenJobs() { return wait(jobs.filter((j) => j.status === 'open')) },
+  // urgent first, then boosted (a referral reward), then as stored
+  async listOpenJobs() { return wait(jobs.filter((j) => j.status === 'open').sort((a, b) => Number(!!b.is_urgent) - Number(!!a.is_urgent) || (b.boosted_until ?? '').localeCompare(a.boosted_until ?? ''))) },
   async getJob(id) { return wait(jobs.find((j) => j.id === id) ?? null) },
 
   async myApplicationStatus() {
@@ -138,6 +140,7 @@ export const jobsMock: Pick<Api, 'savedJobIds' | 'saveJobs' | 'unsaveJob' | 'job
       if (job.filled >= job.slots) job.status = 'closed'
     }
     a.status = decision
+    if (decision === 'accepted' && guides[job.id]) notify(a.seeker_id, 'job_guide', 'Hướng dẫn công việc', `"${job.title}": ${guides[job.id]}`.slice(0, 300), '/app/cham-cong')
     if (decision === 'accepted') notify(a.seeker_id, 'accepted', `${bizOf(job)} đã nhận bạn`, `Việc "${job.title}" — xem ca và liên hệ quán`, '/app/cham-cong')
     else notify(a.seeker_id, 'rejected', 'Đơn chưa được chọn', `Việc "${job.title}" của ${bizOf(job)}`, '/app/da-ung-tuyen')
     return wait({ phone: decision === 'accepted' ? users[a.seeker_id]?.profile.phone ?? null : null })

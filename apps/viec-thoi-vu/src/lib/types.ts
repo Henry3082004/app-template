@@ -68,6 +68,8 @@ export interface Job {
   business_logo?: string | null
   /** held for the admin (suspicious words, or many workers said it was not as posted); starts with REJECTED once refused */
   held_reason?: string | null
+  /** pushed to the top of the list until then (referral reward) */
+  boosted_until?: string | null
   /** sample job: only admins can see it */
   is_sample?: boolean
 }
@@ -101,6 +103,9 @@ export interface Escrow {
   cancel_late?: boolean | null
   /** the worker's answer to "was it as posted?" after the shift */
   as_posted?: boolean | null
+  /** each side tapped "I agree" to the shift terms (pay, day, job) */
+  agreed_seeker_at?: string | null
+  agreed_employer_at?: string | null
 }
 
 export interface MyApplication extends Escrow {
@@ -158,7 +163,14 @@ export interface AppNotification { id: string; kind: string; title: string; body
 
 /** A comment another shop left about a worker (shown on the candidate card). */
 export interface WorkerNote { user_id: string; stars: number; comment: string; shop_name: string; created_at: string }
+export interface AdminKpis {
+  jobs_30d: number; jobs_with_applicant_24h: number; shops_60d: number; shops_repeat_60d: number
+  weekly_shifts: { week: string; shifts: number }[]
+  noshow_30d: number; finished_30d: number; avg_reply_hours_30d: number | null
+  held_jobs: number; referrals_30d: number; open_reports: number
+}
 export interface AdminHeldJob { id: string; title: string; business: string; held_reason: string; created_at: string }
+export interface Referral { code: string; n: number }
 export interface ChatMessage { id: string; sender_id: string; body: string; created_at: string }
 export const REPORT_REASONS = ['scam', 'fee', 'no_show', 'harassment', 'fake_info', 'lost_property', 'other'] as const
 export type ReportReason = (typeof REPORT_REASONS)[number]

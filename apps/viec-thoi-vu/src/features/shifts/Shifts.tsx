@@ -4,6 +4,7 @@ import { ChatDialog } from '../collab/ChatDialog'
 import { Ic } from '../../components/Ic'
 import { ReportDialog } from '../collab/ReportDialog'
 import { ShiftTabs } from './ShiftTabs'
+import { JobGuide, ShiftAgreement } from './escrow'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../../components/ui'
 import { api } from '../../lib/api'
 import { addDays, dateRange, money, vnClock, vnDate, vnToday } from '../../lib/format'
@@ -56,6 +57,12 @@ function ShiftCard({ s, onChanged }: { s: Shift; onChanged(): void }) {
         <span><Ic n="calendar" size={15} /> {dateRange(job.start_date, job.end_date)}{job.shift_note ? ` · ${job.shift_note}` : ''}</span>
         <span><Ic n="pin" size={15} /> {job.address}</span>
       </div>
+      {s.when !== 'done' && ['none', 'held'].includes(a.pay_status) && (
+        <>
+          <ShiftAgreement appId={a.id} app={a} job={job} side="seeker" otherName={job.business_name ?? '—'} onChanged={onChanged} />
+          <JobGuide jobId={job.id} />
+        </>
+      )}
       {['none', 'held'].includes(a.pay_status) && !inToday && vnToday() >= addDays(job.start_date, -1) && vnToday() <= job.end_date && (
         <div className="attend">
           {a.confirmed_at

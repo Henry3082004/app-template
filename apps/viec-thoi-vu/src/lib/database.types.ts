@@ -63,6 +63,8 @@ export type Database = {
           cancelled_at: string | null
           cancel_late: boolean | null
           as_posted: boolean | null
+          agreed_seeker_at: string | null
+          agreed_employer_at: string | null
         }
         Insert: {
           attendance?: string | null
@@ -96,6 +98,8 @@ export type Database = {
           cancelled_at?: string | null
           cancel_late?: boolean | null
           as_posted?: boolean | null
+          agreed_seeker_at?: string | null
+          agreed_employer_at?: string | null
         }
         Update: {
           attendance?: string | null
@@ -129,6 +133,8 @@ export type Database = {
           cancelled_at?: string | null
           cancel_late?: boolean | null
           as_posted?: boolean | null
+          agreed_seeker_at?: string | null
+          agreed_employer_at?: string | null
         }
         Relationships: [
           {
@@ -320,6 +326,7 @@ export type Database = {
           title: string
           held_reason: string | null
           vetted: boolean
+          boosted_until: string | null
         }
         Insert: {
           address: string
@@ -344,6 +351,7 @@ export type Database = {
           title: string
           held_reason?: string | null
           vetted?: boolean
+          boosted_until?: string | null
         }
         Update: {
           address?: string
@@ -368,6 +376,7 @@ export type Database = {
           title?: string
           held_reason?: string | null
           vetted?: boolean
+          boosted_until?: string | null
         }
         Relationships: [
           {
@@ -883,6 +892,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_kpis: { Args: never; Returns: Json }
+      set_job_guide: { Args: { p_job: string; p_body: string }; Returns: undefined }
+      job_guide: { Args: { p_job: string }; Returns: string | null }
+      agree_shift: { Args: { p_application: string }; Returns: undefined }
+      my_referral: { Args: never; Returns: { code: string; n: number }[] }
+      redeem_referral: { Args: { p_code: string }; Returns: undefined }
       admin_held_jobs: { Args: never; Returns: { id: string; title: string; business: string; held_reason: string; created_at: string }[] }
       admin_review_job: { Args: { p_job: string; p_ok: boolean; p_note?: string }; Returns: undefined }
       mark_as_posted: { Args: { p_application: string; p_ok: boolean }; Returns: undefined }

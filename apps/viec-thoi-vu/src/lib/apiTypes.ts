@@ -1,5 +1,5 @@
 // The contract every backend (Supabase or the in-memory mock) implements.
-import type { CapyMsg, CapyReply, Highlights, Role, JobStatus, AppStatus, Attendance, Profile, Job, MyApplication, MyJob, Applicant, Hire, Reputation, AppNotification, TrustSignals, WorkerNote, AdminHeldJob, ChatMessage, ReportReason, AdminReport, DeletionRequest, AdminDeletion, SentInvite, FoundWorker, WorkerSearch, BankAccount, AdminDispute, AdminPayout, AdminFlag, AdminStats, AdminSamples, AppConfig, CompleteProfileInput, PendingProfile, Quote, ReceivedReview, SignUpInput, JobInput, ZaloLoginResult, ProfileUpdate } from './types'
+import type { CapyMsg, CapyReply, Highlights, Role, JobStatus, AppStatus, Attendance, Profile, Job, MyApplication, MyJob, Applicant, Hire, Reputation, AppNotification, TrustSignals, WorkerNote, AdminHeldJob, AdminKpis, Referral, ChatMessage, ReportReason, AdminReport, DeletionRequest, AdminDeletion, SentInvite, FoundWorker, WorkerSearch, BankAccount, AdminDispute, AdminPayout, AdminFlag, AdminStats, AdminSamples, AppConfig, CompleteProfileInput, PendingProfile, Quote, ReceivedReview, SignUpInput, JobInput, ZaloLoginResult, ProfileUpdate } from './types'
 import type { QuizAnswers } from './quiz'
 
 export interface Api {
@@ -120,6 +120,16 @@ export interface Api {
   /** admin: posts held for review, and the decision */
   adminHeldJobs(): Promise<AdminHeldJob[]>
   adminReviewJob(jobId: string, ok: boolean, note?: string): Promise<void>
+  /** admin: does the marketplace work? (answers within a day, shops coming back, finished shifts per week, no-shows, reply time) */
+  adminKpis(): Promise<AdminKpis>
+  /** shop: the guide (what to wear / bring / who to ask for) only the people it hires can read */
+  setJobGuide(jobId: string, body: string): Promise<void>
+  jobGuide(jobId: string): Promise<string | null>
+  /** either side taps "I agree" to the shift terms */
+  agreeShift(applicationId: string): Promise<void>
+  /** my referral code and how many people used it; and using someone's code (new accounts, once) */
+  myReferral(): Promise<Referral>
+  redeemReferral(code: string): Promise<void>
   /** until when I cannot apply (after repeated no-shows), or null */
   myApplyLock(): Promise<string | null>
   /** settle overdue shifts for the signed-in user (also done hourly on the server) */

@@ -1,7 +1,7 @@
-import { type Api, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type AdminDeletion, type AdminReport, type AdminHeldJob } from '../types'
+import { type Api, type AdminDispute, type AdminFlag, type AdminPayout, type AdminSamples, type AdminStats, type AdminDeletion, type AdminReport, type AdminHeldJob, type AdminKpis } from '../types'
 import { rpc, num } from './core'
 
-export const adminApi: Pick<Api, 'adminReports' | 'resolveReport' | 'adminDeletions' | 'resolveDeletion' | 'adminDisputes' | 'resolveDispute' | 'adminPayouts' | 'markPayoutPaid' | 'adminFlags' | 'adminStats' | 'adminSamples' | 'adminHeldJobs' | 'adminReviewJob'> = {
+export const adminApi: Pick<Api, 'adminReports' | 'resolveReport' | 'adminDeletions' | 'resolveDeletion' | 'adminDisputes' | 'resolveDispute' | 'adminPayouts' | 'markPayoutPaid' | 'adminFlags' | 'adminStats' | 'adminSamples' | 'adminHeldJobs' | 'adminReviewJob' | 'adminKpis'> = {
   async adminReports() {
     // "lost property" travels as reason 'other' with a [lost_property] prefix (the database list of reasons stays as it was)
     return (((await rpc('admin_reports')) ?? []) as AdminReport[]).map((r) => r.reason === 'other' && r.detail?.startsWith('[lost_property]')
@@ -48,6 +48,11 @@ export const adminApi: Pick<Api, 'adminReports' | 'resolveReport' | 'adminDeleti
   },
   async adminReviewJob(jobId, ok, note) {
     await rpc('admin_review_job', { p_job: jobId, p_ok: ok, p_note: note ?? null })
+  },
+
+  async adminKpis() {
+    const k = (await rpc('admin_kpis')) as AdminKpis
+    return { ...k, avg_reply_hours_30d: k.avg_reply_hours_30d == null ? null : Number(k.avg_reply_hours_30d) }
   },
 
   async adminSamples() {

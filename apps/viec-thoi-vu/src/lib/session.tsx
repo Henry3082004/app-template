@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { api } from './api'
+import { captureRef, takeRef } from './referral'
 import { setSentryUser } from './sentry'
 import type { PendingProfile, Profile, ProfileUpdate, Role } from './types'
 
@@ -41,6 +42,8 @@ const Ctx = createContext<Session>(null as unknown as Session)
 const VIEW_KEY = 'vtv-view-as-user'
 const readView = () => { try { return localStorage.getItem(VIEW_KEY) === '1' } catch { return false } }
 
+captureRef()
+
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [profile, setProfileState] = useState<Profile | null>(null)
   const [ready, setReady] = useState(false)
@@ -67,6 +70,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [setProfile])
 
   useEffect(() => { refresh().finally(() => setReady(true)) }, [refresh])
+  // a friend's link (?ref=CODE) is used once there is an account for it (an old account or a wrong code is simply ignored)
+  useEffect(() => {
+    if (!profile) return
+    const c = takeRef()
+    if (c) api.redeemReferral(c).catch(() => undefined)
+  }, [profile?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const setViewAsUser = useCallback((on: boolean) => {
     setViewAsUserState(on)

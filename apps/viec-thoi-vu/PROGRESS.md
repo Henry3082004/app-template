@@ -196,3 +196,12 @@ Tuyển người (Tin đăng | Ứng viên, đăng lại tin cũ) · Ca làm (C�
 - Đăng nhập thử đuôi `@pw` trước, rồi đuôi cũ `@phone` (tài khoản tạo từ thời trước).
 - Hạn chế đã biết: người khác có thể gõ số của bạn khi tạo tài khoản mật khẩu (như đường Google hiện nay); số đó hiện "chưa xác thực" và chủ số vẫn tạo được tài khoản Zalo riêng của mình. Muốn chặn hẳn thì thêm OTP qua SMS.
 - Thẻ việc làm: chân thẻ gọn lại (lịch, giờ làm, "còn n chỗ" dạng nhãn), quán chưa có đánh giá hiện nhãn "Mới" thay cho "Quán mới".
+
+## 01/11/2026 — Giải quyết nỗi lo của quán, người làm và nhà đầu tư (22 việc)
+Làm theo danh sách "việc 7–28" trong tài liệu chiến lược marketing. Chi tiết DB ở `supabase/migrations/APPLIED.md`, test DB `190`–`220`, test e2e `commitments`, `trust-safety`, `hiring-tools`.
+- **Cam kết ca:** "Tôi vẫn đến" (hôm trước hoặc ngày làm), người dự bị (đơn đang chờ, không chiếm chỗ), khóa ứng tuyển 7 ngày khi vắng ca 2 lần/30 ngày, quán hủy người đã nhận (tính hủy sát giờ, gợi ý việc khác cho người bị hủy), "Chưa nhận được tiền", dòng uy tín dưới tên (SĐT xác thực qua Zalo, số lần vắng, bị báo chưa trả tiền, tỉ lệ hủy, thời gian trả lời, số người báo không đúng tin đăng).
+- **Niềm tin và an toàn:** cảnh báo "không bao giờ phải trả tiền để nhận việc"; tin có cụm đáng ngờ bị giữ cho quản trị duyệt (tab "Tin chờ duyệt"); câu hỏi "Công việc có đúng như tin đăng không?" sau ca (2 người trả lời "không" thì tin bị giữ); nhận xét của quán trước trên thẻ ứng viên; báo cáo "mất tài sản" (tạm khóa 3 ngày chờ xác minh); cảnh báo ứng viên dưới 18 tuổi; nút gửi ca cho người thân + mẹo an toàn.
+- **Công cụ tuyển người:** hướng dẫn công việc (chỉ người được nhận đọc), thỏa thuận ca hai bên bấm đồng ý, nhãn "Hợp loại việc", mã giới thiệu (cả hai được đẩy tin lên đầu 7 ngày), gợi ý khi tin 12 giờ chưa ai ứng tuyển, gợi ý việc khác khi đơn quá 24 giờ chưa được trả lời, ghi mốc miễn phí (30/06/2027, hằng số `FREE_UNTIL` trong `lib/config.ts`), "Đăng lại tin" dùng sẵn.
+- **Quản trị:** thẻ chỉ số tăng trưởng (tin có người ứng tuyển trong 24 giờ, quán quay lại, ca mỗi tuần, tỉ lệ vắng ca, thời gian trả lời).
+- Chính sách: Điều khoản mục 7b, Bảo mật mục 3c (cập nhật 01/11/2026). Chưa nhờ luật sư xem.
+- Việc cần người làm (không phải code): nhờ luật sư xem điều khoản; in poster; đi gặp quán; sổ tay mở quận; số liệu thị trường; khảo sát giá.

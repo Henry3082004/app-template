@@ -4,11 +4,12 @@ import { api } from '../../lib/api'
 import { money } from '../../lib/format'
 import { useI18n, type TKey } from '../../lib/i18n'
 import { useSession } from '../../lib/session'
-import type { AdminDeletion, AdminDispute, AdminFlag, AdminHeldJob, AdminReport, AdminPayout, AdminSamples, AdminStats } from '../../lib/types'
+import type { AdminDeletion, AdminDispute, AdminFlag, AdminHeldJob, AdminKpis, AdminReport, AdminPayout, AdminSamples, AdminStats } from '../../lib/types'
 import { DeletionCard } from './cards/DeletionCard'
 import { DisputeCard } from './cards/DisputeCard'
 import { HealthCard, SentryCheck } from './cards/Health'
 import { HeldJobCard } from './cards/HeldJobCard'
+import { KpiCard } from './cards/KpiCard'
 import { PayoutCard } from './cards/PayoutCard'
 import { ReportCard } from './cards/ReportCard'
 import { SamplesTab } from './cards/SamplesTab'
@@ -27,6 +28,7 @@ export default function Admin() {
   const [reports, setReports] = useState<AdminReport[] | null>(null)
   const [deletions, setDeletions] = useState<AdminDeletion[] | null>(null)
   const [held, setHeld] = useState<AdminHeldJob[] | null>(null)
+  const [kpis, setKpis] = useState<AdminKpis | null>(null)
   const [error, setError] = useState<unknown>(null)
 
   const load = () => {
@@ -39,6 +41,7 @@ export default function Admin() {
     api.adminReports().then(setReports).catch(setError)
     api.adminDeletions().then(setDeletions).catch(setError)
     api.adminHeldJobs().then(setHeld).catch(setError)
+    api.adminKpis().then(setKpis).catch(setError)
   }
   useEffect(() => { if (profile?.is_admin) load() }, [profile?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -52,6 +55,7 @@ export default function Admin() {
     <div className="page-scroll"><div className="pg wide">
       <h1 className="ptitle" style={{ marginBottom: 16 }}>{t('adminTitle')}</h1>
       <HealthCard s={stats} />
+      <KpiCard k={kpis} />
       <div className="seg" style={{ marginBottom: 16 }}>
         <button type="button" className={tab === 'disputes' ? 'on' : ''} onClick={() => setTab('disputes')}>{t('adminTabDisputes')}{disputes?.length ? ` (${disputes.length})` : ''}</button>
         <button type="button" className={tab === 'payouts' ? 'on' : ''} onClick={() => setTab('payouts')}>{t('adminTabPayouts')}{pendingN ? ` (${pendingN})` : ''}</button>

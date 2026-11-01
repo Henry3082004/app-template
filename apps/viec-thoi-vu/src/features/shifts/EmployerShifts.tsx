@@ -4,7 +4,7 @@ import { ChatDialog } from '../collab/ChatDialog'
 import { ContactButtons } from '../../components/ContactButtons'
 import { Ic } from '../../components/Ic'
 import { ReportDialog } from '../collab/ReportDialog'
-import { CancelHire, EmployerPay, TrustLine, useTrust } from './escrow'
+import { CancelHire, EmployerPay, ShiftAgreement, TrustLine, useTrust } from './escrow'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../../components/ui'
 import { CandHead } from '../hiring/CandHead'
 import { api } from '../../lib/api'
@@ -44,6 +44,7 @@ function Card({ s, rep, sig, onChanged }: { s: HireShift; rep?: Reputation; sig?
       {h.phone && s.when !== 'done' && (
         <div className="acts"><ContactButtons phone={h.phone} /></div>
       )}
+      {s.when !== 'done' && ['none', 'held'].includes(h.pay_status) && <ShiftAgreement appId={h.id} app={h} job={h.job} side="employer" otherName={h.full_name} onChanged={onChanged} />}
       <EmployerPay app={h} job={h.job} onChanged={onChanged} />
       {h.cash_received_at && <Tag tone="ok">{t('cashAckByWorker')}</Tag>}
       <div className="acts">

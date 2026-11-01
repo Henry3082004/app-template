@@ -13,7 +13,7 @@ export const KNOWN = ['FREE_PLAN_LIMIT', 'URGENT_REQUIRES_PRO', 'JOB_NOT_OPEN', 
   'NOT_ACCEPTED', 'JOB_ENDED', 'PAYMENT_NOT_AVAILABLE', 'CANNOT_DISPUTE', 'NOT_COMPLETED', 'ALREADY_REVIEWED', 'REVIEW_WINDOW_CLOSED',
   'BAD_PHONE', 'PROFILE_EXISTS', 'INVALID_ROLE', 'NAME_REQUIRED', 'BAD_HOURS', 'BAD_STARS', 'BAD_TAGS', 'BAD_ATTENDANCE', 'BAD_BANK', 'BAD_OUTCOME', 'NOT_DISPUTED', 'PAYOUT_DONE', 'REFERENCE_REQUIRED', 'ROLE_EXISTS', 'BUSINESS_REQUIRED', 'ROLE_NOT_OWNED',
   'ALREADY_CHECKED_IN', 'NOT_CHECKED_IN', 'ALREADY_CHECKED_OUT', 'BAD_LOCATION', 'NOT_CASH',
-  'BAD_MESSAGE', 'TOO_MANY_BACKUPS', 'TOO_MANY', 'BAD_REASON', 'NOT_A_REGULAR', 'ALREADY_APPLIED', 'APPLY_LOCKED', 'ALREADY_STARTED', 'ALREADY_PAID']
+  'BAD_MESSAGE', 'TOO_MANY_BACKUPS', 'TOO_MANY', 'BAD_REASON', 'NOT_A_REGULAR', 'ALREADY_APPLIED', 'APPLY_LOCKED', 'ALREADY_STARTED', 'ALREADY_PAID', 'BAD_CODE', 'OWN_CODE', 'ALREADY_REFERRED', 'TOO_LATE']
 
 export function fail(e: PostgrestError | Error | null | undefined): never {
   const msg = e?.message ?? ''
@@ -80,7 +80,7 @@ export async function phonesOf(userIds: string[]): Promise<Record<string, string
   return Object.fromEntries((data ?? []).map((r) => [r.user_id, r.phone]))
 }
 
-export const ESCROW_COLS = 'pay_status, escrow_amount, platform_fee, attendance, funding_mode, paid_cash_at, cash_received_at, checked_in_at, checkin_distance_m, checked_out_at, confirmed_at, unpaid_reported_at, is_backup, cancelled_at, cancel_late, as_posted'
+export const ESCROW_COLS = 'pay_status, escrow_amount, platform_fee, attendance, funding_mode, paid_cash_at, cash_received_at, checked_in_at, checkin_distance_m, checked_out_at, confirmed_at, unpaid_reported_at, is_backup, cancelled_at, cancel_late, as_posted, agreed_seeker_at, agreed_employer_at'
 
 /** Shifts where the other side already reviewed (content stays hidden until I review). */
 export async function otherReviewed(appIds: string[]): Promise<Set<string>> {
@@ -119,6 +119,8 @@ export const toEscrow = (r: any, reviewed: boolean, other: boolean): Escrow => (
   cancelled_at: r.cancelled_at ?? null,
   cancel_late: r.cancel_late ?? null,
   as_posted: r.as_posted ?? null,
+  agreed_seeker_at: r.agreed_seeker_at ?? null,
+  agreed_employer_at: r.agreed_employer_at ?? null,
 })
 
 /** POSTs to one of our Edge Functions; a non-2xx answer becomes an AppError with the function's error code. */

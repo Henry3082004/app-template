@@ -34,7 +34,7 @@ export const jobsApi: Pick<Api, 'savedJobIds' | 'saveJobs' | 'unsaveJob' | 'jobs
   },
   async listOpenJobs() {
     const { data, error } = await sb.from('jobs').select(JOB_COLS).eq('status', 'open')
-      .order('is_urgent', { ascending: false }).order('created_at', { ascending: false }).limit(200)
+      .order('is_urgent', { ascending: false }).order('boosted_until', { ascending: false, nullsFirst: false }).order('created_at', { ascending: false }).limit(200)
     if (error) fail(error)
     return (data ?? []).map(toJob)
   },

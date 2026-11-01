@@ -18,7 +18,7 @@ const OPERATOR_EN = `${COMPANY} (enterprise code ${TAX_ID}), registered office: 
 const docs: Record<'vi' | 'en', Record<Kind, Doc>> = {
   vi: {
     terms: {
-      title: 'Điều khoản sử dụng', updated: 'Cập nhật: 28/10/2026',
+      title: 'Điều khoản sử dụng', updated: 'Cập nhật: 01/11/2026',
       sections: [
         ['1. Dịch vụ và đơn vị vận hành', [`Việc Thời Vụ là nền tảng kết nối người tìm việc thời vụ với nhà tuyển dụng, do ${OPERATOR_VI}`, 'Chúng tôi không phải bên tuyển dụng và không tham gia vào thỏa thuận lao động giữa hai bên.']],
         ['2. Tài khoản', ['Bạn phải từ đủ 16 tuổi trở lên để dùng Việc Thời Vụ. Người dưới 16 tuổi không được tạo tài khoản.', 'Bạn đăng nhập bằng Zalo (trong Zalo Mini App), bằng Google hoặc bằng số điện thoại và mật khẩu (trên web). Số điện thoại gõ tay chưa được xác thực và hiển thị nhãn “chưa xác thực” cho đến khi được xác thực qua Zalo. Bạn chịu trách nhiệm giữ kín mật khẩu và tài khoản Zalo/Google của mình; thông tin bạn cung cấp phải đúng sự thật.', 'Mỗi tài khoản có thể dùng vai trò người tìm việc, nhà tuyển dụng hoặc cả hai, và chuyển qua lại trong mục Hồ sơ.']],
@@ -28,12 +28,13 @@ const docs: Record<'vi' | 'en', Record<Kind, Doc>> = {
         ['6. Đánh giá và uy tín', ['Sau mỗi ca hoàn thành, hai bên có thể đánh giá nhau. Đánh giá chỉ hiện khi cả hai đã đánh giá hoặc sau 7 ngày. Uy tín được tính từ các ca làm qua ứng dụng trong 12 tháng gần nhất; mỗi đối tác chỉ tính một đánh giá, ca có giá trị nhỏ không được tính.', 'Đánh giá phải trung thực và dựa trên ca làm thật. Cấm đánh giá giả, tạo nhiều tài khoản hoặc thông đồng để nâng hay hạ uy tín. Chúng tôi có quyền ẩn đánh giá, điều chỉnh uy tín hoặc khóa tài khoản vi phạm.', 'Người được đánh giá không thấy ai là người viết từng đánh giá cụ thể.']],
         ['7. Giới hạn trách nhiệm', ['Chúng tôi không đảm bảo tuyển được người hoặc tìm được việc, và không chịu trách nhiệm về tranh chấp tiền lương, an toàn lao động giữa hai bên. Hãy trao đổi rõ điều kiện trước khi bắt đầu làm.']],
         ['7a. Tin nhắn, chấm công và báo cáo', ['Tin nhắn chỉ dùng để hẹn công việc; cấm dùng để lừa đảo, thu tiền, quấy rối hoặc gửi nội dung trái pháp luật. Nút "Tôi đã đến" và "Tôi đã làm xong" chỉ là báo của người làm; quán vẫn là bên xác nhận ca làm. Bạn có thể báo cáo người vi phạm, chúng tôi xem xét và có quyền ẩn tin, khóa tài khoản vi phạm.']],
+        ['7b. Cam kết ca, tin bị giữ và tạm khóa', ['Người làm bấm "Tôi vẫn đến" để quán yên tâm; vắng ca 2 lần trong 30 ngày thì tạm dừng ứng tuyển 7 ngày. Quán hủy ca đã nhận sát giờ sẽ được ghi vào hồ sơ quán.', 'Tin có cụm như "đặt cọc", "phí hồ sơ" hoặc bị nhiều người báo không đúng như tin đăng sẽ được giữ lại cho quản trị duyệt. Không bao giờ thu tiền người làm để nhận việc.', 'Báo cáo "mất tài sản" có thể khiến người bị báo cáo bị tạm khóa tối đa 3 ngày để chờ xác minh. Mã giới thiệu chỉ dùng được một lần cho tài khoản mới (trong 7 ngày đầu); phần thưởng là tin được đẩy lên đầu 7 ngày.']],
         ['8. Dữ liệu cá nhân', ['Cách chúng tôi thu thập và sử dụng dữ liệu được nêu trong Chính sách bảo mật.']],
         ['9. Liên hệ', [`${COMPANY} — Email: ${CONTACT}`]],
       ],
     },
     privacy: {
-      title: 'Chính sách bảo mật', updated: 'Cập nhật: 28/10/2026',
+      title: 'Chính sách bảo mật', updated: 'Cập nhật: 01/11/2026',
       sections: [
         ['1. Đơn vị xử lý dữ liệu', [OPERATOR_VI, `Liên hệ về dữ liệu cá nhân: ${CONTACT}`]],
         ['2. Dữ liệu chúng tôi thu thập và để làm gì', [
@@ -58,6 +59,7 @@ const docs: Record<'vi' | 'en', Record<Kind, Doc>> = {
         ['3. Ai thấy dữ liệu của bạn', ['Số điện thoại của người tìm việc hiện cho nhà tuyển dụng khi họ bấm Nhận đơn của bạn. Số điện thoại của nhà tuyển dụng hiện cho người làm sau khi được nhận; khi tính năng giữ tiền được bật thì chỉ hiện sau khi tiền công của ca đã được giữ.', 'Tên, giới thiệu, năm sinh, kinh nghiệm, giờ rảnh và ảnh của người tìm việc chỉ hiện cho nhà tuyển dụng mà bạn đã ứng tuyển. Tên cơ sở, địa chỉ và logo của nhà tuyển dụng hiện công khai trên tin tuyển.', 'Tin nhắn chỉ hai bên của ca làm xem được. Quán thấy thời điểm và khoảng cách bạn báo đã đến. Khi có báo cáo hoặc tranh chấp, quản trị viên có thể xem tin nhắn liên quan để giải quyết.']],
         ['3a. Dữ liệu uy tín', ['Chúng tôi lưu lịch sử ca làm (hoàn thành, đúng giờ, đến muộn, vắng), số sao, nhãn và nhận xét. Ai cũng xem được số liệu tổng hợp (số ca, tỉ lệ đúng giờ, số sao trung bình). Nhận xét chi tiết chỉ người được đánh giá xem được và không kèm tên người viết. Dữ liệu này dùng để vận hành và giữ an toàn cho ứng dụng; chúng tôi không bán hay chia sẻ cho bên thứ ba.']],
         ['3b. Tài khoản nhận tiền', ['Nếu bạn nhập tài khoản ngân hàng để nhận tiền công, chỉ bạn và quản trị viên xem được, và chỉ dùng để chuyển tiền công cho bạn.']],
+        ['3c. Dữ liệu cam kết và an toàn', ['Chúng tôi lưu việc bạn xác nhận "Tôi vẫn đến", thỏa thuận ca hai bên đã bấm đồng ý, báo cáo "chưa nhận được tiền", số lần vắng ca hoặc hủy ca, và nhận xét ngắn quán trước đã viết về người làm (quán khác sẽ đọc được). Hướng dẫn công việc chỉ quán và người được nhận đọc được.', 'Báo cáo mất tài sản và tin bị giữ chỉ quản trị xem. Mã giới thiệu của bạn và số người đã dùng chỉ bạn thấy.']],
         ['4. Lưu trữ và chuyển dữ liệu ra nước ngoài', ['Dữ liệu được lưu tại Supabase (máy chủ Singapore) và được bảo vệ bằng phân quyền theo từng dòng dữ liệu. Trang web được phát hành qua Vercel. Thông tin lỗi kỹ thuật được xử lý bởi Sentry. Đăng nhập do Zalo hoặc Google cung cấp. Vì vậy dữ liệu của bạn có thể được xử lý ở ngoài lãnh thổ Việt Nam; chúng tôi chỉ dùng các nhà cung cấp này để vận hành dịch vụ.']],
         ['5. Thời gian lưu trữ', ['Chúng tôi giữ dữ liệu trong thời gian tài khoản còn hoạt động. Khi bạn yêu cầu xóa, chúng tôi xử lý trong 7 ngày; một số dữ liệu có thể được giữ thêm khi pháp luật yêu cầu hoặc để giải quyết tranh chấp đang diễn ra.']],
         ['6. Quyền của bạn', [`Theo Nghị định 13/2023/NĐ-CP, bạn có quyền được biết, đồng ý hoặc rút lại đồng ý, truy cập, chỉnh sửa, yêu cầu xóa, hạn chế hoặc phản đối việc xử lý dữ liệu của mình, và khiếu nại. Bạn có thể sửa hồ sơ trong mục Hồ sơ, và gửi yêu cầu xóa tài khoản cùng toàn bộ dữ liệu ngay trong Hồ sơ → Xóa tài khoản. Các yêu cầu khác gửi email tới ${CONTACT} kèm tài khoản Zalo hoặc Google đã dùng; chúng tôi phản hồi trong 7 ngày.`]],
@@ -77,7 +79,7 @@ const docs: Record<'vi' | 'en', Record<Kind, Doc>> = {
   },
   en: {
     terms: {
-      title: 'Terms of Service', updated: 'Updated: Oct 28, 2026',
+      title: 'Terms of Service', updated: 'Updated: Nov 1, 2026',
       sections: [
         ['1. The service and who runs it', [`Việc Thời Vụ connects people looking for short-term work with employers. It is operated by ${OPERATOR_EN}`, 'We are not the employer and are not a party to any work agreement between users.']],
         ['2. Accounts', ['You must be at least 16 years old to use Việc Thời Vụ. People under 16 may not create an account.', 'You sign in with Zalo (inside the Zalo Mini App), with Google, or with a phone number and password (on the web). A phone number you type is not verified and shows a “not verified” label until it is verified through Zalo. You are responsible for keeping your password and your Zalo/Google account safe, and the information you provide must be truthful.', 'An account can use the job seeker role, the employer role or both, and switch between them under Profile.']],
@@ -87,12 +89,13 @@ const docs: Record<'vi' | 'en', Record<Kind, Doc>> = {
         ['6. Reviews and reputation', ['After each completed shift both sides may review each other. Reviews appear only when both have reviewed, or after 7 days. Reputation is based on shifts done through the app in the last 12 months; each partner counts once and very small shifts are ignored.', 'Reviews must be honest and based on real shifts. Fake reviews, multiple accounts or collusion to raise or lower reputation are forbidden. We may hide reviews, adjust reputation or suspend accounts that break these rules.', 'The person reviewed does not see who wrote each individual review.']],
         ['7. Limitation of liability', ['We do not guarantee hiring or finding work and are not responsible for pay or workplace disputes between users. Agree on terms before starting work.']],
         ['7a. Messages, attendance and reports', ['Messages are only for agreeing on the work; using them for scams, collecting money, harassment or illegal content is forbidden. "I\'m here" and "I\'m done" are only the worker\'s own notes; the shop still confirms the shift. You can report someone who breaks the rules; we review it and may hide posts or suspend accounts.']],
+        ['7b. Commitments, held posts and holds', ['Workers tap "I\'m still coming" so the shop can rely on them; two no-shows in 30 days pause applying for 7 days. A shop cancelling an accepted worker at the last minute is shown on the shop\'s profile.', 'Posts that mention things like a "deposit" or "application fee", or that several workers report as not as posted, are held for the admin. Nobody should ever pay to get a job.', 'A "lost property" report can put the person reported on hold for up to 3 days pending verification. A referral code can be used once, by a new account (first 7 days); the reward is 7 days at the top of the list.']],
         ['8. Personal data', ['How we collect and use data is described in the Privacy Policy.']],
         ['9. Contact', [`${COMPANY} — Email: ${CONTACT}`]],
       ],
     },
     privacy: {
-      title: 'Privacy Policy', updated: 'Updated: Oct 28, 2026',
+      title: 'Privacy Policy', updated: 'Updated: Nov 1, 2026',
       sections: [
         ['1. Who processes your data', [OPERATOR_EN, `Contact about personal data: ${CONTACT}`]],
         ['2. What we collect and why', [
@@ -117,6 +120,7 @@ const docs: Record<'vi' | 'en', Record<Kind, Doc>> = {
         ['3. Who sees your data', ["A seeker's phone number is shown to an employer once that employer accepts the application. An employer's phone number is shown to the worker once accepted; when holding pay is turned on, only after the shift's pay is held.", "A seeker's name, intro, birth year, experience, free time and photo are shown only to employers they applied to. An employer's business name, address and logo are public on its job posts.", 'Messages are visible only to the two sides of the shift. The shop sees when and how far from the shop you said you arrived. When there is a report or a dispute, the admin may read the related messages to settle it.']],
         ['3a. Reputation data', ['We store your shift history (completed, on time, late, absent), stars, labels and comments. Anyone can see the summary (shifts done, on-time rate, average stars). Detailed comments are visible only to the person reviewed, without the writer’s name. We use this data to run the app and keep it safe; we do not sell or share it with third parties.']],
         ['3b. Payout account', ['If you add a bank account to receive pay, only you and the administrator can see it, and it is used only to send you your pay.']],
+        ['3c. Commitment and safety data', ['We keep your "I\'m still coming" confirmations, shift agreements both sides accepted, "not paid" reports, counts of no-shows or cancels, and the short comments shops wrote about a worker (other shops can read them). A job guide is readable only by the shop and the accepted worker.', 'Lost-property reports and held posts are seen only by the admin. Your referral code and how many people used it are visible only to you.']],
         ['4. Storage and transfers abroad', ['Data is stored with Supabase (Singapore) and protected by row-level access rules. The website is delivered through Vercel. Technical error reports are processed by Sentry. Sign-in is provided by Zalo or Google. So your data may be processed outside Vietnam; we use these providers only to run the service.']],
         ['5. How long we keep it', ['We keep your data while your account is active. When you ask us to delete it we act within 7 days; some data may be kept longer when the law requires it or to settle an ongoing dispute.']],
         ['6. Your rights', [`Under Vietnam’s Decree 13/2023/ND-CP you may be informed, consent or withdraw consent, access, correct, request deletion of, restrict or object to the processing of your data, and complain. Edit your profile under Profile, and send a request to delete your account and all data right there (Profile → Delete account). For anything else email ${CONTACT} with the Zalo or Google account you used; we reply within 7 days.`]],

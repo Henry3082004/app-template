@@ -78,7 +78,7 @@ export default function EmployerCandidates() {
             <CandHead name={a.full_name} avatar={a.avatar_path} rep={reps[a.seeker_id]} sub={<><Ic n="briefcase" size={14} /> {a.job.title} · {dateRange(a.job.start_date, a.job.end_date)}</>} tag={a.is_backup && <Tag tone="sun">{t('backupTag')}</Tag>} />
             <TrustLine sig={trust[a.seeker_id]} />
             <WorkerNotes notes={notes[a.seeker_id]} />
-            <WorkerFacts w={a} />
+            <WorkerFacts w={a} category={a.job.category} />
             {a.message && <div className="tag" style={{ borderRadius: 12, whiteSpace: 'normal' }}><Ic n="message" size={14} /> “{a.message}”</div>}
             <div className="acts">
               <PickCand on={chosen.includes(a.id)} disabled={chosen.length >= MAX_COMPARE} onChange={() => pick(a.id)} />

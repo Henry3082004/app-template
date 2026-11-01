@@ -12,6 +12,7 @@ import { CITIES } from '../../lib/geo'
 import { useI18n, type TKey } from '../../lib/i18n'
 import { DeleteAccount } from './DeleteAccount'
 import { Discoverable } from '../hiring/Discoverable'
+import { ReferralCard } from './ReferralCard'
 import { Regulars } from '../hiring/Regulars'
 import { displayPhone } from '../../lib/phone'
 import { useSession } from '../../lib/session'
@@ -134,6 +135,7 @@ export default function Account() {
         </div>
       </Sect>
       <Sect title={t('myReviewsTitle')} sub={t('secReviewsSub')}><MyReviews employer={emp} /></Sect>
+      <Sect title={t('refTitle')} sub={t('refSub')}><ReferralCard /></Sect>
       <Sect title={t('rolesTitle')} sub={t('secRolesSub')}><RolesCard /></Sect>
       {!emp && <Sect title={t('bankTitle')} sub={t('secBankSub')}><BankCard /></Sect>}
       <Sect title={t('secSettings')} sub={t('secSettingsSub')}>

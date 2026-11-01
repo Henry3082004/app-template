@@ -17,7 +17,7 @@ alter table public.applications
 
 -- a backup is a pending applicant: once decided it is no longer one
 create or replace function private.backup_reset() returns trigger
-language plpgsql as $$
+language plpgsql set search_path = public as $$
 begin
   if new.status <> 'pending' then new.is_backup := false; end if;
   return new;

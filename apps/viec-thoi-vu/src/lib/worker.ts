@@ -1,4 +1,4 @@
-import type { Profile } from './types'
+import type { Category, Experience, Profile } from './types'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
 
@@ -8,6 +8,10 @@ export function avatarUrl(path: string | null | undefined): string | null {
   if (path.startsWith('data:') || path.startsWith('/')) return path // mock photos and the bundled sample pictures
   return `${SUPABASE_URL}/storage/v1/object/public/avatars/${path}`
 }
+
+/** Past work that fits each kind of job (the profile lists what the worker did before). */
+const EXP_FOR: Record<Category, Experience[]> = { service: ['service', 'barista', 'kitchen', 'cashier'], retail: ['sales', 'cashier'], warehouse: ['warehouse'], event: ['event', 'service'], farm: [], other: [] }
+export const fitsJob = (category: Category, experience: Experience[]) => experience.some((e) => EXP_FOR[category].includes(e))
 
 export const ageOf = (birthYear: number | null) => (birthYear ? new Date().getFullYear() - birthYear : null)
 

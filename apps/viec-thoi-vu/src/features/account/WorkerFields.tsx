@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { api } from '../../lib/api'
 import { tap } from '../../lib/haptics'
 import { useI18n, type TKey } from '../../lib/i18n'
-import { AppError, AVAILABILITY, EXPERIENCE, type Availability, type Experience, type WorkerInfo } from '../../lib/types'
-import { ageOf, avatarUrl, birthYears, squarePhoto } from '../../lib/worker'
+import { AppError, AVAILABILITY, EXPERIENCE, type Availability, type Category, type Experience, type WorkerInfo } from '../../lib/types'
+import { ageOf, avatarUrl, birthYears, fitsJob, squarePhoto } from '../../lib/worker'
 import { Ic } from '../../components/Ic'
 import { Avatar, Chip, ErrorBox, Fld } from '../../components/ui'
 
@@ -66,13 +66,14 @@ export function WorkerFields({ name, value, onChange }: { name: string; value: W
 }
 
 /** One line of facts for a business: age, past work, free time. */
-export function WorkerFacts({ w }: { w: WorkerInfo }) {
+export function WorkerFacts({ w, category }: { w: WorkerInfo; category?: Category }) {
   const { t } = useI18n()
   const age = ageOf(w.birth_year)
   if (!age && !w.experience.length && !w.availability.length) return null
   return (
     <div className="wfacts">
       {age != null && age < 18 && <div className="notice warn" style={{ width: '100%' }}>{t('minorWarn')}</div>}
+      {category && fitsJob(category, w.experience) && <span className="tag ok">{t('expMatch')}</span>}
       {age && <span className="tag">{t('ageYears', { n: age })}</span>}
       {w.experience.map((k) => <span key={k} className="tag">{t(`exp_${k}` as TKey)}</span>)}
       {w.availability.length > 0 && <span className="muted"><Ic n="calendar" size={13} /> {w.availability.map((k) => t(`avail_${k}` as TKey)).join(' · ')}</span>}
