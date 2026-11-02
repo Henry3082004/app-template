@@ -185,7 +185,7 @@ export interface AdminReport { id: string; reporter_name: string; target_id: str
 export interface DeletionRequest { status: 'open'; requested_at: string }
 export interface AdminDeletion { id: string; user_id: string; name: string; email: string | null; reason: string | null; status: 'open' | 'done' | 'cancelled'; requested_at: string }
 export interface SentInvite { job_id: string; worker_id: string }
-/** Capy, the AI helper. A job seeker's request becomes a search (filters the app applies to the real list); a shop's becomes a draft post. */
+/** Capi, the AI helper. A job seeker's request becomes a search (filters the app applies to the real list); a shop's becomes a draft post. */
 export interface CapyMsg { role: 'user' | 'assistant'; text: string }
 export interface CapySearch {
   keywords: string[]; category: Category | ''; city: string; urgent: boolean; min_pay: number | null; pay_unit: PayUnit | ''

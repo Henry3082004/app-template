@@ -1,7 +1,7 @@
 import { AppError, type Api, type CapyReply } from '../types'
 import { KEY, URL, sb } from './core'
 
-/** Chat with Capy through the `capy-assistant` Edge Function (it needs the signed-in token, if any, to know who is asking). */
+/** Chat with Capi through the `capy-assistant` Edge Function (it needs the signed-in token, if any, to know who is asking). */
 export const capyApi: Pick<Api, 'capyChat'> = {
   async capyChat(messages, ctx) {
     const { data } = await sb.auth.getSession()

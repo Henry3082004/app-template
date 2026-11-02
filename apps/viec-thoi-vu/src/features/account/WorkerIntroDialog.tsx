@@ -25,7 +25,7 @@ export function WorkerIntroDialog() {
   const open = !!profile && profile.role === 'seeker' && (!!introRequest || auto)
   useEffect(() => {
     if (!open || !profile) return
-    // what they already told Capy is filled in for them
+    // what they already told Capi is filled in for them
     const w0 = workerInfoOf(profile), a = readQuiz().answers
     setW({ ...w0, experience: w0.experience.length ? w0.experience : a.exp ?? [], availability: w0.availability.length ? w0.availability : a.time ?? [] })
   }, [open, profile?.id]) // eslint-disable-line react-hooks/exhaustive-deps

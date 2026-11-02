@@ -21,7 +21,7 @@ const copy = {
     e: [['sparkles', 'Đăng tin 1 phút', 'Tin sau điền sẵn theo tin trước.'], ['users', 'Chọn người dễ dàng', 'Xem lời nhắn, nhận hoặc từ chối bằng một nút.'], ['target', 'Đúng đợt, đúng ca', 'Đặt số chỗ theo từng đợt cần người; đủ người tin tự đóng.']],
     priceTitle: 'Bảng giá đơn giản', priceSub: 'Người tìm việc luôn miễn phí.',
     faqTitle: 'Câu hỏi thường gặp',
-    faq: [['Tôi có cần đăng nhập để xem việc không?', 'Không. Bạn chỉ đăng ký khi bấm Ứng tuyển.'], ['Ứng tuyển có mất phí không?', 'Người tìm việc luôn miễn phí.'], ['Bao lâu thì nhà tuyển dụng liên hệ?', 'Thường trong ngày. Khi được nhận, bạn thấy số điện thoại để gọi hoặc nhắn Zalo.'], ['Có mất phí không?', 'Hiện tại Việc Thời Vụ miễn phí hoàn toàn cho cả người tìm việc và nhà tuyển dụng.'], ['Tôi có dùng được trong Zalo không?', 'Có, Việc Thời Vụ chạy cả trên web và trong Zalo Mini App.']],
+    faq: [['Tôi có cần đăng nhập để xem việc không?', 'Không. Bạn chỉ đăng ký khi bấm Ứng tuyển.'], ['Ứng tuyển có mất phí không?', 'Người tìm việc luôn miễn phí.'], ['Bao lâu thì nhà tuyển dụng liên hệ?', 'Thường trong ngày. Khi được nhận, bạn thấy số điện thoại để gọi hoặc nhắn Zalo.'], ['Có mất phí không?', 'Hiện tại Capi miễn phí hoàn toàn cho cả người tìm việc và nhà tuyển dụng.'], ['Tôi có dùng được trong Zalo không?', 'Có, Capi chạy cả trên web và trong Zalo Mini App.']],
     bandT: 'Sẵn sàng tìm việc đầu tiên?', bandS: 'Mở app và xem việc quanh bạn ngay hôm nay.',
     terms: 'Điều khoản', privacy: 'Bảo mật', refund: 'Hoàn tiền',
   },
@@ -34,7 +34,7 @@ const copy = {
     e: [['sparkles', 'Post in 1 minute', 'New posts are pre-filled from the last one.'], ['users', 'Choose people easily', 'Read messages, accept or decline with one button.'], ['target', 'Right shift, right time', 'Set spots per round; posts close automatically when full.']],
     priceTitle: 'Simple pricing', priceSub: 'Always free for job seekers.',
     faqTitle: 'FAQ',
-    faq: [['Do I need to sign in to browse jobs?', 'No. You only sign up when you tap Apply.'], ['Does applying cost anything?', 'Job seekers always use it for free.'], ['How soon will employers get in touch?', "Usually the same day. Once you're accepted you'll see their phone number."], ['Does it cost anything?', 'Right now Việc Thời Vụ is completely free for both job seekers and employers.'], ['Does it work in Zalo?', 'Yes — on the web and as a Zalo Mini App.']],
+    faq: [['Do I need to sign in to browse jobs?', 'No. You only sign up when you tap Apply.'], ['Does applying cost anything?', 'Job seekers always use it for free.'], ['How soon will employers get in touch?', "Usually the same day. Once you're accepted you'll see their phone number."], ['Does it cost anything?', 'Right now Capi is completely free for both job seekers and employers.'], ['Does it work in Zalo?', 'Yes — on the web and as a Zalo Mini App.']],
     bandT: 'Ready for your first job?', bandS: 'Open the app and see jobs around you today.',
     terms: 'Terms', privacy: 'Privacy', refund: 'Refunds',
   },
@@ -66,7 +66,7 @@ export function LandingFooter() {
       <div className="wrap">
         <div className="logo"><img src={LOGO} alt="" />{t('appName')}</div>
         <div className="links"><Link to="/dieu-khoan">{c.terms}</Link><Link to="/bao-mat">{c.privacy}</Link><Link to="/hoan-tien">{c.refund}</Link></div>
-        <div>© 2026 Việc Thời Vụ</div>
+        <div>© 2026 Capi</div>
       </div>
     </footer>
   )
@@ -77,7 +77,7 @@ export default function Landing() {
   const cfg = useAppConfig()
   const nav = useNavigate()
   const c = copy[locale]
-  useEffect(() => { document.title = locale === 'vi' ? 'Việc Thời Vụ — tìm việc thời vụ gần bạn' : 'Việc Thời Vụ — short-term jobs near you' }, [locale])
+  useEffect(() => { document.title = locale === 'vi' ? 'Capi — tìm việc thời vụ gần bạn' : 'Capi — short-term jobs near you' }, [locale])
   return (
     <div className="landing">
       <LandingBar />
@@ -90,7 +90,7 @@ export default function Landing() {
         <div className="pwrap">
           <img className="mascot" src={capy('wave')} alt="" />
           <div className="phoneframe" aria-hidden="true">
-            <div className="logo" style={{ fontSize: 13 }}><img src={LOGO} alt="" style={{ width: 24, height: 24, borderRadius: 8 }} />Việc Thời Vụ</div>
+            <div className="logo" style={{ fontSize: 13 }}><img src={LOGO} alt="" style={{ width: 24, height: 24, borderRadius: 8 }} />Capi</div>
             <div className="sk"><Ic n="search" size={13} /> …</div>
             {preview.map((j) => <JobCard key={j.id} job={j} onOpen={() => nav('/app')} />)}
           </div>

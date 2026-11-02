@@ -58,7 +58,7 @@ export interface Api {
   adminFlags(): Promise<AdminFlag[]>
   adminStats(): Promise<AdminStats>
   adminSamples(): Promise<AdminSamples>
-  /** "Capy hỏi nhanh": answers kept per device, folded into the account once signed in */
+  /** "Capi hỏi nhanh": answers kept per device, folded into the account once signed in */
   saveQuiz(device: string, answers: QuizAnswers): Promise<void>
   myQuiz(): Promise<QuizAnswers>
   /** in-app notifications of the signed-in user, newest first */
@@ -86,7 +86,7 @@ export interface Api {
   /** invite a worker who already did a shift for me to one of my open posts */
   inviteWorker(jobId: string, workerId: string): Promise<void>
   mySentInvites(): Promise<SentInvite[]>
-  /** chat with Capy (needs the AI helper switched on) */
+  /** chat with Capi (needs the AI helper switched on) */
   capyChat(messages: CapyMsg[], ctx: { device: string; city?: string }): Promise<CapyReply>
   /** "Việc đã lưu" of the signed-in person (newest first) */
   savedJobIds(): Promise<string[]>

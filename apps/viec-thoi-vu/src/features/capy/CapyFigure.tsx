@@ -1,6 +1,6 @@
 export type CapyAct = 'hello' | 'wave' | 'happy' | 'think' | 'dragged' | 'drop' | 'sleepy' | 'tap' | 'cheer'
 
-/** Capy, the mascot, as live SVG (drawn in Claude Design): it breathes, blinks, twitches its ears and the orange on its head sways.
+/** Capi, the mascot, as live SVG (drawn in Claude Design): it breathes, blinks, twitches its ears and the orange on its head sways.
  *  `act` plays one of the actions in app.css (`.cfx.act-…`); with no `act` it just idles. Everything stops when the phone asks for less motion. */
 export function CapyFigure({ act, className }: { act?: CapyAct; className?: string }) {
   const cls = ['cfx', act && `act-${act}`, className].filter(Boolean).join(' ')

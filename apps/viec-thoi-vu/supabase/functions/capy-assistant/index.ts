@@ -1,6 +1,6 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-// Capy, the AI helper. The browser sends the last few chat messages; this function asks Google Gemini to turn them into
+// Capi, the AI helper. The browser sends the last few chat messages; this function asks Google Gemini to turn them into
 //   · a SEARCH (for job seekers): filters the app applies to the real job list, or
 //   · a DRAFT job post (for shops): fields the app puts into the post form for the shop to check and publish.
 // The model never sees accounts, phones or the job list, never writes to the database and never posts or applies by itself.
@@ -31,7 +31,7 @@ function vnToday(): { iso: string; weekday: string } {
   return { iso: d.toISOString().slice(0, 10), weekday: wd };
 }
 
-const RULES_COMMON = `Bạn là Capy, trợ lý của ứng dụng "Việc Thời Vụ" (việc làm thời vụ, ca ngắn ở Việt Nam). Luôn trả lời bằng tiếng Việt, thân thiện, ngắn gọn (tối đa 3 câu), không dùng biểu tượng cảm xúc.
+const RULES_COMMON = `Bạn là Capi, trợ lý của ứng dụng "Capi" (việc làm thời vụ, ca ngắn ở Việt Nam). Luôn trả lời bằng tiếng Việt, thân thiện, ngắn gọn (tối đa 3 câu), không dùng biểu tượng cảm xúc.
 Chỉ giúp việc tìm việc / đăng tin tuyển trong ứng dụng; câu hỏi khác thì từ chối lịch sự và gợi ý quay lại việc chính.
 Bạn KHÔNG đăng tin, KHÔNG ứng tuyển, KHÔNG bịa việc làm hay mức lương. Mọi thứ bạn tạo ra chỉ là bộ lọc hoặc bản nháp để người dùng tự kiểm tra.
 Nếu thiếu thông tin quan trọng và không thể đoán hợp lý thì hỏi lại đúng MỘT câu ngắn thay vì đoán; còn lại hãy làm ngay.
@@ -52,7 +52,7 @@ Nếu họ chỉ chào hoặc hỏi chung chung, trả lời ngắn và hỏi h�
 
 // Gemini response schema (an OpenAPI subset). Allowed values are listed in the descriptions and enforced again in cleanSearch/cleanDraft.
 function schemaFor(role: "seeker" | "employer") {
-  const reply = { type: "STRING", description: "Lời nhắn của Capy cho người dùng, tiếng Việt, tối đa 3 câu." };
+  const reply = { type: "STRING", description: "Lời nhắn của Capi cho người dùng, tiếng Việt, tối đa 3 câu." };
   if (role === "employer") {
     return {
       type: "OBJECT", required: ["reply"],

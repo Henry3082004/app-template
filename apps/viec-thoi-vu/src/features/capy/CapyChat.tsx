@@ -19,8 +19,8 @@ import { CapyFigure } from './CapyFigure'
 
 type Item = { role: 'user' | 'assistant'; text: string; search?: CapySearch; draft?: CapyDraft }
 
-/** Capy, the AI helper: a chat bubble in the corner. Job seekers say what they look for and get matching jobs from the real list;
- *  shops say what they need and get a draft post to check and publish. Capy never posts or applies by itself. */
+/** Capi, the AI helper: a chat bubble in the corner. Job seekers say what they look for and get matching jobs from the real list;
+ *  shops say what they need and get a draft post to check and publish. Capi never posts or applies by itself. */
 export function CapyChat() {
   const { t, locale } = useI18n()
   const cfg = useAppConfig()

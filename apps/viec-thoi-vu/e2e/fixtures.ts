@@ -44,7 +44,7 @@ export function helpers(p: Page) {
 // Most tests start as someone who already answered the quick questions; the quiz tests turn this off.
 const QUIZ_DONE = JSON.stringify({ device: 'aaaaaaaa-e2e0-4000-8000-000000000000', answers: { goal: null, city: null, cats: null, time: null, exp: null }, synced: null })
 
-// Capy says hello (fly-in + speech bubble) once per tab; most tests skip it so the bubble never covers what they click.
+// Capi says hello (fly-in + speech bubble) once per tab; most tests skip it so the bubble never covers what they click.
 export const test = base.extend<{ problems: string[]; quizSeen: boolean; capyHello: boolean }>({
   quizSeen: [true, { option: true }],
   capyHello: [false, { option: true }],

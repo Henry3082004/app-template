@@ -24,7 +24,7 @@ interface Session {
   introRequest: IntroRequest | null
   askIntro(req: IntroRequest): void
   closeIntro(): void
-  /** open "Capy hỏi nhanh" on demand (the admin's practice run asks every question again) */
+  /** open "Capi hỏi nhanh" on demand (the admin's practice run asks every question again) */
   quizRequest: QuizRequest | null
   askQuiz(req: QuizRequest): void
   closeQuiz(): void

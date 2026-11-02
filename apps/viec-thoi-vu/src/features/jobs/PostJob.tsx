@@ -51,7 +51,7 @@ export default function PostJob() {
   const isPro = isProFor(profile, cfg)
 
   useEffect(() => {
-    if (profile?.role !== 'employer' || draft) return // a draft from Capy is not overwritten by the previous post
+    if (profile?.role !== 'employer' || draft) return // a draft from Capi is not overwritten by the previous post
     api.myJobs().then((list) => {
       const last = list.find((j) => j.id === qs.get('lai')) ?? list[0]
       if (!last) return

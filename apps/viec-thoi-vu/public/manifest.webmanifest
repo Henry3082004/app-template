@@ -1,6 +1,6 @@
 {
-  "name": "Việc Thời Vụ",
-  "short_name": "Việc Thời Vụ",
+  "name": "Capi",
+  "short_name": "Capi",
   "description": "Tìm việc thời vụ gần bạn — tìm nhanh, nhận việc trong ngày.",
   "start_url": "/app",
   "scope": "/",

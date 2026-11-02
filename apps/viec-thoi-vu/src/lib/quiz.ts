@@ -3,7 +3,7 @@ import type { CapyPose } from './capy'
 import { AVAILABILITY, EXPERIENCE, type Availability, type Category, type Experience, type Job, type Role } from './types'
 
 /**
- * "Capy hỏi nhanh" — a few tap-only questions the first time someone opens the app. Answers suggest matching jobs
+ * "Capi hỏi nhanh" — a few tap-only questions the first time someone opens the app. Answers suggest matching jobs
  * and pre-fill the worker profile. Each question is asked once; a question added later is asked on its own.
  * Adding a question = add it here AND to private.clean_quiz (supabase/migrations/20261027_quick_quiz.sql).
  */
@@ -79,7 +79,7 @@ export function fitScore(j: Job, a: QuizAnswers): number {
   return city + cat
 }
 
-/** Fits everything the person told Capy (only what they answered counts). */
+/** Fits everything the person told Capi (only what they answered counts). */
 export function isFit(j: Job, a: QuizAnswers): boolean {
   const asked = (a.city && a.city !== 'other' ? 1 : 0) + (a.cats?.length ? 1 : 0)
   return asked > 0 && fitScore(j, a) === asked

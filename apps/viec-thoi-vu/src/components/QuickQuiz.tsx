@@ -25,7 +25,7 @@ const ALONE = new Set(['any', 'none'])
 interface Run { base: QuizAnswers; draft: QuizAnswers; i: number; all: boolean; done: boolean }
 
 /**
- * "Capy hỏi nhanh": shown once, the first time someone opens the app (signed in or not). Each question is asked only
+ * "Capi hỏi nhanh": shown once, the first time someone opens the app (signed in or not). Each question is asked only
  * once — a skipped one is stored as null — so later only newly added questions come up. Admins can run it again
  * from Account to try out the wording.
  */

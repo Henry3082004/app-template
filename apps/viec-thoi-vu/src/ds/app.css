@@ -1,4 +1,4 @@
-/* Việc Thời Vụ — app styles on the Capy design system tokens (src/ds/tokens/*).
+/* Capi — app styles on the Capi design system tokens (src/ds/tokens/*).
    Ported from the design system's responsive kit (ui_kits/responsive/vt.css + vt2.css).
    Breakpoints: <600 phone · 600–1023 tablet · 1024–1279 tablet landscape · ≥1280 desktop. */
 :root{--p:var(--brand-500);--p2:var(--brand-600);--pbg:var(--brand-50);--bg:var(--surface-page);--tx:var(--text-strong);--tx2:var(--text-muted);--err:var(--danger-solid);--errbg:var(--danger-bg);--errfg:var(--danger-fg);--ok:var(--success-solid);--okbg:var(--success-bg);--okfg:var(--success-fg);--line:var(--border-default);--sun:var(--sun-500);--water:var(--water-500);--waterbg:var(--water-50);--waterfg:var(--water-700);--sh:var(--shadow-sm);--ring:0 0 0 3px var(--pbg),0 0 0 4.5px var(--p);--safe-bottom:env(safe-area-inset-bottom,0px)}
@@ -410,7 +410,7 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 .shopbox>div{display:flex;flex-direction:column;gap:2px;min-width:0}.shopbox b{font-size:15px}
 .shopbox .avatar{background:#fff}
 
-/* ---------- Capy hỏi nhanh ---------- */
+/* ---------- Capi hỏi nhanh ---------- */
 .quiz{display:flex;flex-direction:column;gap:16px}
 .quiz.done{align-items:center;text-align:center;gap:12px}.quiz.done .btn{width:100%}
 .qtop{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:8px}
@@ -529,7 +529,7 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 .ctarow{display:flex;gap:10px;align-items:stretch;width:100%}.ctarow .btn{flex:1;min-width:0}
 .savebtn.lg{width:52px;height:auto;min-height:52px;border-radius:16px}
 .detailcol .ctarow{max-width:360px}.detailcol .cta .ctarow .btn{max-width:none}
-/* ---------- Capy, the AI helper ---------- */
+/* ---------- Capi, the AI helper ---------- */
 .capybot{position:fixed;right:12px;bottom:calc(150px + var(--safe-bottom));z-index:30;width:72px;height:72px}
 @media(min-width:600px){.capybot{right:24px;bottom:24px}}
 .capyme{position:relative;width:72px;height:72px;padding:0;border:0;border-radius:50%;background:none;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
@@ -540,7 +540,7 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 .capybot.hi .capysay{animation-delay:1.6s}
 .capybot.onleft .capysay{right:auto;left:0;border-radius:18px 18px 18px 6px}
 @keyframes capyfly{0%{transform:translate(45vw,40vh) scale(.3) rotate(30deg);opacity:0}60%{opacity:1}100%{transform:none;opacity:1}}
-/* Capy mascot (Claude Design, v2). The <svg> carries "cfx act-…" (see CapyFigure.tsx); pivots are in viewBox units 0–100:
+/* Capi mascot (Claude Design, v2). The <svg> carries "cfx act-…" (see CapyFigure.tsx); pivots are in viewBox units 0–100:
    root 50,92 · breath 50,91 · neck 50,60 · ears 29.4,20.8 / 70.6,20.8 · shoulders 25,62 / 75,62 · hips 37,89 / 63,89 · orange 50,14 */
 .cfx *{transform-box:view-box}
 .cfx .cf-root{transform-origin:50px 92px}
@@ -642,7 +642,7 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 @keyframes cf-cheer-r{from{transform:rotate(-125deg)}to{transform:rotate(-150deg)}}
 @keyframes cf-orange-hop{0%,100%{transform:translateY(0)}45%{transform:translateY(-3px) rotate(-10deg)}}
 @media (prefers-reduced-motion:reduce){.cfx *{animation:none!important}}
-/* end Capy mascot */
+/* end Capi mascot */
 @keyframes capysay{from{opacity:0;transform:translateY(8px) scale(.9)}to{opacity:1;transform:none}}
 .capyscrim{position:fixed;inset:0;z-index:60;background:rgba(40,25,15,.35);display:flex;align-items:flex-end;justify-content:center}
 .capypanel{background:#fff;width:100%;max-width:520px;height:min(82dvh,640px);border-radius:24px 24px 0 0;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow-lg)}

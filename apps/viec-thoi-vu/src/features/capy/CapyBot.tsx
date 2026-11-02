@@ -5,7 +5,7 @@ import { CapyFigure, type CapyAct } from './CapyFigure'
 const POS_KEY = 'vtv-capy-pos'
 const HI_KEY = 'vtv-capy-hi'
 const SIZE = 72
-const SLEEP_AFTER = 30_000 // no touch for this long: Capy dozes off until the next touch
+const SLEEP_AFTER = 30_000 // no touch for this long: Capi dozes off until the next touch
 const HELLO_MS = 2800 // fly-in (0.9s) + the waving hello (1.8s)
 const WAVE_EVERY = 9000, WAVE_MS = 2400
 const EDGE = 8
@@ -19,7 +19,7 @@ function readPos(): Pos | null {
   } catch { return null }
 }
 
-/** First visit in this browser tab: Capy flies in from the bottom-right corner, waves and says hello. */
+/** First visit in this browser tab: Capi flies in from the bottom-right corner, waves and says hello. */
 function firstHello(): boolean {
   try {
     if (sessionStorage.getItem(HI_KEY)) return false
@@ -30,7 +30,7 @@ function firstHello(): boolean {
 
 const clamp = (v: number, max: number) => Math.min(Math.max(v, EDGE), Math.max(EDGE, max - EDGE))
 
-/** Capy as a little character in the corner instead of a plain button: it can be dragged anywhere with a finger or the mouse,
+/** Capi as a little character in the corner instead of a plain button: it can be dragged anywhere with a finger or the mouse,
  *  remembers where it was left, and a tap opens the chat. */
 export function CapyBot({ onOpen }: { onOpen: () => void }) {
   const { t } = useI18n()
@@ -41,7 +41,7 @@ export function CapyBot({ onOpen }: { onOpen: () => void }) {
   const drag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null)
   const justDragged = useRef(false)
   const [live, setLive] = useState<{ x: number; y: number } | null>(null)
-  // what Capy is doing: hello on the first visit, then idle with a short wave every few seconds; drag, drop, tap and dozing play over it
+  // what Capi is doing: hello on the first visit, then idle with a short wave every few seconds; drag, drop, tap and dozing play over it
   const [act, setAct] = useState<CapyAct | undefined>(hello ? 'hello' : undefined)
   const actRef = useRef(act)
   actRef.current = act

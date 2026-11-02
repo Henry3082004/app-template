@@ -3,7 +3,7 @@ import type { CapySearch, Job } from './types'
 
 const strip = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase()
 
-/** How well a job fits what Capy understood: null = excluded by a hard filter, otherwise the number of keywords it matches. */
+/** How well a job fits what Capi understood: null = excluded by a hard filter, otherwise the number of keywords it matches. */
 export function scoreJob(j: Job, s: CapySearch): number | null {
   if (s.category && j.category !== s.category) return null
   if (s.city && j.city !== s.city && !s.near) return null

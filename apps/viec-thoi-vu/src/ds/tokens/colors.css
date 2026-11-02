@@ -1,13 +1,13 @@
 :root{
-/* Brand — Capy brown, anchored on #A65F2A (500) */
+/* Brand — Capi brown, anchored on #A65F2A (500) */
 --brand-50:#FBEFE4;--brand-100:#F0D5BD;--brand-200:#E3C8AE;--brand-300:#D4A27A;--brand-400:#C47A45;--brand-500:#B35A24;--brand-600:#8F4519;--brand-700:#74370F;--brand-800:#5A2B0C;--brand-900:#3B2A20;
 /* Warm neutrals */
 --gray-0:#FFFFFF;--gray-25:#FFFCF8;--gray-50:#FBF7F1;--gray-100:#F1EBE3;--gray-200:#EADFD2;--gray-300:#E5D8C9;--gray-400:#A8978A;--gray-500:#6F5D50;--gray-600:#5A4A3E;--gray-700:#4A3A2F;--gray-800:#3B2A20;--gray-900:#2A1C12;
 /* Sun — warm yellow highlight (Pro, urgent, rewards) */
 --sun-50:#FFF6DC;--sun-500:#F2B63D;--sun-700:#8A6410;
-/* Water — cool secondary (Capy bath) */
+/* Water — cool secondary (Capi bath) */
 --water-50:#E8EEF3;--water-500:#6E93B0;--water-700:#2F5470;
-/* Illustration palette — from Capy reference art (meadow, sky, sunflower, blush) */
+/* Illustration palette — from Capi reference art (meadow, sky, sunflower, blush) */
 --ink:#3A2418;--fur:#C99567;--fur-light:#E2B48A;--muzzle:#B07A4E;--blush:#F4A6A0;
 --meadow-200:#B8F5A6;--meadow-400:#91C968;--meadow-600:#6FAE4A;--sky-300:#A9DCF0;--sunflower:#FFD83A;--carrot:#F27B35;
 /* Semantic */

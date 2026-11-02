@@ -49,7 +49,7 @@ export default function Jobs() {
   const [coords, setCoords] = useState<Coords | null>(cachedCoords)
   const [capyFilter, setCapyFilter] = useState<CapySearch | null>(null)
   const location = useLocation()
-  // Capy's "see all": the list is filtered the same way until the visitor clears it
+  // Capi's "see all": the list is filtered the same way until the visitor clears it
   useEffect(() => {
     const c = (location.state as { capy?: CapySearch } | null)?.capy
     if (c) { setCapyFilter(c); nav(location.pathname, { replace: true, state: null }) }

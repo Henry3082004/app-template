@@ -1,4 +1,4 @@
-# Đưa Việc Thời Vụ lên Zalo Mini App
+# Đưa Capi lên Zalo Mini App
 
 Mini App của bạn: **Capi việc làm 30s** — ID `2847107362388346804` (xem tại mini.zalo.me → ứng dụng của bạn).
 Thư mục này (`zalo/`) đã đóng gói sẵn app thành bản Zalo (cùng code với bản web). Bước đưa lên Zalo cần

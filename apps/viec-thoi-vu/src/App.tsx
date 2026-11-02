@@ -35,7 +35,7 @@ const Legal = lazy(() => import('./features/public/Legal'))
 /** Everything under /app lives in the responsive shell (bottom bar · side rail · top bar). */
 function AppPages() {
   const { pathname } = useLocation()
-  useEffect(() => { document.title = 'Việc Thời Vụ' }, [])
+  useEffect(() => { document.title = 'Capi' }, [])
   useEffect(() => { document.querySelector('.main')?.scrollTo(0, 0) }, [pathname])
   return (
     <Shell>
