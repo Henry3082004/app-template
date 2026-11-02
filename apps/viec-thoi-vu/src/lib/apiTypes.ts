@@ -1,5 +1,5 @@
 // The contract every backend (Supabase or the in-memory mock) implements.
-import type { CapyMsg, CapyReply, Highlights, Role, JobStatus, AppStatus, Attendance, Profile, Job, MyApplication, MyJob, Applicant, Hire, Reputation, AppNotification, TrustSignals, WorkerNote, AdminHeldJob, AdminKpis, Referral, ChatMessage, ReportReason, AdminReport, DeletionRequest, AdminDeletion, SentInvite, FoundWorker, WorkerSearch, BankAccount, AdminDispute, AdminPayout, AdminFlag, AdminStats, AdminSamples, AppConfig, CompleteProfileInput, PendingProfile, Quote, ReceivedReview, SignUpInput, JobInput, ZaloLoginResult, ProfileUpdate } from './types'
+import type { CapyMsg, CapyReply, Highlights, Role, JobStatus, AppStatus, Attendance, Profile, Job, MyApplication, MyJob, Applicant, Hire, Reputation, AppNotification, TrustSignals, WorkerNote, AdminHeldJob, AdminKpis, FeePlan, MyFees, AdminFees, Referral, ChatMessage, ReportReason, AdminReport, DeletionRequest, AdminDeletion, SentInvite, FoundWorker, WorkerSearch, BankAccount, AdminDispute, AdminPayout, AdminFlag, AdminStats, AdminSamples, AppConfig, CompleteProfileInput, PendingProfile, Quote, ReceivedReview, SignUpInput, JobInput, ZaloLoginResult, ProfileUpdate } from './types'
 import type { QuizAnswers } from './quiz'
 
 export interface Api {
@@ -122,6 +122,11 @@ export interface Api {
   adminReviewJob(jobId: string, ok: boolean, note?: string): Promise<void>
   /** admin: does the marketplace work? (answers within a day, shops coming back, finished shifts per week, no-shows, reply time) */
   adminKpis(): Promise<AdminKpis>
+  /** service fee per finished shift and the voucher (anyone); the shop's own fees; admin: totals and changing the plan */
+  feePlan(): Promise<FeePlan>
+  myFees(): Promise<MyFees>
+  adminFees(): Promise<AdminFees>
+  adminSetFee(fee: number, voucherPct: number, voucherName: string): Promise<void>
   /** shop: the guide (what to wear / bring / who to ask for) only the people it hires can read */
   setJobGuide(jobId: string, body: string): Promise<void>
   jobGuide(jobId: string): Promise<string | null>

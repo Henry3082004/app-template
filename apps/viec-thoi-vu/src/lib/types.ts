@@ -171,6 +171,11 @@ export interface AdminKpis {
   noshow_30d: number; finished_30d: number; avg_reply_hours_30d: number | null
   held_jobs: number; referrals_30d: number; open_reports: number
 }
+/** Service fee per finished shift and the voucher that takes some or all of it off (payments stay off: nothing is charged). */
+export interface FeePlan { fee: number; voucher_pct: number; voucher_name: string | null }
+export interface FeeRow { application_id: string; fee: number; discount: number; due: number; voucher: string | null; created_at: string; title: string; worker: string }
+export interface MyFees { rows: FeeRow[]; month_fee: number; month_discount: number; month_due: number; total_due: number }
+export interface AdminFees extends FeePlan { month_shifts: number; month_fee: number; month_discount: number; month_due: number }
 export interface AdminHeldJob { id: string; title: string; business: string; held_reason: string; created_at: string }
 export interface Referral { code: string; n: number }
 export interface ChatMessage { id: string; sender_id: string; body: string; created_at: string }

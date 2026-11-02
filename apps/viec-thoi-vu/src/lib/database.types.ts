@@ -895,6 +895,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      fee_plan: { Args: never; Returns: Json }
+      my_fees: { Args: never; Returns: Json }
+      admin_fees: { Args: never; Returns: Json }
+      admin_set_fee: { Args: { p_fee: number; p_pct: number; p_name: string }; Returns: undefined }
       admin_kpis: { Args: never; Returns: Json }
       set_job_guide: { Args: { p_job: string; p_body: string }; Returns: undefined }
       job_guide: { Args: { p_job: string }; Returns: string | null }

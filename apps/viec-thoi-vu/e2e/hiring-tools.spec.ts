@@ -4,7 +4,7 @@ test('job guide reaches only the accepted worker; both sides agree to the shift 
   const h = helpers(p)
   await p.goto(url(PORTS.free, '/app')); await h.see('Phụ bếp ca tối')
   await h.asEmployer()
-  await h.go('/app/dang-tin'); await h.see('Miễn phí cho quán và người làm đến')
+  await h.go('/app/dang-tin'); await h.see('Ưu đãi ra mắt giảm 100%')
   await p.getByLabel('Tên việc').fill('Ca có hướng dẫn'); await p.getByLabel('Bắt đầu').fill(new Date().toISOString().slice(0, 10))
   await p.locator('#p-guide').fill('Mặc áo đen, đến sớm 15 phút, hỏi chị Lan.')
   await p.getByRole('button', { name: 'Đăng tin', exact: true }).last().click(); await h.see('Đã đăng tin!')

@@ -12,7 +12,8 @@ import { CITIES } from '../../lib/geo'
 import { tap } from '../../lib/haptics'
 import { useI18n, type TKey } from '../../lib/i18n'
 import { report } from '../../lib/sentry'
-import { freeUntilLabel, isProFor, useAppConfig } from '../../lib/config'
+import { isProFor, useAppConfig } from '../../lib/config'
+import { FeeNote } from '../fees/Fees'
 import { useSession } from '../../lib/session'
 import type { CapyDraft, Category, Job, JobInput, PayUnit } from '../../lib/types'
 import { useBp } from '../../lib/useBp'
@@ -21,7 +22,7 @@ const CATS: Category[] = ['service', 'warehouse', 'event', 'farm', 'retail', 'ot
 const UNITS: PayUnit[] = ['hour', 'day', 'shift', 'job']
 
 export default function PostJob() {
-  const { t, locale } = useI18n()
+  const { t } = useI18n()
   const nav = useNavigate()
   const [qs] = useSearchParams()
   const { state } = useLocation() as { state: { capyDraft?: CapyDraft; capyNote?: string } | null }
@@ -144,7 +145,7 @@ export default function PostJob() {
           {bp === 'm' && <button type="button" className="back" aria-label={t('back')} onClick={() => nav('/app/tin-cua-toi')}>←</button>}
           <h1 className="ptitle">{t('postTitle')}</h1>
         </div>
-        <div className="notice info small" style={{ marginBottom: 12 }}>{t('noFeePost')} {t('freeUntilNote', { date: freeUntilLabel(locale) })}</div>
+        <div className="notice info small" style={{ marginBottom: 12 }}>{t('noFeePost')} <FeeNote /></div>
         {bp === 'd'
           ? <div className="formwrap"><div>{form}<div style={{ marginTop: 20 }}>{submitBtn}</div></div><div className="preview"><div className="sub" style={{ marginBottom: 8 }}><Ic n="eye" size={16} /> {t('whoSees')}</div><JobCard job={preview} onOpen={() => undefined} /></div></div>
           : <div>{form}{bp !== 'm' && <div style={{ marginTop: 20 }}>{submitBtn}</div>}</div>}

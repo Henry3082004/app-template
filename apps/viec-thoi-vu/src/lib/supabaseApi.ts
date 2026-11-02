@@ -7,7 +7,8 @@ import { jobsApi } from './supabase/jobsApi'
 import { payApi } from './supabase/payApi'
 import { trustApi } from './supabase/trustApi'
 import { hireToolsApi } from './supabase/hireToolsApi'
+import { feesApi } from './supabase/feesApi'
 
 /** The real backend (Supabase), one file per area under ./supabase: sign-in & profile, jobs & applications, collaboration
  *  (notifications, attendance, chat, reports, invites, finding workers), pay & reviews, admin. Helpers live in ./supabase/core. */
-export const supabaseApi: Api = { ...authApi, ...capyApi, ...jobsApi, ...collabApi, ...payApi, ...trustApi, ...hireToolsApi, ...adminApi }
+export const supabaseApi: Api = { ...authApi, ...capyApi, ...jobsApi, ...collabApi, ...payApi, ...trustApi, ...hireToolsApi, ...feesApi, ...adminApi }

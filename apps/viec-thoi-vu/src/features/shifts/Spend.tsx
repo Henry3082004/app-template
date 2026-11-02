@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { Ic } from '../../components/Ic'
+import { FeeCard } from '../fees/Fees'
 import { Btn, Empty, ErrorBox, Skel, Tag } from '../../components/ui'
 import { dateRange, money } from '../../lib/format'
 import { spendOf } from '../../lib/hires'
@@ -47,6 +48,7 @@ export default function Spend() {
         <div><b>{s?.shifts ?? '…'}</b><span>{t('spendShifts')}</span></div>
         <div><b>{s?.people ?? '…'}</b><span>{t('spendPeople')}</span></div>
       </div>
+      <FeeCard />
       {s?.estimated && <div className="notice info">{t('spendEstimated')}</div>}
       {error != null && <ErrorBox error={error} where="Spend.load" onRetry={reload} />}
       <div className="seg pills" role="tablist">

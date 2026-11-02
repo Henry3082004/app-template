@@ -10,6 +10,7 @@ import { DisputeCard } from './cards/DisputeCard'
 import { HealthCard, SentryCheck } from './cards/Health'
 import { HeldJobCard } from './cards/HeldJobCard'
 import { KpiCard } from './cards/KpiCard'
+import { FeeAdminCard } from './cards/FeeAdminCard'
 import { PayoutCard } from './cards/PayoutCard'
 import { ReportCard } from './cards/ReportCard'
 import { SamplesTab } from './cards/SamplesTab'
@@ -56,6 +57,7 @@ export default function Admin() {
       <h1 className="ptitle" style={{ marginBottom: 16 }}>{t('adminTitle')}</h1>
       <HealthCard s={stats} />
       <KpiCard k={kpis} />
+      <FeeAdminCard />
       <div className="seg" style={{ marginBottom: 16 }}>
         <button type="button" className={tab === 'disputes' ? 'on' : ''} onClick={() => setTab('disputes')}>{t('adminTabDisputes')}{disputes?.length ? ` (${disputes.length})` : ''}</button>
         <button type="button" className={tab === 'payouts' ? 'on' : ''} onClick={() => setTab('payouts')}>{t('adminTabPayouts')}{pendingN ? ` (${pendingN})` : ''}</button>
