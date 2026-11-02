@@ -44,7 +44,9 @@ Deno.serve(async (req) => {
   const locale = body.locale === "en" ? "en" : "vi";
 
   // a daily cap per network address (and overall) so the endpoint can't be used to mass-create accounts
-  const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
+  // cf-connecting-ip is written by the platform's proxy; the LAST x-forwarded-for hop is the one our own proxy added (the first can be forged)
+  const xff = (req.headers.get("x-forwarded-for") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  const ip = req.headers.get("cf-connecting-ip") || xff[xff.length - 1] || "unknown";
   const { data: allowed, error: hitErr } = await admin.rpc("ai_hit", { p_key: `su:${ip}`, p_cap: 20, p_total_cap: 6000 });
   if (hitErr) return json({ error: "SIGNUP_FAILED" }, 500);
   if (!allowed) return json({ error: "TOO_MANY" }, 429);

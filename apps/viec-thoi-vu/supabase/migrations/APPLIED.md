@@ -75,3 +75,5 @@ Edge function `zalo-webhook` (Webhook URL của Mini App: `https://niscqjczfvipx
 Lưu ý: công việc chưa có giờ trong ngày (chỉ có ngày bắt đầu/kết thúc), nên "Tôi vẫn đến" mở từ hôm trước và nhắc lúc 08:00; quán được báo lúc 09:00 ngày làm việc nếu người làm chưa xác nhận.
 
 02/11/2026: `20261112_job_tasks.sql` áp dụng thành `job_tasks` (cột `jobs.tasks text[]` công khai, cấp quyền ghi cho cột này, trigger `jobs_tasks` chuẩn hóa: cắt khoảng trắng, bỏ rỗng và trùng, 60 ký tự, tối đa 12; `jobs_screen` đọc cả đầu việc). Test: `supabase/tests/230_job_tasks.sql`.
+
+03/11/2026: `20261113_abuse_limits.sql` áp dụng thành `abuse_limits` (tổng lượt mỗi ngày của `ai_hit` chỉ tính các khóa cùng loại: `u:` người đã đăng nhập, `g:` khách, `su:` đăng ký; nên đăng ký hàng loạt không làm tắt Capy). Hàm `signup` và `capy-assistant` deploy lại: lấy IP thật (`cf-connecting-ip` hoặc phần tử cuối của `x-forwarded-for`), khách Capy tính theo IP, 5 lượt/ngày/IP, tổng khách 500/ngày (`ai_cap_guest_total`). Danh sách việc mở tải tối đa 100 tin. Test: `supabase/tests/170_capy_ai.sql`.

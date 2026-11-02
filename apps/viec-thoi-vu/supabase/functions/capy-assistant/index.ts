@@ -130,7 +130,7 @@ Deno.serve(async (req) => {
   if (!url || !service) return json({ error: "AI_FAILED" }, 500);
   const admin = createClient(url, service, { auth: { persistSession: false } });
 
-  const { data: settings } = await admin.from("app_settings").select("key, value").in("key", ["ai_assistant", "ai_cap_guest", "ai_cap_user", "ai_cap_total", "ai_model"]);
+  const { data: settings } = await admin.from("app_settings").select("key, value").in("key", ["ai_assistant", "ai_cap_guest", "ai_cap_user", "ai_cap_total", "ai_cap_guest_total", "ai_model"]);
   const cfg = Object.fromEntries((settings ?? []).map((r) => [r.key, r.value]));
   if (cfg.ai_assistant !== "on") return json({ error: "AI_OFF" }, 403);
   if (!apiKey) return json({ error: "AI_NOT_CONFIGURED" }, 503);
@@ -154,9 +154,15 @@ Deno.serve(async (req) => {
     if (p?.role === "employer") role = "employer";
     if (!city && p?.city) city = String(p.city);
   }
-  const key = userId ? `u:${userId}` : `d:${str(body.device, 64) || "unknown"}`;
-  const cap = Number(userId ? cfg.ai_cap_user : cfg.ai_cap_guest) || (userId ? 40 : 15);
-  const { data: allowed, error: hitErr } = await admin.rpc("ai_hit", { p_key: key, p_cap: cap, p_total_cap: Number(cfg.ai_cap_total) || 3000 });
+  // a visitor is counted by network address (the device id comes from the browser and a bot can change it at will);
+  // cf-connecting-ip is written by the platform's proxy, the LAST x-forwarded-for hop is the one our own proxy added
+  const xff = (req.headers.get("x-forwarded-for") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  const ip = req.headers.get("cf-connecting-ip") || xff[xff.length - 1] || str(body.device, 64) || "unknown";
+  const key = userId ? `u:${userId}` : `g:${ip}`;
+  const cap = Number(userId ? cfg.ai_cap_user : cfg.ai_cap_guest) || (userId ? 40 : 5);
+  // totals are kept apart: visitors can never use up the signed-in people's share
+  const total = Number(userId ? cfg.ai_cap_total : cfg.ai_cap_guest_total) || (userId ? 3000 : 500);
+  const { data: allowed, error: hitErr } = await admin.rpc("ai_hit", { p_key: key, p_cap: cap, p_total_cap: total });
   if (hitErr) return json({ error: "AI_FAILED" }, 500);
   if (!allowed) return json({ error: "AI_RATE_LIMIT" }, 429);
 

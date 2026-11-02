@@ -6,7 +6,9 @@ select t_check(app_config()->>'ai_assistant' = 'off', 'the AI helper is off by d
 select t_check(ai_hit('d:abc', 2, 100) and ai_hit('d:abc', 2, 100), 'two requests are allowed');
 select t_check(not ai_hit('d:abc', 2, 100), 'the third is refused (per-person cap)');
 select t_check(ai_hit('u:other', 2, 100), 'another person still has theirs');
-select t_check(not ai_hit('u:third', 2, 3), 'the global daily cap stops everyone');
+select t_check(ai_hit('u:t1', 5, 3) and ai_hit('u:t2', 5, 3), 'two more signed-in requests fit in the total');
+select t_check(not ai_hit('u:third', 2, 3), 'the daily total of a kind stops everyone of that kind');
+select t_check(ai_hit('su:ip1', 5, 3), 'another kind (sign-ups) has its own total');
 set role anon; select set_config('request.jwt.claim.sub', '', false);
 select t_err($$select ai_hit('d:x', 1, 1)$$, 'permission denied');
 select t_err($$select * from ai_usage$$, 'permission denied');
