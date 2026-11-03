@@ -23,7 +23,7 @@ import { avatarUrl } from '../../lib/worker'
 export default function Account() {
   const { t, locale, setLocale } = useI18n()
   const nav = useNavigate()
-  const { profile, updateProfile, signOut, askAuth, askQuiz, setViewAsUser } = useSession()
+  const { profile, updateProfile, signOut, askAuth, askQuiz, setViewAsUser, viewAsUser } = useSession()
   const cfg = useAppConfig()
   const [f, setF] = useState({ full_name: '', bio: '', business_name: '', address: '', city: '' })
   const [w, setW] = useState<WorkerInfo | null>(null)
@@ -155,6 +155,13 @@ export default function Account() {
           <LegalLinks />
         </div>
       </Sect>
+      {viewAsUser && (
+        <section className="card devtools">
+          <b><Ic n="eye" size={18} /> {t('viewAsOn')}</b>
+          <div className="sub" style={{ fontSize: 13 }}>{t('viewAsHint')}</div>
+          <Btn block onClick={() => setViewAsUser(false)}>{t('viewAsBack')}</Btn>
+        </section>
+      )}
       {profile.is_admin && (
         <section className="card devtools">
           <b><Ic n="sparkles" size={18} /> {t('devTools')}</b>

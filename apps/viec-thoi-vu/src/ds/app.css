@@ -448,11 +448,7 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 @media(min-width:1024px){.page-scroll>.pg.acctpage{max-width:960px}}
 @media(min-width:1024px){.acctpage>.ptitle{display:none}}
 
-.viewbar{position:fixed;z-index:45;left:12px;right:12px;bottom:calc(78px + var(--safe-bottom));display:flex;align-items:center;gap:8px;background:var(--tx);color:#fff;border-radius:999px;padding:6px 6px 6px 14px;font-size:13px;box-shadow:var(--shadow-lg)}
-.viewbar span{flex:1;min-width:0}
-.viewbar button{border:0;border-radius:999px;background:#fff;color:var(--tx);font-weight:600;font-size:13px;min-height:36px;padding:0 14px;cursor:pointer}
-@media(min-width:600px){.viewbar{left:50%;right:auto;transform:translateX(-50%);bottom:20px;width:max-content;max-width:calc(100vw - 32px)}}
-
+@media(min-width:600px){
 /* ---------- Worker tabs: Trang chủ · Chấm công · Thu nhập ---------- */
 .seg a{border:0;background:none;border-radius:999px;padding:8px 16px;color:var(--tx2);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;min-height:40px}
 .seg a.on{background:#fff;color:var(--tx);box-shadow:var(--sh)}.seg a:hover{text-decoration:none;color:var(--tx)}
