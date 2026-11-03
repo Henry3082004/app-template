@@ -50,7 +50,7 @@ export default function EmployerJobs() {
     <>
       <div className="hrow" style={{ alignItems: 'center', marginBottom: 12 }}>
         <h1 className="ptitle">{t('navHiring')}</h1>
-        {wide && <Btn sm onClick={post_}>{t('postJob')}</Btn>}
+        {wide && <Btn sm data-tour="post" onClick={post_}>{t('postJob')}</Btn>}
       </div>
       <HireTabs pending={list?.reduce((n, j) => n + j.newApplicants, 0)} />
       {cfg?.billing === 'on' && (
@@ -91,7 +91,7 @@ export default function EmployerJobs() {
         <div className="cta">
           <div style={{ position: 'relative' }}>
             {list && list.length === 0 && <div className="coach" style={{ bottom: 60, left: 0 }}>{t('firstTip')}</div>}
-            <Btn block onClick={post_}>{t('postJob')}</Btn>
+            <Btn block data-tour="post" onClick={post_}>{t('postJob')}</Btn>
           </div>
         </div>
       </div>

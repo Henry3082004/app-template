@@ -702,3 +702,12 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 
 /* ---------- consent box (sign-up) and the location question ---------- */
 .consent{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.45;color:var(--tx2)}.consent input{margin-top:3px;width:18px;height:18px;flex:none;accent-color:var(--brand-500)}.consent a{color:var(--brand-600);font-weight:600}
+
+/* ---------- first-visit guide: the page dims, one element is lit, Capi explains it ---------- */
+.tour{position:fixed;inset:0;z-index:90}.tourblock{position:absolute;inset:0}.tourdim{position:absolute;inset:0;background:rgba(35,22,14,.6)}
+.tourhole{position:absolute;border-radius:16px;box-shadow:0 0 0 100vmax rgba(35,22,14,.6),0 0 0 3px var(--carrot);pointer-events:none;transition:left .2s,top .2s,width .2s,height .2s}
+.tourcard{position:absolute;left:50%;transform:translateX(-50%);width:min(92vw,380px);background:var(--gray-0);border:3px solid var(--brand-900);border-radius:18px;box-shadow:0 5px 0 var(--brand-900);padding:14px;display:grid;grid-template-columns:56px 1fr;gap:6px 12px;align-items:start}
+.tourcard.top{top:max(12px,env(safe-area-inset-top))}.tourcard.bottom{bottom:max(12px,env(safe-area-inset-bottom))}.tourcard.mid{top:50%;transform:translate(-50%,-50%)}
+.tourcard img{width:56px;height:56px;object-fit:contain}.tourtxt{display:flex;flex-direction:column;gap:3px;font-size:14px;line-height:1.45;color:var(--tx2)}.tourtxt b{font-size:16px;color:var(--brand-900)}
+.tourfoot{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.tourdots{display:flex;gap:6px}.tourdots i{width:8px;height:8px;border-radius:50%;background:var(--gray-200)}.tourdots i.on{background:var(--carrot);width:20px;border-radius:6px}
+.touracts{display:flex;align-items:center;gap:8px}.tourskip{background:none;border:0;color:var(--tx2);font:inherit;font-size:13px;min-height:44px;padding:0 6px;cursor:pointer}

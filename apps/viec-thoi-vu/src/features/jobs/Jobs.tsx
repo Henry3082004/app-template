@@ -221,7 +221,7 @@ export default function Jobs() {
           <Banners />
           <section className="searchcard" role="search">
             <div className="srow">
-              <div className="searchbox">
+              <div className="searchbox" data-tour="search">
                 <span className="si"><Ic n="search" size={18} /></span>
                 <input ref={searchRef} className="inp" type="search" placeholder={t('searchPh')} aria-label={t('searchPh')} value={q} onChange={(e) => setQ(e.target.value)} />
               </div>

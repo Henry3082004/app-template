@@ -13,6 +13,7 @@ import { useI18n, type TKey } from '../../lib/i18n'
 import { DeleteAccount } from './DeleteAccount'
 import { Discoverable } from '../hiring/Discoverable'
 import { ReferralCard } from './ReferralCard'
+import { resetTour, tourHome } from '../../lib/tour'
 import { Regulars } from '../hiring/Regulars'
 import { displayPhone } from '../../lib/phone'
 import { useSession } from '../../lib/session'
@@ -137,6 +138,9 @@ export default function Account() {
       <Sect title={t('myReviewsTitle')} sub={t('secReviewsSub')}><MyReviews employer={emp} /></Sect>
       <Sect title={t('refTitle')} sub={t('refSub')}><ReferralCard /></Sect>
       <Sect title={t('rolesTitle')} sub={t('secRolesSub')}><RolesCard /></Sect>
+      <Sect title={t('tourSect')} sub={t('tourSectSub')}>
+        <Btn v="ghost" onClick={() => { const r = emp ? 'employer' : 'seeker'; resetTour(r); nav(tourHome(r)) }}>{t('tourReplay')}</Btn>
+      </Sect>
       {!emp && <Sect title={t('bankTitle')} sub={t('secBankSub')}><BankCard /></Sect>}
       <Sect title={t('secSettings')} sub={t('secSettingsSub')}>
         <div className="stack">

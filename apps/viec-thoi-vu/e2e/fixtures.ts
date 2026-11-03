@@ -45,12 +45,15 @@ export function helpers(p: Page) {
 const QUIZ_DONE = JSON.stringify({ device: 'aaaaaaaa-e2e0-4000-8000-000000000000', answers: { goal: null, city: null, cats: null, time: null, exp: null }, synced: null })
 
 // Capi says hello (fly-in + speech bubble) once per tab; most tests skip it so the bubble never covers what they click.
-export const test = base.extend<{ problems: string[]; quizSeen: boolean; capyHello: boolean }>({
+export const test = base.extend<{ problems: string[]; quizSeen: boolean; capyHello: boolean; tourSeen: boolean }>({
   quizSeen: [true, { option: true }],
+  tourSeen: [true, { option: true }],
   capyHello: [false, { option: true }],
-  problems: [async ({ page, quizSeen, capyHello }, use) => {
+  problems: [async ({ page, quizSeen, capyHello, tourSeen }, use) => {
     if (!capyHello) await page.context().addInitScript(() => sessionStorage.setItem('vtv-capy-hi', '1'))
     if (quizSeen) await page.context().addInitScript((v) => { if (!localStorage.getItem('vtv-quiz')) localStorage.setItem('vtv-quiz', v) }, QUIZ_DONE)
+    // most tests skip the first-visit guide so its dimmed overlay never covers what they click; the tour tests turn this off
+    if (tourSeen) await page.context().addInitScript(() => { localStorage.setItem('vtv-tour-seeker', '1'); localStorage.setItem('vtv-tour-employer', '1') })
     const problems: string[] = []
     const watch = (p: Page) => {
       p.on('console', (m) => { if (['error', 'warning'].includes(m.type()) && !/Failed to load resource/.test(m.text())) problems.push(m.text()) })

@@ -92,7 +92,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const Items = () => (
     <>
       {items.map((i) => (
-        <NavLink key={i.to} to={i.to} end={i.end} className={isOn(i) ? 'on' : ''} aria-current={isOn(i) ? 'page' : undefined}>
+        <NavLink key={i.to} to={i.to} end={i.end} data-tour={'nav:' + i.to} className={isOn(i) ? 'on' : ''} aria-current={isOn(i) ? 'page' : undefined}>
           <span className="ic" data-cart={i.cart || undefined}><Ic n={i.ico} size={22} />{!!i.badge && <i className={'navbadge' + (i.cart ? ' cart' : '')} aria-label={String(i.badge)}>{i.badge > 99 ? '99+' : i.badge}</i>}</span>{i.label}
         </NavLink>
       ))}

@@ -128,7 +128,7 @@ export function CapyBot({ onOpen }: { onOpen: () => void }) {
           {t('capyGreet')}
         </button>
       )}
-      <button type="button" className="capyme" aria-label={t('capyFab')}
+      <button type="button" className="capyme" data-tour="capi" aria-label={t('capyFab')}
         onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onClick={click}>
         <CapyFigure act={act} />
       </button>
