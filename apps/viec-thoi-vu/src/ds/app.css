@@ -712,3 +712,4 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 .modeopt{display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;width:100%;min-height:56px;padding:10px 14px;border:2px solid var(--gray-200);border-radius:14px;background:var(--gray-0);color:var(--tx);font:inherit;cursor:pointer}
 .modeopt span{display:flex;flex-direction:column;gap:2px}.modeopt small{color:var(--tx2);font-size:12.5px}
 .modeopt.on{border-color:var(--brand-500);background:var(--brand-50)}.modeopt:disabled{opacity:.6;cursor:default}
+.turnstile{display:flex;justify-content:center;min-height:0}

@@ -43,6 +43,22 @@ Deno.serve(async (req) => {
   if (!role) return json({ error: "INVALID_ROLE" }, 400);
   const locale = body.locale === "en" ? "en" : "vi";
 
+  // "I am not a bot" (Cloudflare Turnstile): checked when the Edge Function secret TURNSTILE_SECRET is set (add it in the dashboard, never in code);
+  // without the secret the check is skipped so sign-up keeps working until it is switched on
+  const tsSecret = Deno.env.get("TURNSTILE_SECRET");
+  const ipForCheck = req.headers.get("cf-connecting-ip") || (req.headers.get("x-forwarded-for") ?? "").split(",").map((s) => s.trim()).filter(Boolean).pop() || "";
+  if (tsSecret) {
+    const token = typeof body.turnstile === "string" ? body.turnstile.slice(0, 2048) : "";
+    if (!token) return json({ error: "CAPTCHA_FAILED" }, 400);
+    try {
+      const form = new URLSearchParams({ secret: tsSecret, response: token });
+      if (ipForCheck) form.set("remoteip", ipForCheck);
+      const r = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body: form });
+      const v = await r.json().catch(() => ({}));
+      if (!v?.success) return json({ error: "CAPTCHA_FAILED" }, 400);
+    } catch { return json({ error: "CAPTCHA_UNAVAILABLE" }, 503); }
+  }
+
   // a daily cap per network address (and overall) so the endpoint can't be used to mass-create accounts
   // cf-connecting-ip is written by the platform's proxy; the LAST x-forwarded-for hop is the one our own proxy added (the first can be forged)
   const xff = (req.headers.get("x-forwarded-for") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
@@ -85,5 +101,10 @@ Deno.serve(async (req) => {
     await admin.auth.admin.deleteUser(uid); // leave nothing half-made behind
     return json({ error: "SIGNUP_FAILED" }, 500);
   }
+  // hand back a one-time sign-in so the browser does not need a second "not a bot" token to log in
+  try {
+    const { data: link } = await admin.auth.admin.generateLink({ type: "magiclink", email: `${digits}@pw.viecthoivu.app` });
+    if (link?.properties?.hashed_token) return json({ ok: true, token_hash: link.properties.hashed_token, email: `${digits}@pw.viecthoivu.app` });
+  } catch { /* the browser signs in with the password instead */ }
   return json({ ok: true });
 });

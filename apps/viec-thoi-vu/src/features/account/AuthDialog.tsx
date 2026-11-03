@@ -12,6 +12,7 @@ import { useSession } from '../../lib/session'
 import type { Profile, Role } from '../../lib/types'
 import { RoleCards } from './RoleCards'
 import { ConsentCheck } from './ConsentCheck'
+import { TurnstileBox, TURNSTILE_SITE_KEY } from './TurnstileBox'
 import { TERMS_VERSION } from '../../lib/consent'
 import { Btn, Dialog, ErrorBox, Fld } from '../../components/ui'
 
@@ -24,6 +25,7 @@ export function AuthDialog() {
   const [f, setF] = useState({ full_name: '', phone: '', password: '', business_name: '', address: '', city: 'TP.HCM' })
   const [busy, setBusy] = useState(false)
   const [agreed, setAgreed] = useState(false)
+  const [botToken, setBotToken] = useState('')
   const [error, setError] = useState<unknown>(null)
   // Inside Zalo the default is "continue with Zalo" (no typing, no password); the old form stays as a fallback.
   const [viaZalo, setViaZalo] = useState(IN_ZALO)
@@ -117,7 +119,7 @@ export function AuthDialog() {
     tap()
     if (mode === 'login') return run(() => api.signIn(f.phone, f.password))
     return run(() => api.signUp({
-      phone: f.phone, password: f.password, full_name: f.full_name, role, locale,
+      phone: f.phone, password: f.password, full_name: f.full_name, role, locale, turnstile: botToken || undefined,
       business_name: role === 'employer' ? f.business_name : undefined,
       address: role === 'employer' ? f.address : undefined,
       city: f.city,
@@ -224,8 +226,9 @@ export function AuthDialog() {
           <input id="a-pass" className="inp" type="password" value={f.password} onChange={set('password')} autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} required minLength={mode === 'signup' ? 8 : 1} />
         </Fld>
         {mode === 'signup' && <ConsentCheck checked={agreed} onChange={setAgreed} />}
+        {mode === 'signup' && ALLOW_PASSWORD === false && <TurnstileBox key={authRequest.role + String(viaPhone)} onToken={setBotToken} />}
         {error != null && <ErrorBox error={error} where="AuthDialog" />}
-        <Btn block type="submit" disabled={busy}>
+        <Btn block type="submit" disabled={busy || (mode === 'signup' && !!TURNSTILE_SITE_KEY && !botToken)}>
           {busy ? '…' : employerSignup ? t('saveAndPost') : mode === 'login' ? t('login') : role === 'seeker' ? t('applyNow') : t('continue')}
         </Btn>
       </form>

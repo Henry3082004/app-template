@@ -371,4 +371,6 @@ export const en: Dict = {
   quizAiPost: 'Let Capi write the post',
   quizOwnPost: 'Post it myself',
   quizAiHint: 'Tell Capi in plain words; it drafts the post for you to check and publish.',
+  eCAPTCHA_FAILED: 'Could not confirm you are not a robot. Please reload the page and try again.',
+  eCAPTCHA_UNAVAILABLE: 'The check is not available right now. Please try again in a few minutes.',
 }

@@ -383,6 +383,8 @@ export const vi = {
   quizAiPost: 'Nhờ Capi soạn tin giúp',
   quizOwnPost: 'Tự đăng tin',
   quizAiHint: 'Kể bằng lời thường, Capi soạn bản nháp để bạn kiểm tra rồi đăng.',
+  eCAPTCHA_FAILED: 'Chưa xác minh được bạn không phải robot. Vui lòng tải lại trang và thử lại.',
+  eCAPTCHA_UNAVAILABLE: 'Chưa kiểm tra được lúc này. Vui lòng thử lại sau ít phút.',
 }
 
 export type Dict = typeof vi

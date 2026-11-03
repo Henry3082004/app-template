@@ -13,8 +13,9 @@ export const authApi: Pick<Api, 'me' | 'signUp' | 'signIn' | 'signInWithGoogle' 
   async signUp(input: SignUpInput) {
     const digits = normalizePhone(input.phone)
     if (!digits) throw new AppError('INVALID_PHONE')
-    await callFunction('signup', { ...input, phone: digits }, 'SIGNUP_FAILED')
-    return this.signIn(digits, input.password)
+    const body = await callFunction('signup', { ...input, phone: digits }, 'SIGNUP_FAILED')
+    // the function hands back a one-time sign-in (so the "not a bot" token is used once); the password sign-in is the fallback
+    return body?.token_hash ? sessionFromHash(body) : this.signIn(digits, input.password)
   },
 
   async signIn(phone, password) {

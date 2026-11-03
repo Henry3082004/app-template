@@ -247,6 +247,8 @@ export interface Quote { amount: number; fee: number; net: number }
 export interface ReceivedReview { id: string; stars: number; tags: string[]; comment: string | null; created_at: string; reviewer_role: Role }
 
 export interface SignUpInput {
+  /** token of the "I am not a bot" box (Cloudflare Turnstile), checked by the sign-up function */
+  turnstile?: string
   phone: string
   password: string
   full_name: string
