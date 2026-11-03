@@ -35,8 +35,12 @@ test('Zalo login: new user, returning user, denied permission, password fallback
 
   await setPhone('0977123456')
   await tab('Việc làm'); await p.getByRole('button', { name: 'Tôi cần tuyển người' }).locator('visible=true').first().click()
+  await h.see('Cứ điền tin trước') // the post form opens first; the account is asked for only when pressing Post
+  await p.getByLabel('Tên việc').fill('Phụ quán hoa'); await p.locator('#p-addr').fill('12 Lê Lợi')
+  await p.getByRole('button', { name: 'Đăng tin', exact: true }).last().click()
   await h.see('Đăng nhập bằng Zalo'); await p.getByRole('button', { name: 'Tiếp tục với Zalo' }).click(); await h.see('Tên cơ sở')
-  await p.locator('#a-name').fill('Chị Hoa'); await p.locator('#a-biz').fill('Quán Hoa Cúc'); await p.locator('#a-addr').fill('12 Lê Lợi')
-  await p.getByLabel(/Tôi đã đọc và đồng ý/).check(); await p.getByRole('button', { name: /Lưu và đăng tin/ }).click(); await p.waitForTimeout(600)
+  await expect(p.locator('#a-addr')).toHaveValue('12 Lê Lợi') // the address typed in the post is already filled in
+  await p.locator('#a-name').fill('Chị Hoa'); await p.locator('#a-biz').fill('Quán Hoa Cúc')
+  await p.getByLabel(/Tôi đã đọc và đồng ý/).check(); await p.getByRole('button', { name: /Lưu và đăng tin/ }).click(); await h.see('Đã đăng tin!'); await p.getByRole('button', { name: 'Về Tin của tôi' }).click()
   await tab('Hồ sơ'); await h.see('Quán Hoa Cúc')
 })

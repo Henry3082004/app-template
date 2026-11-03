@@ -378,6 +378,8 @@ export const vi = {
   eADMIN_SESSION_LOST: 'Phiên quản trị đã hết hạn. Hãy đăng nhập lại tài khoản quản trị.',
   eNO_DEMO_ACCOUNT: 'Chưa có tài khoản mẫu cho chế độ này.',
   eSWITCH_FAILED: 'Không chuyển được chế độ. Vui lòng thử lại.',
+  postGuestNote: 'Cứ điền tin trước. Bạn chỉ cần tạo tài khoản ở bước cuối, khi bấm Đăng tin.',
+  postHaveAccount: 'Đã có tài khoản? Đăng nhập',
 }
 
 export type Dict = typeof vi

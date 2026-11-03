@@ -100,7 +100,7 @@ export function Shell({ children }: { children: ReactNode }) {
   )
 
   const today = new Intl.DateTimeFormat(locale === 'vi' ? 'vi-VN' : 'en-GB', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date())
-  const hire = () => askAuth({ role: 'employer', onDone: (p) => nav(p.role === 'employer' ? '/app/dang-tin' : '/app') })
+  const hire = () => nav('/app/dang-tin') // a visitor fills the post first and signs up at the very end
 
   return (
     <div className="app">

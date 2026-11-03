@@ -1,9 +1,9 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Ic } from '../../components/Ic'
 import { JobCard } from './JobCard'
 import { TasksField } from './TasksField'
-import { Btn, Chip, Dialog, ErrorBox, Fld, Tag } from '../../components/ui'
+import { Btn, Chip, Dialog, ErrorBox, Fld, Skel, Tag } from '../../components/ui'
 import { api } from '../../lib/api'
 import { capy } from '../../lib/capy'
 import { errorCode } from '../../lib/errors'
@@ -14,6 +14,7 @@ import { useI18n, type TKey } from '../../lib/i18n'
 import { report } from '../../lib/sentry'
 import { isProFor, useAppConfig } from '../../lib/config'
 import { FeeNote } from '../fees/Fees'
+import { clearPostDraft, loadPostDraft, savePostDraft } from '../../lib/postDraft'
 import { useSession } from '../../lib/session'
 import type { CapyDraft, Category, Job, JobInput, PayUnit } from '../../lib/types'
 import { useBp } from '../../lib/useBp'
@@ -28,9 +29,10 @@ export default function PostJob() {
   const { state } = useLocation() as { state: { capyDraft?: CapyDraft; capyNote?: string } | null }
   const draft = state?.capyDraft ?? null
   const bp = useBp()
-  const { profile, ready } = useSession()
+  const { profile, ready, askAuth } = useSession()
   const cfg = useAppConfig()
   const start = addDays(today(), 1)
+  const stored = useRef(!draft && !qs.get('lai') ? loadPostDraft() : null).current // what a visitor typed before signing up
   const [f, setF] = useState<JobInput>(() => ({
     title: '', description: '', tasks: [], category: 'service', pay_amount: 30000, pay_unit: 'hour',
     start_date: start, end_date: addDays(start, 6), shift_note: '', address: profile?.address ?? '',
@@ -40,6 +42,7 @@ export default function PostJob() {
       slots: draft.slots, start_date: draft.start_date, end_date: draft.end_date, shift_note: draft.shift_note,
       address: draft.address || profile?.address || '', city: draft.city && CITIES[draft.city] ? draft.city : profile?.city && CITIES[profile.city] ? profile.city : 'TP.HCM', is_urgent: draft.is_urgent,
     } : {}),
+    ...(stored ? stored.f : {}),
   }))
   const [prefilled, setPrefilled] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -47,25 +50,43 @@ export default function PostJob() {
   const [formErr, setFormErr] = useState<TKey | null>(null)
   const [done, setDone] = useState(false)
   const [held, setHeld] = useState<string | null>(null)
-  const [guide, setGuide] = useState('')
+  const [guide, setGuide] = useState(stored?.guide ?? '')
   const isPro = isProFor(profile, cfg)
 
+  // the shop's own address fills in as soon as the account is known (a reload, or signing in on this very form)
+  useEffect(() => {
+    if (profile?.role !== 'employer') return
+    setF((cur) => (cur.address.trim() ? cur : { ...cur, address: profile.address ?? '', city: profile.city && CITIES[profile.city] ? profile.city : cur.city }))
+  }, [profile?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // a shop's form starts from its previous post; the form is shown once that is in (so nobody types into it and gets overwritten),
+  // and nothing is overwritten when the person already typed a title (a visitor who signs in on this very form)
+  const [loaded, setLoaded] = useState(false)
   useEffect(() => {
     if (profile?.role !== 'employer' || draft) return // a draft from Capi is not overwritten by the previous post
+    let live = true
     api.myJobs().then((list) => {
       const last = list.find((j) => j.id === qs.get('lai')) ?? list[0]
-      if (!last) return
-      setF((cur) => ({
-        ...cur, title: cur.title || last.title, description: last.description ?? '', tasks: last.tasks ?? [], category: last.category, pay_amount: last.pay_amount,
-        pay_unit: last.pay_unit, shift_note: last.shift_note ?? '', address: last.address, city: last.city,
-        lat: last.lat, lng: last.lng, slots: last.slots,
-      }))
-      setPrefilled(true)
-    }).catch(() => undefined)
-  }, [profile]) // eslint-disable-line react-hooks/exhaustive-deps
+      if (!live || !last) return
+      setF((cur) => {
+        if (cur.title.trim()) return cur
+        setPrefilled(true)
+        return {
+          ...cur, title: last.title, description: last.description ?? '', tasks: last.tasks ?? [], category: last.category, pay_amount: last.pay_amount,
+          pay_unit: last.pay_unit, shift_note: last.shift_note ?? '', address: last.address, city: last.city,
+          lat: last.lat, lng: last.lng, slots: last.slots,
+        }
+      })
+    }).catch(() => undefined).finally(() => { if (live) setLoaded(true) })
+    return () => { live = false }
+  }, [profile?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // keep what a visitor types, so signing up in the last step (or through Google) never loses the form
+  useEffect(() => { if (!profile && !done) savePostDraft(f, guide) }, [f, guide, profile, done])
 
   if (!ready) return null
-  if (profile?.role !== 'employer') return <Navigate to="/app" replace />
+  if (profile && profile.role !== 'employer') return <Navigate to="/app" replace />
+  if (profile && !draft && !loaded && !f.title.trim()) return <div className="pg"><Skel n={2} /></div>
 
   const set = <K extends keyof JobInput>(k: K, v: JobInput[K]) => setF((cur) => ({ ...cur, [k]: v }))
 
@@ -82,10 +103,19 @@ export default function PostJob() {
       ...f, title: f.title.trim(), address: f.address.trim(), description: f.description.trim(), shift_note: f.shift_note.trim(),
       lat: f.lat ?? c.lat, lng: f.lng ?? c.lng, is_urgent: isPro && f.is_urgent,
     }
+    if (!profile) { // the account is asked for only now, at the last step; the post is published as soon as it exists
+      askAuth({ role: 'employer', prefill: { address: input.address, city: input.city }, onDone: (p) => { if (p.role === 'employer') void publish(input) } })
+      return
+    }
+    await publish(input)
+  }
+
+  const publish = async (input: JobInput) => {
     setBusy(true)
     try {
       const j = await api.createJob(input)
       if (guide.trim()) await api.setJobGuide(j.id, guide).catch(() => undefined) // the post itself is already live
+      clearPostDraft()
       setHeld(j.held_reason ?? null)
       setDone(true)
     } catch (err) {
@@ -98,10 +128,10 @@ export default function PostJob() {
 
   const limit = errorCode(error) === 'FREE_PLAN_LIMIT' || errorCode(error) === 'URGENT_REQUIRES_PRO'
   const preview: Job = {
-    id: 'preview', employer_id: profile.id, title: f.title || t('jobTitle'), description: f.description, category: f.category,
+    id: 'preview', employer_id: profile?.id ?? '', title: f.title || t('jobTitle'), description: f.description, category: f.category,
     pay_amount: f.pay_amount || 0, pay_unit: f.pay_unit, start_date: f.start_date, end_date: f.end_date, shift_note: f.shift_note,
     address: f.address, city: f.city, lat: null, lng: null, slots: f.slots, filled: 0, is_urgent: isPro && f.is_urgent, status: 'open',
-    created_at: '', business_name: profile.business_name || profile.full_name,
+    created_at: '', business_name: profile?.business_name || profile?.full_name || '',
   }
 
   const form = (
@@ -146,6 +176,12 @@ export default function PostJob() {
           <h1 className="ptitle">{t('postTitle')}</h1>
         </div>
         <div className="notice info small" style={{ marginBottom: 12 }}>{t('noFeePost')} <FeeNote /></div>
+        {!profile && (
+          <div className="plan ok" style={{ marginBottom: 12 }}>
+            <span><Ic n="sparkles" size={16} /> {t('postGuestNote')}</span>
+            <button type="button" className="back" style={{ minHeight: 0, padding: 0 }} onClick={() => askAuth({ role: 'employer' })}>{t('postHaveAccount')}</button>
+          </div>
+        )}
         {bp === 'd'
           ? <div className="formwrap"><div>{form}<div style={{ marginTop: 20 }}>{submitBtn}</div></div><div className="preview"><div className="sub" style={{ marginBottom: 8 }}><Ic n="eye" size={16} /> {t('whoSees')}</div><JobCard job={preview} onOpen={() => undefined} /></div></div>
           : <div>{form}{bp !== 'm' && <div style={{ marginTop: 20 }}>{submitBtn}</div>}</div>}

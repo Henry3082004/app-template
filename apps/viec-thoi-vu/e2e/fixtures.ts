@@ -14,7 +14,9 @@ export function helpers(p: Page) {
   const noHScroll = async () => expect(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true)
   const signOut = async () => { await go('/app/tai-khoan'); await p.getByRole('button', { name: 'Đăng xuất' }).click(); await see('Tôi cần tuyển người') }
   const asEmployer = async () => {
-    await go('/app?tuyen=1'); await p.getByRole('button', { name: 'Dùng thử: Nhà tuyển dụng' }).click(); await see('Tuyển người'); await p.waitForTimeout(400)
+    await go('/app/dang-tin'); await p.getByRole('button', { name: 'Đã có tài khoản? Đăng nhập' }).click() // a shop with an account signs in from the post form
+    await p.getByRole('button', { name: 'Dùng thử: Nhà tuyển dụng' }).click(); await see('Tuyển người'); await p.waitForTimeout(400)
+    await go('/app') // back to the job list, as before
   }
   const asSeeker = async () => {
     await go('/app/da-ung-tuyen'); await p.getByRole('button', { name: 'Đăng nhập' }).first().click()

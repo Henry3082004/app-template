@@ -10,6 +10,8 @@ import type { Role } from '../../lib/types'
 import { RoleCards } from './RoleCards'
 import { ConsentCheck } from './ConsentCheck'
 import { TERMS_VERSION } from '../../lib/consent'
+import { loadPostDraft } from '../../lib/postDraft'
+import { useNavigate } from 'react-router-dom'
 import { Btn, Dialog, ErrorBox, Fld } from '../../components/ui'
 
 /** Shown right after a first Google sign-in: we still need the role, a name and a phone number. */
@@ -19,6 +21,7 @@ export function CompleteProfileDialog() {
   const [role, setRole] = useState<Role>('seeker')
   const [iso, setIso] = useState(() => guessCountry(locale).iso)
   const [f, setF] = useState({ full_name: '', phone: '', business_name: '', address: '', city: 'TP.HCM' })
+  const nav = useNavigate()
   const [busy, setBusy] = useState(false)
   const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState<unknown>(null)
@@ -46,6 +49,7 @@ export function CompleteProfileDialog() {
       setProfile(p)
       await api.recordConsent('terms', TERMS_VERSION).catch(() => undefined) // proof of agreement; never blocks the sign-up
       await refresh()
+      if (role === 'employer' && loadPostDraft()) nav('/app/dang-tin') // came back from Google with a post half-typed: back to it, one tap to publish
     } catch (err) {
       setError(err)
     } finally {

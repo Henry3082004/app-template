@@ -412,7 +412,7 @@ select.inp{color-scheme:light} /* the open list stays light even when the phone 
 
 /* ---------- Capi hỏi nhanh ---------- */
 .quiz{display:flex;flex-direction:column;gap:16px}
-.quiz.done{align-items:center;text-align:center;gap:12px}.quiz.done .btn{width:100%}
+.quiz.done{align-items:center;text-align:center;gap:12px}.dlg .quiz.done h2{padding-right:0}.quiz.done .btn{width:100%}
 .qtop{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:8px}
 .qback{border:0;background:var(--bg);border-radius:50%;width:44px;height:44px;display:grid;place-items:center;color:var(--p2);cursor:pointer}
 .qskip{border:0;background:none;color:var(--tx2);font-weight:600;min-height:44px;padding:0 6px;cursor:pointer}

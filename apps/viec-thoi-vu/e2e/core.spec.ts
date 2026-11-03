@@ -17,8 +17,7 @@ test('seeker: browse, apply, see and withdraw the application, account, language
 test('employer (paid plans on): post, free-plan limit, accept applicant, phone shown, pricing', async ({ page: p }) => {
   const h = helpers(p)
   await p.goto('/app'); await h.see('Phụ bếp ca tối')
-  await h.go('/app?tuyen=1'); await h.see('Tạo hồ sơ cơ sở')
-  await p.getByRole('button', { name: 'Dùng thử: Nhà tuyển dụng' }).click(); await h.see('Đăng tin')
+  await h.asEmployer(); await h.see('Đăng tin')
   await h.postJob('Phục vụ ca chiều'); await h.noHScroll()
   await p.getByRole('button', { name: 'Về Tin của tôi' }).click(); await h.see('2/2 tin đang mở')
   await h.go('/app/dang-tin'); await h.see('Đã điền theo tin trước')
@@ -44,5 +43,5 @@ test('public pages: landing and terms', async ({ page: p }) => {
 test('opening the plain link goes straight to the job list (intro page lives at /gioi-thieu)', async ({ page: p }) => {
   const h = helpers(p)
   await p.goto('/'); await h.see('Phụ bếp ca tối'); expect(new URL(p.url()).pathname).toBe('/app')
-  await p.goto('/?tuyen=1'); await h.see('Đăng nhập') // share links keep their query
+  await p.goto('/?tuyen=1'); await h.see('Cứ điền tin trước') // share links keep their query: a visitor lands on the post form, no sign-in yet
 })

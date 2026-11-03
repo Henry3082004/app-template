@@ -34,7 +34,10 @@ export function AuthDialog() {
   // the role a new account starts with: pre-selected from the button pressed, changeable on the sign-up form
   const [pick, setPick] = useState<Role | null>(null)
   useEffect(() => {
-    if (authRequest) { setViaZalo(IN_ZALO); setViaPhone(false); setZalo(null); setError(null); setPick(null) }
+    if (authRequest) {
+      setViaZalo(IN_ZALO); setViaPhone(false); setZalo(null); setError(null); setPick(null); setAgreed(false)
+      if (authRequest.prefill) setF((c) => ({ ...c, ...(authRequest.prefill?.address ? { address: authRequest.prefill.address } : {}), ...(authRequest.prefill?.city ? { city: authRequest.prefill.city } : {}) }))
+    }
   }, [authRequest])
   if (!authRequest) return null
   const role: Role = pick ?? authRequest.role

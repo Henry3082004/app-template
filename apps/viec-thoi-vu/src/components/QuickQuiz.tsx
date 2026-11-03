@@ -33,7 +33,7 @@ export function QuickQuiz() {
   const { t } = useI18n()
   const nav = useNavigate()
   const { pathname } = useLocation()
-  const { profile, ready, pending, authRequest, introRequest, quizRequest, closeQuiz, askAuth } = useSession()
+  const { profile, ready, pending, authRequest, introRequest, quizRequest, closeQuiz } = useSession()
   const [synced, setSynced] = useState<string | null | undefined>(undefined) // profile id whose answers are merged
   const [run, setRun] = useState<Run | null>(null)
 
@@ -90,7 +90,7 @@ export function QuickQuiz() {
     const post = () => {
       close()
       if (profile?.role === 'employer') nav('/app/dang-tin')
-      else askAuth({ role: 'employer', onDone: (p) => nav(p.role === 'employer' ? '/app/dang-tin' : '/app') })
+      else nav('/app/dang-tin')
     }
     return (
       <Dialog label={t('quizDoneTitle')}>

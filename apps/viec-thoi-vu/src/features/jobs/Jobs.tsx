@@ -86,11 +86,11 @@ export default function Jobs() {
     return () => window.removeEventListener('keydown', f)
   }, [])
 
-  // Landing "Đăng tin tuyển" lands here with ?tuyen=1 → open employer sign-up straight away.
+  // Landing "Đăng tin tuyển" lands here with ?tuyen=1 → open the post form straight away (the account comes at the last step).
   useEffect(() => {
     if (ready && params.has('tuyen')) {
       setParams({}, { replace: true })
-      if (!profile) askAuth({ role: 'employer', onDone: (p) => nav(p.role === 'employer' ? '/app/dang-tin' : '/app') })
+      if (!profile) nav('/app/dang-tin')
     }
   }, [ready, params]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -233,7 +233,7 @@ export default function Jobs() {
             <section className="jlist">
               <div className="jhead">
                 <h1 className="ptitle">{t(desk ? 'jobsForYou' : 'navJobs')}</h1>
-                {!desk && !profile && <Btn v="ghost" sm onClick={() => askAuth({ role: 'employer', onDone: (p) => nav(p.role === 'employer' ? '/app/dang-tin' : '/app') })}>{t('iNeedStaff')}</Btn>}
+                {!desk && !profile && <Btn v="ghost" sm onClick={() => nav('/app/dang-tin')}>{t('iNeedStaff')}</Btn>}
                 {sortLine}
               </div>
               {loc === 'denied' && <div className="notice warn">{t('locDenied')}</div>}

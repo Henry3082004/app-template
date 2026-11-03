@@ -24,10 +24,14 @@ test('Google login: first sign-in completes the profile with a country code, ret
   await signOut()
 
   await setGoogle('bob@example.com', 'Bob Smith')
-  await h.go('/app?tuyen=1'); await p.getByRole('button', { name: 'Tiếp tục với Google' }).click()
+  // a visitor fills the post first; the account comes at the last step (here through Google), then the post is one tap away
+  await h.go('/app?tuyen=1'); await h.see('Cứ điền tin trước')
+  await p.getByLabel('Tên việc').fill('Phục vụ quán Bob'); await p.locator('#p-addr').fill('1 Main St')
+  await p.getByRole('button', { name: 'Đăng tin', exact: true }).last().click(); await p.getByRole('button', { name: 'Tiếp tục với Google' }).click()
   await h.see('Điền nốt để bắt đầu'); await h.see('Tên cơ sở')
   await p.locator('#c-phone').fill('0911000222'); await p.locator('#c-biz').fill('Bob Cafe'); await p.locator('#c-addr').fill('1 Main St')
   await p.getByLabel(/Tôi đã đọc và đồng ý/).check(); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click(); await p.waitForTimeout(600)
+  await expect(p.getByLabel('Tên việc')).toHaveValue('Phục vụ quán Bob'); await p.getByRole('button', { name: 'Đăng tin', exact: true }).last().click(); await h.see('Đã đăng tin!') // the typed post was kept
   await h.go('/app/tai-khoan'); await h.see('Bob Cafe')
 })
 

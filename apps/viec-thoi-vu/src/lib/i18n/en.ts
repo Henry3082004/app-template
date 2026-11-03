@@ -366,4 +366,6 @@ export const en: Dict = {
   eADMIN_SESSION_LOST: 'The admin session has expired. Please sign in as admin again.',
   eNO_DEMO_ACCOUNT: 'There is no sample account for this mode yet.',
   eSWITCH_FAILED: 'Could not switch the mode. Please try again.',
+  postGuestNote: 'Just fill in the post first. You only create an account at the last step, when you tap Post.',
+  postHaveAccount: 'Already have an account? Sign in',
 }

@@ -4,7 +4,7 @@ import { captureRef, takeRef } from './referral'
 import { setSentryUser } from './sentry'
 import type { PendingProfile, Profile, ProfileUpdate, Role } from './types'
 
-export interface AuthRequest { role: Role; onDone?: (p: Profile) => void }
+export interface AuthRequest { role: Role; onDone?: (p: Profile) => void; /** fields the sign-up form starts with (e.g. the address typed in the post) */ prefill?: { address?: string; city?: string } }
 
 interface Session {
   profile: Profile | null
