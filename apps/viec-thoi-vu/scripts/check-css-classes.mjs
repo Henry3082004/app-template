@@ -10,6 +10,9 @@ const files = walk('src')
 const defined = new Set()
 for (const f of files.filter((f) => f.endsWith('.css'))) {
   const css = readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+  // an unclosed block (e.g. a leftover "@media(...){") silently turns off every rule after it on some screens
+  const open = (css.match(/\{/g) || []).length, close = (css.match(/\}/g) || []).length
+  if (open !== close) { console.error(`CSS braces do not balance in ${f}: ${open} "{" and ${close} "}"`); process.exit(1) }
   for (const m of css.matchAll(/\.(-?[_a-zA-Z][\w-]*)/g)) defined.add(m[1])
 }
 const used = new Map()
