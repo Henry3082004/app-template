@@ -365,6 +365,19 @@ export const vi = {
   tourSect: 'Hướng dẫn nhanh',
   tourSectSub: 'Xem lại các bước chính',
   tourReplay: 'Xem lại hướng dẫn',
+  modeTitle: 'Chế độ xem (quản trị)',
+  modeSub: 'Chọn app sẽ hiện như thế nào. Hai chế độ quán và người làm dùng tài khoản mẫu đã có lịch sử dùng, không phải tài khoản khách thật.',
+  modeNewT: 'Người dùng mới',
+  modeNewS: 'Chưa đăng nhập, như vừa mở app lần đầu (có câu hỏi nhanh và hướng dẫn)',
+  modeEmpT: 'Nhà tuyển dụng',
+  modeEmpS: 'Đã đăng nhập quán mẫu, đã đăng tin và thuê người từ lâu',
+  modeSeekT: 'Người tìm việc',
+  modeSeekS: 'Đã đăng nhập người làm mẫu, đã làm nhiều ca và có đánh giá',
+  modeAdminT: 'Quản trị',
+  modeAdminS: 'Tài khoản quản trị của bạn',
+  eADMIN_SESSION_LOST: 'Phiên quản trị đã hết hạn. Hãy đăng nhập lại tài khoản quản trị.',
+  eNO_DEMO_ACCOUNT: 'Chưa có tài khoản mẫu cho chế độ này.',
+  eSWITCH_FAILED: 'Không chuyển được chế độ. Vui lòng thử lại.',
 }
 
 export type Dict = typeof vi

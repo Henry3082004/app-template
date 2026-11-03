@@ -122,6 +122,10 @@ export interface Api {
   adminReviewJob(jobId: string, ok: boolean, note?: string): Promise<void>
   /** admin: does the marketplace work? (answers within a day, shops coming back, finished shifts per week, no-shows, reply time) */
   adminKpis(): Promise<AdminKpis>
+  /** admin: look at the app as a new visitor, a sample shop, a sample worker, or as the admin again (the null result means "not signed in") */
+  adminMode(mode: 'new' | 'employer' | 'seeker' | 'admin'): Promise<Profile | null>
+  /** is an admin's own session kept on this device while they look around as someone else? */
+  adminSessionSaved(): boolean
   /** proof that a person agreed (to the terms at sign-up, or to sharing their location when checking in) */
   recordConsent(kind: 'terms' | 'location', version: string): Promise<void>
   adminConsentStats(version: string): Promise<{ users: number; terms_current: number; location: number }>

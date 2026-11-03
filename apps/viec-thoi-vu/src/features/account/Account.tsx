@@ -13,6 +13,7 @@ import { useI18n, type TKey } from '../../lib/i18n'
 import { DeleteAccount } from './DeleteAccount'
 import { Discoverable } from '../hiring/Discoverable'
 import { ReferralCard } from './ReferralCard'
+import { ModeSwitcher } from './ModeSwitcher'
 import { resetTour, tourHome } from '../../lib/tour'
 import { Regulars } from '../hiring/Regulars'
 import { displayPhone } from '../../lib/phone'
@@ -23,7 +24,7 @@ import { avatarUrl } from '../../lib/worker'
 export default function Account() {
   const { t, locale, setLocale } = useI18n()
   const nav = useNavigate()
-  const { profile, updateProfile, signOut, askAuth, askQuiz, setViewAsUser, viewAsUser } = useSession()
+  const { profile, updateProfile, signOut, askAuth, askQuiz } = useSession()
   const cfg = useAppConfig()
   const [f, setF] = useState({ full_name: '', bio: '', business_name: '', address: '', city: '' })
   const [w, setW] = useState<WorkerInfo | null>(null)
@@ -77,6 +78,7 @@ export default function Account() {
         <div className="acct">
           <div className="card"><Empty pose="wave" title={t('guestAccount')}><Btn onClick={() => askAuth({ role: 'seeker' })}>{t('login')}</Btn></Empty></div>
           <div className="card">{lang}</div>
+          <ModeSwitcher />
         </div>
         <p className="center small mt24"><Link to="/dieu-khoan">{t('legal')}</Link></p>
       </div></div>
@@ -155,13 +157,7 @@ export default function Account() {
           <LegalLinks />
         </div>
       </Sect>
-      {viewAsUser && (
-        <section className="card devtools">
-          <b><Ic n="eye" size={18} /> {t('viewAsOn')}</b>
-          <div className="sub" style={{ fontSize: 13 }}>{t('viewAsHint')}</div>
-          <Btn block onClick={() => setViewAsUser(false)}>{t('viewAsBack')}</Btn>
-        </section>
-      )}
+      <ModeSwitcher />
       {profile.is_admin && (
         <section className="card devtools">
           <b><Ic n="sparkles" size={18} /> {t('devTools')}</b>
@@ -170,9 +166,6 @@ export default function Account() {
           <div className="sub" style={{ fontSize: 13 }}>{t('quizAdminHint')}</div>
           <Btn v="ghost" block onClick={() => askQuiz({ all: true })}>{t('quizAdminBtn')}</Btn>
           <Btn v="ghost" block onClick={() => nav('/app/quan-tri')}>{t('openAdmin')}</Btn>
-          <div className="lab">{t('viewAsTitle')}</div>
-          <div className="sub" style={{ fontSize: 13 }}>{t('viewAsHint')}</div>
-          <Btn block onClick={() => { setViewAsUser(true); nav('/app') }}>{t('viewAsBtn')}</Btn>
         </section>
       )}
       <Btn v="danger" block className="signout" onClick={out}><Ic n="logout" size={18} /> {t('signOut')}</Btn>

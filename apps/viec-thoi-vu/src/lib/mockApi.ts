@@ -10,8 +10,9 @@ import { trustMock } from './mock/trustMock'
 import { hireToolsMock } from './mock/hireToolsMock'
 import { feesMock } from './mock/feesMock'
 import { consentMock } from './mock/consentMock'
+import { adminModeMock } from './mock/adminModeMock'
 
 /** In-memory backend for local UI testing (VITE_MOCK=1), split like ./supabase. Shared state and helpers live in ./mock/core. */
-export const mockApi: Api = { ...authMock, ...capyMock, ...jobsMock, ...collabMock, ...payMock, ...trustMock, ...hireToolsMock, ...feesMock, ...consentMock, ...adminMock }
+export const mockApi: Api = { ...authMock, ...capyMock, ...jobsMock, ...collabMock, ...payMock, ...trustMock, ...hireToolsMock, ...feesMock, ...consentMock, ...adminModeMock, ...adminMock }
 
 if (import.meta.env.VITE_DEMO_SHOP === '1') seedDemoShop()

@@ -53,21 +53,44 @@ test('admin sees the sample shops and workers; other users cannot open the admin
   await h.signOut(); await h.asSeeker(); await h.go('/app/quan-tri'); await h.see('chỉ dành cho quản trị viên'); await h.notSee('Quán Cơm Tấm Bà Tư')
 })
 
-test('admin can look at the app as a normal user and come back', async ({ page: p }) => {
+test('admin picks what the app shows: new visitor, sample shop, sample worker, admin — and can always get back', async ({ page: p }) => {
   const h = helpers(p)
+  const adminLink = p.locator('.rail a[href="/app/quan-tri"], .bnav a[href="/app/quan-tri"]')
+  const mode = async (name: RegExp) => { await p.getByRole('radio', { name }).click(); await p.waitForLoadState('load'); await p.waitForTimeout(700) }
   await p.goto('/app'); await h.see('Phụ bếp ca tối')
   await h.asAdmin(); await h.go('/app/tai-khoan')
-  await expect(p.locator('.rail a[href="/app/quan-tri"], .bnav a[href="/app/quan-tri"]').first()).toBeAttached()
-  await p.getByRole('button', { name: 'Chuyển sang bản người dùng thường' }).click()
-  await expect(p.getByRole('button', { name: 'Chuyển sang bản người dùng thường' })).toHaveCount(0)
-  await expect(p.locator('.viewbar')).toHaveCount(0) // no floating pill on top of the app any more
-  // no admin menu, no admin tools, the admin page refuses
-  await expect(p.locator('.rail a[href="/app/quan-tri"], .bnav a[href="/app/quan-tri"]')).toHaveCount(0)
-  await h.go('/app/tai-khoan'); await h.notSee('Công cụ admin & kiểm thử'); await h.see('Đang xem như người dùng thường')
+  await expect(adminLink.first()).toBeAttached()
+  await h.see('Chế độ xem (quản trị)')
+  await expect(p.getByRole('radio', { name: /^Quản trị/ })).toHaveAttribute('aria-checked', 'true')
+  // the old floating pill and toggle are gone
+  await expect(p.locator('.viewbar')).toHaveCount(0); await expect(p.getByRole('button', { name: 'Chuyển sang bản người dùng thường' })).toHaveCount(0)
+
+  // a sample worker: signed in, no admin menu, the admin page refuses
+  await mode(/^Người tìm việc/)
+  await h.go('/app/tai-khoan'); await h.see('Minh Anh'); await expect(adminLink).toHaveCount(0)
   await h.go('/app/quan-tri'); await h.see('chỉ dành cho quản trị viên')
-  // remembered on this device across a reload
-  await p.reload(); await h.go('/app/tai-khoan'); await h.see('Đang xem như người dùng thường')
-  await p.getByRole('button', { name: 'Về quản trị' }).click()
-  await h.notSee('Đang xem như người dùng thường'); await h.see('Công cụ admin & kiểm thử')
-  await expect(p.locator('.rail a[href="/app/quan-tri"], .bnav a[href="/app/quan-tri"]').first()).toBeAttached()
+  // the way back is in Account even now
+  await h.go('/app/tai-khoan'); await h.see('Chế độ xem (quản trị)'); await expect(p.getByRole('radio', { name: /^Người tìm việc/ })).toHaveAttribute('aria-checked', 'true')
+
+  // a sample shop
+  await mode(/^Nhà tuyển dụng/)
+  await h.go('/app/tai-khoan'); await h.see('Phê Dùng Thử'); await expect(adminLink).toHaveCount(0)
+
+  // a new visitor: signed out, the first-visit questions come up again, and the switch is still there
+  await mode(/^Người dùng mới/)
+  await expect(p.getByRole('dialog').first()).toBeVisible({ timeout: 15_000 })
+  await p.getByRole('button', { name: 'Để sau' }).click(); await h.see('Hoàn tất'); await p.getByRole('button', { name: /Xem việc/ }).first().click()
+  await h.go('/app/tai-khoan'); await h.see('Chế độ xem (quản trị)'); await expect(p.getByRole('radio', { name: /^Người dùng mới/ })).toHaveAttribute('aria-checked', 'true')
+
+  // and back to admin
+  await mode(/^Quản trị/)
+  await h.go('/app/tai-khoan'); await h.see('Công cụ admin & kiểm thử')
+  await expect(adminLink.first()).toBeAttached(); await expect(p.getByRole('radio', { name: /^Quản trị/ })).toHaveAttribute('aria-checked', 'true')
+})
+
+test('only an admin can see the mode switch', async ({ page: p }) => {
+  const h = helpers(p)
+  await p.goto('/app'); await h.see('Phụ bếp ca tối')
+  await h.go('/app/tai-khoan'); await h.notSee('Chế độ xem (quản trị)') // a visitor
+  await h.asSeeker(); await h.go('/app/tai-khoan'); await h.notSee('Chế độ xem (quản trị)') // a worker
 })
