@@ -10,6 +10,8 @@ export interface Api {
   zaloLogin(creds: { access_token: string; phone_token: string }): Promise<ZaloLoginResult>
   zaloSignUp(ticket: string, input: Omit<SignUpInput, 'phone' | 'password'>): Promise<Profile>
   /** International users: Google sign-in (leaves the page; the session is there when it comes back) */
+  /** Google One Tap: exchange the card's credential for a session (nonce = the raw value whose hash was given to Google) */
+  signInWithGoogleIdToken(idToken: string, nonce: string): Promise<void>
   signInWithGoogle(): Promise<void>
   /** Signed in with Google but no profile yet → we still need role, name and phone */
   pendingProfile(): Promise<PendingProfile | null>

@@ -2,7 +2,7 @@ import { AppError, type Api, type Profile } from '../types'
 import { normalizePhone } from '../phone'
 import { CFG, nid, users, addUser, current, quizzes, setCurrent, wait, me, byDigits } from './core'
 
-export const authMock: Pick<Api, 'me' | 'signUp' | 'signIn' | 'signInWithGoogle' | 'pendingProfile' | 'completeProfile' | 'zaloLogin' | 'zaloSignUp' | 'signOut' | 'updateProfile' | 'addRole' | 'switchRole' | 'uploadAvatar' | 'appConfig' | 'saveQuiz' | 'myQuiz'> = {
+export const authMock: Pick<Api, 'me' | 'signUp' | 'signIn' | 'signInWithGoogle' | 'signInWithGoogleIdToken' | 'pendingProfile' | 'completeProfile' | 'zaloLogin' | 'zaloSignUp' | 'signOut' | 'updateProfile' | 'addRole' | 'switchRole' | 'uploadAvatar' | 'appConfig' | 'saveQuiz' | 'myQuiz'> = {
   async me() { return wait(current && users[current] ? users[current].profile : null) },
 
   async signUp(input) {
@@ -27,6 +27,8 @@ export const authMock: Pick<Api, 'me' | 'signUp' | 'signIn' | 'signInWithGoogle'
     setCurrent(u.profile.id)
     return wait(u.profile)
   },
+
+  async signInWithGoogleIdToken() { /* the One Tap card is not used in the mock build */ },
 
   async signInWithGoogle() {
     let g = { email: 'ann@example.com', name: 'Ann Lee' }

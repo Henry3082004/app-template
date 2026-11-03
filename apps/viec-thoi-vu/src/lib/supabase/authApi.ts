@@ -3,7 +3,7 @@ import type { QuizAnswers } from '../quiz'
 import { normalizePhone, passwordEmail, phoneEmail } from '../phone'
 import { sb, fail, rpc, uid, WORKER_KEYS, loadProfile, requireProfile, callFunction, sessionFromHash } from './core'
 
-export const authApi: Pick<Api, 'me' | 'signUp' | 'signIn' | 'signInWithGoogle' | 'pendingProfile' | 'completeProfile' | 'zaloLogin' | 'zaloSignUp' | 'signOut' | 'updateProfile' | 'addRole' | 'switchRole' | 'uploadAvatar' | 'appConfig' | 'saveQuiz' | 'myQuiz'> = {
+export const authApi: Pick<Api, 'me' | 'signUp' | 'signIn' | 'signInWithGoogle' | 'signInWithGoogleIdToken' | 'pendingProfile' | 'completeProfile' | 'zaloLogin' | 'zaloSignUp' | 'signOut' | 'updateProfile' | 'addRole' | 'switchRole' | 'uploadAvatar' | 'appConfig' | 'saveQuiz' | 'myQuiz'> = {
   async me() {
     const { data } = await sb.auth.getSession()
     if (!data.session) return null
@@ -28,6 +28,11 @@ export const authApi: Pick<Api, 'me' | 'signUp' | 'signIn' | 'signInWithGoogle' 
       fail(error)
     }
     return requireProfile(data.user.id)
+  },
+
+  async signInWithGoogleIdToken(idToken, nonce) {
+    const { error } = await sb.auth.signInWithIdToken({ provider: 'google', token: idToken, nonce })
+    if (error) fail(error)
   },
 
   async signInWithGoogle() {

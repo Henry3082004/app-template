@@ -6,6 +6,7 @@ import { CompleteProfileDialog } from './features/account/CompleteProfileDialog'
 import { InstallBanner } from './components/InstallBanner'
 import { QuickQuiz } from './components/QuickQuiz'
 import { TourHost } from './components/Tour'
+import { GoogleOneTap } from './features/account/GoogleOneTap'
 import { Shell } from './components/Shell'
 import { Skel } from './components/ui'
 import { WorkerIntroDialog } from './features/account/WorkerIntroDialog'
@@ -87,6 +88,7 @@ function AppRoutes() {
       <WorkerIntroDialog />
       <QuickQuiz />
       <TourHost />
+      <GoogleOneTap />
       <InstallBanner />
     </Suspense>
   )
