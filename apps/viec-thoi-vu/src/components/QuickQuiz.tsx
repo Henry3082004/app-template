@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import { capy } from '../lib/capy'
 import { tap } from '../lib/haptics'
+import { useAppConfig } from '../lib/config'
 import { useI18n, type TKey } from '../lib/i18n'
 import { questionsFor, QUESTIONS, readQuiz, writeQuiz, type Question, type QuizAnswers } from '../lib/quiz'
 import { useSession } from '../lib/session'
@@ -31,6 +32,7 @@ interface Run { base: QuizAnswers; draft: QuizAnswers; i: number; all: boolean; 
  */
 export function QuickQuiz() {
   const { t } = useI18n()
+  const cfg = useAppConfig()
   const nav = useNavigate()
   const { pathname } = useLocation()
   const { profile, ready, pending, authRequest, introRequest, quizRequest, closeQuiz } = useSession()
@@ -99,7 +101,18 @@ export function QuickQuiz() {
           <h2>{t('quizDoneTitle')}</h2>
           <div className="sub">{t(employer ? 'quizDoneEmployer' : 'quizDoneSeeker')}</div>
           {employer
-            ? <><Btn block onClick={post}>{t('quizPostJob')}</Btn><Btn v="text" block onClick={close}>{t('quizSeeJobs')}</Btn></>
+            ? (
+              <>
+                {cfg?.ai_assistant === 'on' && (
+                  <>
+                    <Btn block onClick={() => { close(); window.dispatchEvent(new CustomEvent('vtv-capy-open', { detail: { employer: true } })) }}><Ic n="sparkles" size={18} /> {t('quizAiPost')}</Btn>
+                    <div className="sub" style={{ fontSize: 13 }}>{t('quizAiHint')}</div>
+                  </>
+                )}
+                <Btn v={cfg?.ai_assistant === 'on' ? 'ghost' : 'primary'} block onClick={post}>{t(cfg?.ai_assistant === 'on' ? 'quizOwnPost' : 'quizPostJob')}</Btn>
+                <Btn v="text" block onClick={close}>{t('quizSeeJobs')}</Btn>
+              </>
+            )
             : <Btn block onClick={() => { close(); nav('/app') }}>{t('quizSeeFit')}</Btn>}
         </div>
       </Dialog>

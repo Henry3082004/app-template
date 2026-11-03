@@ -10,7 +10,7 @@ export const capyApi: Pick<Api, 'capyChat'> = {
       res = await fetch(`${URL}/functions/v1/capy-assistant`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: `Bearer ${data.session?.access_token ?? KEY}` },
-        body: JSON.stringify({ messages, device: ctx.device, city: ctx.city }),
+        body: JSON.stringify({ messages, device: ctx.device, city: ctx.city, role: ctx.role }),
       })
     } catch (e) {
       throw new AppError('NETWORK', String(e))

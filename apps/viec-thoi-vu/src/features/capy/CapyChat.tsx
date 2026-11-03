@@ -33,10 +33,17 @@ export function CapyChat() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<unknown>(null)
   const end = useRef<HTMLDivElement>(null)
-  const employer = profile?.role === 'employer'
+  const [guestShop, setGuestShop] = useState(false) // a visitor who said "I need staff": the helper drafts a post for them
+  const employer = profile?.role === 'employer' || (!profile && guestShop)
   const jobsQ = useQuery({ queryKey: ['openJobs'], queryFn: () => api.listOpenJobs(), enabled: open && !employer })
 
   useEffect(() => { end.current?.scrollIntoView({ block: 'end' }) }, [items, busy, open])
+  // "Ask Capi to write my post" from the first-visit questions
+  useEffect(() => {
+    const f = (e: Event) => { if ((e as CustomEvent).detail?.employer) { setGuestShop(true); setItems([]); setError(null) } setOpen(true) }
+    window.addEventListener('vtv-capy-open', f)
+    return () => window.removeEventListener('vtv-capy-open', f)
+  }, [])
   useEffect(() => { if (!profile) return; setItems([]); setError(null) }, [profile?.id, profile?.role]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (cfg?.ai_assistant !== 'on' || pathname.startsWith('/app/dang-tin') || pathname.startsWith('/app/quan-tri')) return null
@@ -48,7 +55,7 @@ export function CapyChat() {
     setItems(next); setText(''); setBusy(true); setError(null)
     try {
       const history: CapyMsg[] = next.slice(-8).map((i) => ({ role: i.role, text: i.text }))
-      const r = await api.capyChat(history, { device: readQuiz().device, city: profile?.city ?? undefined })
+      const r = await api.capyChat(history, { device: readQuiz().device, city: profile?.city ?? undefined, role: !profile && guestShop ? 'employer' : undefined })
       setItems((cur) => [...cur, { role: 'assistant', text: r.reply, search: r.search, draft: r.draft }])
     } catch (e) { setError(e) } finally { setBusy(false) }
   }

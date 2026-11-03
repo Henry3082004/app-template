@@ -368,4 +368,7 @@ export const en: Dict = {
   eSWITCH_FAILED: 'Could not switch the mode. Please try again.',
   postGuestNote: 'Just fill in the post first. You only create an account at the last step, when you tap Post.',
   postHaveAccount: 'Already have an account? Sign in',
+  quizAiPost: 'Let Capi write the post',
+  quizOwnPost: 'Post it myself',
+  quizAiHint: 'Tell Capi in plain words; it drafts the post for you to check and publish.',
 }

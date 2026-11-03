@@ -31,7 +31,7 @@ test('"Later" counts as done; a business skips the worker questions and is offer
   await p.evaluate(() => localStorage.removeItem('vtv-quiz')); await p.reload(); await h.see('Bạn đến đây để…')
   await p.getByRole('button', { name: 'Tuyển người cho quán' }).click()
   await h.see('Hoàn tất'); await h.see('Đăng tin chỉ mất 1 phút')
-  await p.getByRole('button', { name: 'Đăng tin tuyển' }).click(); await h.see('Cứ điền tin trước') // the post form first, no sign-in yet
+  await p.getByRole('button', { name: 'Tự đăng tin' }).click(); await h.see('Cứ điền tin trước') // the post form first, no sign-in yet
 })
 
 test('a question added later is asked on its own; the worker intro is pre-filled from the answers', async ({ page: p }) => {

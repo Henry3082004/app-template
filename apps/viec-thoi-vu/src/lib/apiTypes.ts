@@ -87,7 +87,7 @@ export interface Api {
   inviteWorker(jobId: string, workerId: string): Promise<void>
   mySentInvites(): Promise<SentInvite[]>
   /** chat with Capi (needs the AI helper switched on) */
-  capyChat(messages: CapyMsg[], ctx: { device: string; city?: string }): Promise<CapyReply>
+  capyChat(messages: CapyMsg[], ctx: { device: string; city?: string; role?: 'employer' }): Promise<CapyReply>
   /** "Việc đã lưu" of the signed-in person (newest first) */
   savedJobIds(): Promise<string[]>
   saveJobs(jobIds: string[]): Promise<void>

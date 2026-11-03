@@ -15,11 +15,11 @@ const CITY: [RegExp, string][] = [[/ha noi/, 'Hà Nội'], [/da nang/, 'Đà N�
 const CAT: [RegExp, CapySearch['category']][] = [[/phuc vu|quan an|nha hang|ca phe|pha che|bep|chen/, 'service'], [/\bkho\b|boc xep|soan hang/, 'warehouse'], [/su kien|le tan/, 'event'], [/nong|thu hoach|hai /, 'farm'], [/ban hang|cua hang|sieu thi/, 'retail']]
 
 export const capyMock: Pick<Api, 'capyChat'> = {
-  async capyChat(messages) {
+  async capyChat(messages, ctx) {
     const p = current ? users[current]?.profile : null // visitors may ask too
     const text = strip(messages[messages.length - 1]?.text ?? '')
     await new Promise((r) => setTimeout(r, 200))
-    if (p?.role === 'employer') {
+    if (p?.role === 'employer' || (!p && ctx.role === 'employer')) { // a visitor who said they are a shop gets a draft too
       const slots = Number(text.match(/(\d+)\s*(nguoi|ban|bac)/)?.[1] ?? 1)
       const unit: CapyDraft['pay_unit'] = has(text, /\/\s*ngay|moi ngay|mot ngay/) ? 'day' : 'hour'
       const role = has(text, /phu bep/) ? 'Phụ bếp' : has(text, /phuc vu/) ? 'Phục vụ' : has(text, /rua chen/) ? 'Rửa chén' : has(text, /pha che/) ? 'Pha chế' : 'Nhân viên thời vụ'

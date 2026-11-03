@@ -380,6 +380,9 @@ export const vi = {
   eSWITCH_FAILED: 'Không chuyển được chế độ. Vui lòng thử lại.',
   postGuestNote: 'Cứ điền tin trước. Bạn chỉ cần tạo tài khoản ở bước cuối, khi bấm Đăng tin.',
   postHaveAccount: 'Đã có tài khoản? Đăng nhập',
+  quizAiPost: 'Nhờ Capi soạn tin giúp',
+  quizOwnPost: 'Tự đăng tin',
+  quizAiHint: 'Kể bằng lời thường, Capi soạn bản nháp để bạn kiểm tra rồi đăng.',
 }
 
 export type Dict = typeof vi

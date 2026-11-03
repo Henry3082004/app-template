@@ -148,7 +148,8 @@ Deno.serve(async (req) => {
   const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
   let userId: string | null = null;
   try { const { data } = await admin.auth.getUser(token); userId = data.user?.id ?? null; } catch { /* a visitor: the anon key is not a user token */ }
-  let role: "seeker" | "employer" = "seeker", city = str(body.city, 40);
+  // a visitor who said they are a shop gets post drafts (nothing private is involved: a draft is only text); signed-in people keep their real role
+  let role: "seeker" | "employer" = !userId && body.role === "employer" ? "employer" : "seeker", city = str(body.city, 40);
   if (userId) {
     const { data: p } = await admin.from("profiles").select("role, city").eq("id", userId).maybeSingle();
     if (p?.role === "employer") role = "employer";
