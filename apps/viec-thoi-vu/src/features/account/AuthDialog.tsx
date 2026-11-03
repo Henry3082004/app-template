@@ -11,6 +11,8 @@ import { DEMO } from '../../lib/seed'
 import { useSession } from '../../lib/session'
 import type { Profile, Role } from '../../lib/types'
 import { RoleCards } from './RoleCards'
+import { ConsentCheck } from './ConsentCheck'
+import { TERMS_VERSION } from '../../lib/consent'
 import { Btn, Dialog, ErrorBox, Fld } from '../../components/ui'
 
 /** Sign-up / sign-in, opened only when an action needs an account (apply, post). */
@@ -21,6 +23,7 @@ export function AuthDialog() {
   const [mode, setMode] = useState<'signup' | 'login'>('signup')
   const [f, setF] = useState({ full_name: '', phone: '', password: '', business_name: '', address: '', city: 'TP.HCM' })
   const [busy, setBusy] = useState(false)
+  const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState<unknown>(null)
   // Inside Zalo the default is "continue with Zalo" (no typing, no password); the old form stays as a fallback.
   const [viaZalo, setViaZalo] = useState(IN_ZALO)
@@ -37,11 +40,12 @@ export function AuthDialog() {
   const role: Role = pick ?? authRequest.role
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value })
 
-  const run = async (fn: () => Promise<Profile>) => {
+  const run = async (fn: () => Promise<Profile>, consent = false) => {
     setBusy(true)
     setError(null)
     try {
       const p = await fn()
+      if (consent) await api.recordConsent('terms', TERMS_VERSION).catch(() => undefined) // proof of agreement; never blocks the sign-up
       setProfile(p)
       closeAuth()
       authRequest.onDone?.(p)
@@ -102,7 +106,7 @@ export function AuthDialog() {
       business_name: role === 'employer' ? f.business_name : undefined,
       address: role === 'employer' ? f.address : undefined,
       city: f.city,
-    }))
+    }), true)
   }
 
   const submit = (e: FormEvent) => {
@@ -114,7 +118,7 @@ export function AuthDialog() {
       business_name: role === 'employer' ? f.business_name : undefined,
       address: role === 'employer' ? f.address : undefined,
       city: f.city,
-    }))
+    }), true)
   }
 
   const d = DEMO[role === 'seeker' ? 'seeker' : 'employer']
@@ -179,6 +183,7 @@ export function AuthDialog() {
                 </div>
               </>
             )}
+            <ConsentCheck checked={agreed} onChange={setAgreed} />
             {error != null && <ErrorBox error={error} where="AuthDialog.zaloSignup" />}
             <Btn block type="submit" disabled={busy}>{busy ? '…' : emp ? t('saveAndPost') : role === 'seeker' ? t('applyNow') : t('continue')}</Btn>
           </form>
@@ -215,6 +220,7 @@ export function AuthDialog() {
         <Fld label={t('password')} htmlFor="a-pass" hint={mode === 'signup' ? t('passwordHint') : undefined}>
           <input id="a-pass" className="inp" type="password" value={f.password} onChange={set('password')} autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} required minLength={mode === 'signup' ? 8 : 1} />
         </Fld>
+        {mode === 'signup' && <ConsentCheck checked={agreed} onChange={setAgreed} />}
         {error != null && <ErrorBox error={error} where="AuthDialog" />}
         <Btn block type="submit" disabled={busy}>
           {busy ? '…' : employerSignup ? t('saveAndPost') : mode === 'login' ? t('login') : role === 'seeker' ? t('applyNow') : t('continue')}

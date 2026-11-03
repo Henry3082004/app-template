@@ -18,7 +18,7 @@ const OPERATOR_EN = `${COMPANY} (enterprise code ${TAX_ID}), registered office: 
 const docs: Record<'vi' | 'en', Record<Kind, Doc>> = {
   vi: {
     terms: {
-      title: 'Điều khoản sử dụng', updated: 'Cập nhật: 01/11/2026',
+      title: 'Điều khoản sử dụng', updated: 'Cập nhật: 03/11/2026',
       sections: [
         ['1. Dịch vụ và đơn vị vận hành', [`Capi là nền tảng kết nối người tìm việc thời vụ với nhà tuyển dụng, do ${OPERATOR_VI}`, 'Chúng tôi không phải bên tuyển dụng và không tham gia vào thỏa thuận lao động giữa hai bên.']],
         ['2. Tài khoản', ['Bạn phải từ đủ 16 tuổi trở lên để dùng Capi. Người dưới 16 tuổi không được tạo tài khoản.', 'Bạn đăng nhập bằng Zalo (trong Zalo Mini App), bằng Google hoặc bằng số điện thoại và mật khẩu (trên web). Số điện thoại gõ tay chưa được xác thực và hiển thị nhãn “chưa xác thực” cho đến khi được xác thực qua Zalo. Bạn chịu trách nhiệm giữ kín mật khẩu và tài khoản Zalo/Google của mình; thông tin bạn cung cấp phải đúng sự thật.', 'Mỗi tài khoản có thể dùng vai trò người tìm việc, nhà tuyển dụng hoặc cả hai, và chuyển qua lại trong mục Hồ sơ.']],
@@ -34,7 +34,7 @@ const docs: Record<'vi' | 'en', Record<Kind, Doc>> = {
       ],
     },
     privacy: {
-      title: 'Chính sách bảo mật', updated: 'Cập nhật: 01/11/2026',
+      title: 'Chính sách bảo mật', updated: 'Cập nhật: 03/11/2026',
       sections: [
         ['1. Đơn vị xử lý dữ liệu', [OPERATOR_VI, `Liên hệ về dữ liệu cá nhân: ${CONTACT}`]],
         ['2. Dữ liệu chúng tôi thu thập và để làm gì', [
@@ -64,7 +64,9 @@ const docs: Record<'vi' | 'en', Record<Kind, Doc>> = {
         ['5. Thời gian lưu trữ', ['Chúng tôi giữ dữ liệu trong thời gian tài khoản còn hoạt động. Khi bạn yêu cầu xóa, chúng tôi xử lý trong 7 ngày; một số dữ liệu có thể được giữ thêm khi pháp luật yêu cầu hoặc để giải quyết tranh chấp đang diễn ra.']],
         ['6. Quyền của bạn', [`Theo Nghị định 13/2023/NĐ-CP, bạn có quyền được biết, đồng ý hoặc rút lại đồng ý, truy cập, chỉnh sửa, yêu cầu xóa, hạn chế hoặc phản đối việc xử lý dữ liệu của mình, và khiếu nại. Bạn có thể sửa hồ sơ trong mục Hồ sơ, và gửi yêu cầu xóa tài khoản cùng toàn bộ dữ liệu ngay trong Hồ sơ → Xóa tài khoản. Các yêu cầu khác gửi email tới ${CONTACT} kèm tài khoản Zalo hoặc Google đã dùng; chúng tôi phản hồi trong 7 ngày.`]],
         ['7. Chia sẻ', ['Chúng tôi không bán dữ liệu của bạn và không dùng cho quảng cáo của bên thứ ba. Dữ liệu chỉ chia sẻ với nhà cung cấp hạ tầng nêu ở mục 4, với nhà tuyển dụng hoặc người tìm việc theo mục 3, hoặc khi cơ quan nhà nước có thẩm quyền yêu cầu theo pháp luật.', 'Hiện ứng dụng chưa thu tiền. Khi thanh toán được bật, dữ liệu thanh toán do cổng thanh toán (PayOS/SePay/Lemon Squeezy) xử lý; chúng tôi không lưu số thẻ.']],
-        ['8. Đồng ý và thay đổi chính sách', ['Khi bạn bấm đăng nhập bằng Zalo hoặc Google và đồng ý chia sẻ thông tin, bạn đồng ý để chúng tôi xử lý dữ liệu như trên. Nếu bạn từ chối chia sẻ số điện thoại, bạn vẫn xem được việc làm nhưng không tạo được tài khoản. Khi chính sách thay đổi, chúng tôi cập nhật ngày ở đầu trang này và thông báo trong ứng dụng nếu thay đổi quan trọng.']],
+        ['6a. Căn cứ pháp lý', ['Chúng tôi xử lý dữ liệu cá nhân theo Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15 (hiệu lực từ 01/01/2026) và Nghị định 13/2023/NĐ-CP. Căn cứ chính là sự đồng ý của bạn (ô "Tôi đã đọc và đồng ý" khi đăng ký) và việc cần thiết để thực hiện dịch vụ bạn yêu cầu (kết nối bạn với quán hoặc người làm).']],
+        ['6b. Dữ liệu nhạy cảm: vị trí', ['Vị trí điện thoại là dữ liệu cần thận trọng. Chúng tôi chỉ hỏi bạn một lần, bằng lời giải thích riêng, trước khi ghi vị trí lúc bạn bấm "Tôi đã đến". Bạn có thể từ chối mà vẫn chấm công được. Chúng tôi lưu thời điểm và phiên bản điều khoản bạn đã đồng ý để làm bằng chứng. Bạn rút lại đồng ý bất cứ lúc nào bằng cách tắt quyền vị trí trên điện thoại hoặc gửi email tới địa chỉ liên hệ.']],
+        ['8. Đồng ý và thay đổi chính sách', ['Khi đăng ký tài khoản, bạn phải tự tích ô đồng ý với Điều khoản và Chính sách này (không tích sẵn). Chúng tôi lưu thời điểm và phiên bản bạn đã đồng ý. Khi bạn bấm đăng nhập bằng Zalo hoặc Google và đồng ý chia sẻ thông tin, chúng tôi xử lý dữ liệu như trên. Nếu bạn từ chối chia sẻ số điện thoại, bạn vẫn xem được việc làm nhưng không tạo được tài khoản. Khi chính sách thay đổi, chúng tôi cập nhật ngày ở đầu trang và báo trong ứng dụng với thay đổi quan trọng; với thay đổi lớn, chúng tôi sẽ xin bạn đồng ý lại.']],
       ],
     },
     refund: {
@@ -79,7 +81,7 @@ const docs: Record<'vi' | 'en', Record<Kind, Doc>> = {
   },
   en: {
     terms: {
-      title: 'Terms of Service', updated: 'Updated: Nov 1, 2026',
+      title: 'Terms of Service', updated: 'Updated: Nov 3, 2026',
       sections: [
         ['1. The service and who runs it', [`Capi connects people looking for short-term work with employers. It is operated by ${OPERATOR_EN}`, 'We are not the employer and are not a party to any work agreement between users.']],
         ['2. Accounts', ['You must be at least 16 years old to use Capi. People under 16 may not create an account.', 'You sign in with Zalo (inside the Zalo Mini App), with Google, or with a phone number and password (on the web). A phone number you type is not verified and shows a “not verified” label until it is verified through Zalo. You are responsible for keeping your password and your Zalo/Google account safe, and the information you provide must be truthful.', 'An account can use the job seeker role, the employer role or both, and switch between them under Profile.']],
@@ -95,7 +97,7 @@ const docs: Record<'vi' | 'en', Record<Kind, Doc>> = {
       ],
     },
     privacy: {
-      title: 'Privacy Policy', updated: 'Updated: Nov 1, 2026',
+      title: 'Privacy Policy', updated: 'Updated: Nov 3, 2026',
       sections: [
         ['1. Who processes your data', [OPERATOR_EN, `Contact about personal data: ${CONTACT}`]],
         ['2. What we collect and why', [
@@ -125,7 +127,9 @@ const docs: Record<'vi' | 'en', Record<Kind, Doc>> = {
         ['5. How long we keep it', ['We keep your data while your account is active. When you ask us to delete it we act within 7 days; some data may be kept longer when the law requires it or to settle an ongoing dispute.']],
         ['6. Your rights', [`Under Vietnam’s Decree 13/2023/ND-CP you may be informed, consent or withdraw consent, access, correct, request deletion of, restrict or object to the processing of your data, and complain. Edit your profile under Profile, and send a request to delete your account and all data right there (Profile → Delete account). For anything else email ${CONTACT} with the Zalo or Google account you used; we reply within 7 days.`]],
         ['7. Sharing', ['We never sell your data and do not use it for third-party advertising. We share it only with the infrastructure providers in section 4, with the employer or job seeker as described in section 3, or when a competent authority requires it by law.', 'The app does not collect money yet. Once payments are turned on, payment data is processed by the payment provider (PayOS/SePay/Lemon Squeezy); we do not store card numbers.']],
-        ['8. Consent and changes', ['By signing in with Zalo or Google and agreeing to share your information you agree that we process data as described. If you decline to share your phone number you can still browse jobs but cannot create an account. When this policy changes we update the date at the top and tell you in the app for important changes.']],
+        ['6a. Legal basis', ['We process personal data under Vietnam’s Law on Personal Data Protection No. 91/2025/QH15 (in force from 1 Jan 2026) and Decree 13/2023/ND-CP. Our main basis is your consent (the “I have read and agree” box at sign-up) and what is needed to provide the service you ask for (connecting you with shops or workers).']],
+        ['6b. Sensitive data: location', ['Your phone’s location needs extra care. We ask once, with a separate explanation, before recording it when you tap “I’m here”. You can say no and still check in. We keep when you agreed and which version of the terms, as proof. You can withdraw consent at any time by turning off location permission on your phone or e-mailing the contact address.']],
+        ['8. Consent and changes', ['When you create an account you must tick the box agreeing to these Terms and this Policy yourself (it is never pre-ticked). We keep when you agreed and which version. By signing in with Zalo or Google and agreeing to share your information you agree that we process data as described. If you decline to share your phone number you can still browse jobs but cannot create an account. When this policy changes we update the date at the top and tell you in the app for important changes; for major changes we will ask for your consent again.']],
       ],
     },
     refund: {

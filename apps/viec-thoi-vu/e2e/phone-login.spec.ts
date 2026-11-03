@@ -11,7 +11,7 @@ test('production web: phone + password sign-up and sign-in sit next to Google, t
   await p.getByRole('button', { name: 'Tạo tài khoản bằng số điện thoại' }).click()
   await h.see('chưa xác thực'); await expect(p.locator('#a-pass')).toBeVisible(); await h.noHScroll()
   await p.locator('#a-name').fill('Lan Test'); await p.locator('#a-phone').fill('0912345678'); await p.locator('#a-pass').fill('matkhau-123')
-  await p.locator('form button[type=submit]').click(); await p.waitForTimeout(800)
+  await p.getByLabel(/Tôi đã đọc và đồng ý/).check(); await p.locator('form button[type=submit]').click(); await p.waitForTimeout(800)
   await later() // a new seeker is asked once for a photo and past work: skip it
   await h.go('/app/tai-khoan'); await h.see('Lan Test')
   await h.signOut()

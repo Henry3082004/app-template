@@ -8,6 +8,8 @@ import { useI18n } from '../../lib/i18n'
 import { useSession } from '../../lib/session'
 import type { Role } from '../../lib/types'
 import { RoleCards } from './RoleCards'
+import { ConsentCheck } from './ConsentCheck'
+import { TERMS_VERSION } from '../../lib/consent'
 import { Btn, Dialog, ErrorBox, Fld } from '../../components/ui'
 
 /** Shown right after a first Google sign-in: we still need the role, a name and a phone number. */
@@ -18,6 +20,7 @@ export function CompleteProfileDialog() {
   const [iso, setIso] = useState(() => guessCountry(locale).iso)
   const [f, setF] = useState({ full_name: '', phone: '', business_name: '', address: '', city: 'TP.HCM' })
   const [busy, setBusy] = useState(false)
+  const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState<unknown>(null)
 
   useEffect(() => {
@@ -41,6 +44,7 @@ export function CompleteProfileDialog() {
         business_name: emp ? f.business_name : undefined, address: emp ? f.address : undefined, city: f.city,
       })
       setProfile(p)
+      await api.recordConsent('terms', TERMS_VERSION).catch(() => undefined) // proof of agreement; never blocks the sign-up
       await refresh()
     } catch (err) {
       setError(err)
@@ -76,6 +80,7 @@ export function CompleteProfileDialog() {
             </div>
           </>
         )}
+        <ConsentCheck checked={agreed} onChange={setAgreed} />
         {error != null && <ErrorBox error={error} where="CompleteProfileDialog" />}
         <Btn block type="submit" disabled={busy}>{busy ? '…' : t('continue')}</Btn>
       </form>

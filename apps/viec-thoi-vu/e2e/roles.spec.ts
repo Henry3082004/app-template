@@ -11,7 +11,7 @@ test('first sign-in asks "You\'re here to…", pre-selected from the button pres
   await h.noHScroll()
   await employer.click(); await expect(employer).toHaveAttribute('aria-checked', 'true'); await h.see('Tên cơ sở')
   await p.locator('#c-phone').fill('0911333444'); await p.locator('#c-biz').fill('Tiệm Chè Mai'); await p.locator('#c-addr').fill('5 Hai Bà Trưng')
-  await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click(); await p.waitForTimeout(600)
+  await p.getByLabel(/Tôi đã đọc và đồng ý/).check(); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click(); await p.waitForTimeout(600)
   await h.notSee('Giúp quán biết về bạn') // businesses are not asked worker questions
   await h.go('/app/tai-khoan'); await h.see('Tiệm Chè Mai'); await h.section('Vai trò'); await h.see('Tạo thêm hồ sơ tìm việc')
 })

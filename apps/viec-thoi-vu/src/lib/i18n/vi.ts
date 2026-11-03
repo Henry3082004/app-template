@@ -337,6 +337,13 @@ export const vi = {
   feeAdminSave: 'Lưu',
   feeAdminSaved: 'Đã lưu',
   feeAdminHint: 'Giảm ưu đãi dần (100% → 50% → 0%) và báo các quán trước 30 ngày. Ứng dụng chưa thu tiền thật.',
+  consentAgree: 'Tôi đã đọc và đồng ý với',
+  consentAnd: 'và',
+  consentWhat: '. Capi dùng tên và số điện thoại của bạn để kết nối bạn với quán hoặc người làm.',
+  locTitle: 'Dùng vị trí để báo "Tôi đã đến"?',
+  locText: 'Capi có thể ghi lại vị trí điện thoại của bạn đúng lúc bấm "Tôi đã đến" để quán biết bạn đã tới nơi. Vị trí chỉ dùng cho việc này, không theo dõi bạn liên tục, và bạn có thể từ chối mà vẫn chấm công được.',
+  locYes: 'Đồng ý dùng vị trí',
+  locNo: 'Không, chỉ chấm công',
 }
 
 export type Dict = typeof vi

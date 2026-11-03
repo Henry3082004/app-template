@@ -895,6 +895,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      record_consent: { Args: { p_kind: string; p_version: string }; Returns: undefined }
+      my_consents: { Args: never; Returns: { kind: string; version: string; created_at: string }[] }
+      admin_consent_stats: { Args: { p_version: string }; Returns: Json }
       fee_plan: { Args: never; Returns: Json }
       my_fees: { Args: never; Returns: Json }
       admin_fees: { Args: never; Returns: Json }

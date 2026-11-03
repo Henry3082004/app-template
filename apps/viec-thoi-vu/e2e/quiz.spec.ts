@@ -45,7 +45,7 @@ test('a question added later is asked on its own; the worker intro is pre-filled
   await p.evaluate(() => sessionStorage.setItem('mock-google', JSON.stringify({ email: 'quiz@example.com', name: 'Quiz Test' })))
   await h.go('/app/da-ung-tuyen'); await p.getByRole('button', { name: 'Đăng nhập' }).first().click()
   await p.getByRole('button', { name: 'Tiếp tục với Google' }).click(); await h.see('Điền nốt để bắt đầu')
-  await p.locator('#c-phone').fill('0911222444'); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click()
+  await p.locator('#c-phone').fill('0911222444'); await p.getByLabel(/Tôi đã đọc và đồng ý/).check(); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click()
   await h.see('Giúp quán biết về bạn')
   await expect(p.getByRole('button', { name: 'Pha chế', exact: true })).toHaveAttribute('aria-pressed', 'true')
   await expect(p.getByRole('button', { name: 'Cuối tuần' })).toHaveAttribute('aria-pressed', 'true')

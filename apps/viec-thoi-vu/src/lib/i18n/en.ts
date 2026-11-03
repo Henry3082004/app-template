@@ -325,4 +325,11 @@ export const en: Dict = {
   feeAdminSave: 'Save',
   feeAdminSaved: 'Saved',
   feeAdminHint: 'Lower the offer step by step (100% → 50% → 0%) and tell shops 30 days ahead. No real money is charged.',
+  consentAgree: 'I have read and agree to the',
+  consentAnd: 'and',
+  consentWhat: '. Capi uses your name and phone number to connect you with shops or workers.',
+  locTitle: 'Use your location for "I\'m here"?',
+  locText: 'Capi can note where your phone is when you tap "I\'m here", so the shop knows you arrived. It is used only for this, never to follow you around, and you can say no and still check in.',
+  locYes: 'Allow location',
+  locNo: 'No, just check in',
 }

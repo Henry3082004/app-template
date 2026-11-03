@@ -5,10 +5,11 @@ import { Ic } from '../../components/Ic'
 import { ReportDialog } from '../collab/ReportDialog'
 import { ShiftTabs } from './ShiftTabs'
 import { JobGuide, ShiftAgreement } from './escrow'
-import { Btn, Empty, ErrorBox, Skel, Tag } from '../../components/ui'
+import { Btn, Dialog, Empty, ErrorBox, Skel, Tag } from '../../components/ui'
 import { api } from '../../lib/api'
 import { addDays, dateRange, money, vnClock, vnDate, vnToday } from '../../lib/format'
 import { getPosition } from '../../lib/position'
+import { locationAgreed, rememberLocationAgreed, TERMS_VERSION } from '../../lib/consent'
 import { shiftsOf, type Shift, type ShiftWhen } from '../../lib/earnings'
 import { useI18n, type TKey } from '../../lib/i18n'
 import { displayPhone, telHref } from '../../lib/phone'
@@ -24,7 +25,7 @@ function ShiftCard({ s, onChanged }: { s: Shift; onChanged(): void }) {
   const a = s.app
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<unknown>(null)
-  const [dlg, setDlg] = useState<null | 'chat' | 'report'>(null)
+  const [dlg, setDlg] = useState<null | 'chat' | 'report' | 'loc'>(null)
   const [shared, setShared] = useState(false)
   const run = async (fn: () => Promise<unknown>) => {
     setBusy(true); setErr(null)
@@ -33,7 +34,17 @@ function ShiftCard({ s, onChanged }: { s: Shift; onChanged(): void }) {
   // "I'm here" / "I'm done" (today only, until the shop confirms the shift); the phone's location is a bonus, never required
   const inToday = !!a.checked_in_at && vnDate(a.checked_in_at) === vnToday()
   const outToday = inToday && !!a.checked_out_at && a.checked_out_at >= a.checked_in_at!
-  const doIn = () => run(async () => { const pos = await getPosition(); await api.checkIn(a.id, pos?.lat, pos?.lng) })
+  // the location is sensitive data: ask once, in plain words, before the browser's own permission box; "no" still lets the person check in
+  const checkInWith = (withLocation: boolean) => run(async () => {
+    const pos = withLocation ? await getPosition() : null
+    await api.checkIn(a.id, pos?.lat, pos?.lng)
+  })
+  const doIn = () => { if (locationAgreed()) void checkInWith(true); else setDlg('loc') }
+  const answerLoc = (yes: boolean) => {
+    setDlg(null)
+    if (yes) { rememberLocationAgreed(); void api.recordConsent('location', TERMS_VERSION).catch(() => undefined) }
+    void checkInWith(yes)
+  }
   // a text for someone close: where, when, and "call me if I have not written" (the phone's own share sheet, else copied)
   const share = async () => {
     const text = t('shareShiftText', { title: job.title, shop: job.business_name ?? '', address: job.address, when: dateRange(job.start_date, job.end_date) + (job.shift_note ? ` · ${job.shift_note}` : '') })
@@ -114,6 +125,14 @@ function ShiftCard({ s, onChanged }: { s: Shift; onChanged(): void }) {
       </div>
       {shared && <div className="notice ok small">{t('shareCopied')}</div>}
       {s.when !== 'done' && <div className="muted small">{t('safetyTip')}</div>}
+      {dlg === 'loc' && (
+        <Dialog onClose={() => setDlg(null)} label={t('locTitle')}>
+          <h2>{t('locTitle')}</h2>
+          <div className="sub">{t('locText')}</div>
+          <Btn block onClick={() => answerLoc(true)}>{t('locYes')}</Btn>
+          <Btn v="ghost" block onClick={() => answerLoc(false)}>{t('locNo')}</Btn>
+        </Dialog>
+      )}
       {dlg === 'chat' && <ChatDialog applicationId={a.id} name={job.business_name ?? '—'} onClose={() => setDlg(null)} />}
       {dlg === 'report' && <ReportDialog target={job.employer_id} name={job.business_name ?? '—'} jobId={job.id} onClose={() => setDlg(null)} />}
       <div className="shiftfoot">

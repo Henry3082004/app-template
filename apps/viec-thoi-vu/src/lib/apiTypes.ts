@@ -122,6 +122,9 @@ export interface Api {
   adminReviewJob(jobId: string, ok: boolean, note?: string): Promise<void>
   /** admin: does the marketplace work? (answers within a day, shops coming back, finished shifts per week, no-shows, reply time) */
   adminKpis(): Promise<AdminKpis>
+  /** proof that a person agreed (to the terms at sign-up, or to sharing their location when checking in) */
+  recordConsent(kind: 'terms' | 'location', version: string): Promise<void>
+  adminConsentStats(version: string): Promise<{ users: number; terms_current: number; location: number }>
   /** service fee per finished shift and the voucher (anyone); the shop's own fees; admin: totals and changing the plan */
   feePlan(): Promise<FeePlan>
   myFees(): Promise<MyFees>

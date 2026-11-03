@@ -6,7 +6,7 @@ async function newGoogleSeeker(p: import('@playwright/test').Page, email: string
   await p.evaluate(([e, n]) => sessionStorage.setItem('mock-google', JSON.stringify({ email: e, name: n })), [email, name])
   await h.go('/app/da-ung-tuyen'); await p.getByRole('button', { name: 'Đăng nhập' }).first().click()
   await p.getByRole('button', { name: 'Tiếp tục với Google' }).click(); await h.see('Điền nốt để bắt đầu')
-  await p.locator('#c-phone').fill('0911222333'); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click()
+  await p.locator('#c-phone').fill('0911222333'); await p.getByLabel(/Tôi đã đọc và đồng ý/).check(); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click()
 }
 
 test('worker intro after first sign-in → business sees photo, age, past work and free time', async ({ page: p }) => {

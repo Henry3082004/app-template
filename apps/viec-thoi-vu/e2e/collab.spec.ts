@@ -25,7 +25,7 @@ test('notifications, arrival / finish, cash received and the CSV statement — o
   await h.asSeeker()
   await bell(p).click(); await h.see('đã nhận bạn')
   await h.go('/app/cham-cong'); await h.see('Ca chấm công')
-  await p.getByRole('button', { name: 'Tôi đã đến' }).click(); await h.see('Đã đến lúc')
+  await p.getByRole('button', { name: 'Tôi đã đến' }).click(); await p.getByRole('button', { name: 'Không, chỉ chấm công' }).click(); await h.see('Đã đến lúc')
   await p.getByRole('button', { name: 'Tôi đã làm xong' }).click(); await h.see('Làm xong lúc')
   await h.noHScroll()
   await h.signOut()

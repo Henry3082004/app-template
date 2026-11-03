@@ -12,7 +12,7 @@ test('Google login: first sign-in completes the profile with a country code, ret
   await expect(p.locator('#c-name')).toHaveValue('Ann Lee')
   const country = p.locator('select[aria-label="Quốc gia"]')
   await expect(country).toHaveValue('VN')
-  await p.locator('#c-phone').fill('12'); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click(); await h.see('Số điện thoại chưa đúng')
+  await p.locator('#c-phone').fill('12'); await p.getByLabel(/Tôi đã đọc và đồng ý/).check(); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click(); await h.see('Số điện thoại chưa đúng')
   await country.selectOption('US'); await p.locator('#c-phone').fill('415 555 0100'); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click()
   // a new worker is asked about themselves once (covered in worker-profile.spec)
   await h.see('Giúp quán biết về bạn'); await p.getByRole('button', { name: 'Để sau' }).click()
@@ -27,7 +27,7 @@ test('Google login: first sign-in completes the profile with a country code, ret
   await h.go('/app?tuyen=1'); await p.getByRole('button', { name: 'Tiếp tục với Google' }).click()
   await h.see('Điền nốt để bắt đầu'); await h.see('Tên cơ sở')
   await p.locator('#c-phone').fill('0911000222'); await p.locator('#c-biz').fill('Bob Cafe'); await p.locator('#c-addr').fill('1 Main St')
-  await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click(); await p.waitForTimeout(600)
+  await p.getByLabel(/Tôi đã đọc và đồng ý/).check(); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click(); await p.waitForTimeout(600)
   await h.go('/app/tai-khoan'); await h.see('Bob Cafe')
 })
 
