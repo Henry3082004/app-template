@@ -44,7 +44,8 @@ export function TourHost() {
   useEffect(() => {
     if (active || blocked || !here || tourSeen(role)) return
     const timer = window.setInterval(() => {
-      if (!document.querySelector('.scrim')) { window.clearInterval(timer); setActive(role) }
+      // .scrim = dialogs, .capyscrim = the Capi chat panel (it has its own class, so it must be listed too)
+      if (!document.querySelector('.scrim, .capyscrim')) { window.clearInterval(timer); setActive(role) }
     }, 700)
     return () => window.clearInterval(timer)
   }, [active, blocked, here, role, tick])
