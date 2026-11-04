@@ -39,7 +39,9 @@ export function TourHost() {
   }, [])
 
   // wait for the quick questions, sign-in and other dialogs to finish, then start once
-  const blocked = !ready || !!authRequest || !!pending || !!introRequest || !!quizRequest || questionsFor(answers).length > 0
+  // a visitor who said "I need staff" has no shop account yet, and the worker guide ("find a job") is not for them: they get the shop guide after signing up
+  const guestShop = !profile && answers.goal === 'employer'
+  const blocked = !ready || guestShop || !!authRequest || !!pending || !!introRequest || !!quizRequest || questionsFor(answers).length > 0
   const here = pathname.replace(/\/+$/, '') === tourHome(role)
   useEffect(() => {
     if (active || blocked || !here || tourSeen(role)) return
