@@ -8,6 +8,12 @@
 - Code: `apps/viec-thoi-vu`, repo Henry3082004/app-template, nhánh `main`, Vercel tự deploy. Supabase project `niscqjczfvipxxgdslqs`. Vercel project `prj_veoWYQPASeny4e3fQdX1EoTEiYto`.
 - Stack: Vite + React 18 + TypeScript + TanStack Query; Supabase (RLS, hàm SECURITY DEFINER, edge function Deno).
 
+## Môi trường của phiên mới (đọc trước khi làm)
+- Phiên mới có thể chỉ mở repo App-creator. Code Capi ở repo **Henry3082004/app-template**: dùng công cụ `add_repo` (owner Henry3082004, repo app-template, access push), clone, rồi `register_repo_root`. Làm trên nhánh `main` (Vercel tự deploy).
+- Công cụ kết nối của tài khoản (Supabase, Vercel, Google Sheets, Google Drive, GitHub) thường có sẵn. Việc đầu tiên: thử một lệnh nhỏ (ví dụ liệt kê dự án Supabase) để chắc chắn chúng chạy; nếu thiếu, báo Henry bật trong cài đặt kết nối, đừng tìm đường vòng.
+- Container mới là sạch: Postgres cục bộ, file tạm và script phụ trợ cũ KHÔNG còn. Chỉ chạy test cơ sở dữ liệu khi thật cần (phải cài lại Postgres 16); áp migration lên bản thật bằng công cụ Supabase. Cái gì chưa đẩy lên git là đã mất.
+- Khóa bí mật không nằm trong phiên: `GOOGLE_SA_JSON` ở Edge Function Secrets của Supabase, khóa đồng bộ ở vault. Không cần và không được đòi Henry gửi chúng.
+
 ## Cách làm việc
 - Trả lời Henry bằng tiếng Việt ngắn, dễ hiểu. Trước việc khó: nêu model, mức nỗ lực, thời gian, dung lượng phiên. Dùng Sonnet cho code thường, Opus chỉ cho kế hoạch và rà bảo mật, Haiku cho việc lặt vặt.
 - Test giao diện: `npm test` (tsc, eslint, kiểm tra CSS, Playwright). Chạy `pkill -f "vite preview"` trước khi chạy lại, nếu không sẽ phục vụ bản cũ.
