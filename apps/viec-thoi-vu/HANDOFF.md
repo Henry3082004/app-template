@@ -29,13 +29,14 @@
 - Khi một việc bị chặn (proxy từ chối, add_repo bị chặn): không tìm đường vòng.
 
 ## Việc đã xong gần đây
-Giới hạn chống lạm dụng; phí dịch vụ + voucher 100% (không thu tiền); đổi tên Capi; đồng ý dữ liệu (Luật 91/2025); hướng dẫn lần đầu; chế độ xem của admin (người dùng mới / quán / người làm / admin); đăng nhập muộn nhất có thể; Capi AI soạn tin giúp quán; Google One Tap; Cloudflare Turnstile cho đăng ký bằng số điện thoại; gỡ cờ `viewAsUser` cũ; **nguồn số liệu kế toán** (xem dưới).
+Giới hạn chống lạm dụng; phí dịch vụ + voucher 100% (không thu tiền); đổi tên Capi; đồng ý dữ liệu (Luật 91/2025); hướng dẫn lần đầu; chế độ xem của admin (người dùng mới / quán / người làm / admin); đăng nhập muộn nhất có thể; Capi AI soạn tin giúp quán; Google One Tap; Cloudflare Turnstile cho đăng ký bằng số điện thoại; gỡ cờ `viewAsUser` cũ; **nguồn số liệu kế toán** (xem dưới); 05/11/2026: sửa hướng dẫn lần đầu đè lên khung chat Capi (`Tour.tsx` chờ cả `.capyscrim`) và không hiện hướng dẫn người tìm việc cho khách đã trả lời "cần người" (commit `ac7542c` trên `main`; chưa xác nhận log deploy Vercel và chưa chạy Playwright).
 
 ## Kế toán tự động (mới)
 - File Google Sheets "Capi – Kế toán (US GAAP)", id `1DyaDd3CFvGQixEBZk4qzoDmPBC5vwbWifZxVnro4zXA`: tab Guide, Journal, Chart of Accounts, Income Statement, Balance Sheet, Cash Flow, Metrics. Ngôn ngữ vùng en_US (công thức chỉ ghi đúng với vùng này). Chỉ để theo dõi nội bộ, không thay sổ sách thuế.
 - Migration `20261117_accounting_feed.sql`: `acct_daily`, `acct_sync_key` (khóa trong vault), pg_cron `vtv-accounting-sync` chạy phút 20 mỗi giờ gọi edge function `accounting-sync` (verify_jwt tắt, tự kiểm khóa `x-sync-key`). Chỉ ghi số tổng, không dữ liệu cá nhân.
 - Ghi vào tab Metrics (mỗi ngày một dòng) và Journal (bút toán `AUTO-YYYY-MM-DD`: Nợ 1100 / Có 4000 khi có phí phải thu; hiện là 0 vì voucher 100%). Tiền nhận thật vẫn nhập tay.
-- **Chưa chạy:** hàm trả `NOT_CONFIGURED` vì thiếu secret `GOOGLE_SA_JSON`. Henry đang tự làm: bật Google Sheets API (dự án 33844770263), tạo tài khoản dịch vụ `capi-accounting`, chia sẻ file cho e-mail đó (Người chỉnh sửa), thêm secret `GOOGLE_SA_JSON` vào Supabase. Khi Henry báo "xong": gọi thử hàm qua `net.http_post` trong SQL với khóa lấy từ vault (không in khóa ra), kiểm tra `net._http_response`, rồi xem tab Metrics có số liệu và ô `Metrics!I2` có giờ đồng bộ. Việc ghi vào Sheets CHƯA từng được kiểm chứng.
+- **Đã chạy (04/11/2026):** sau khi bật Sheets API, gọi thử `accounting-sync` trả `ok:true, days:400`; tab Metrics có số liệu thật, `Metrics!I2` có giờ sync. Tab Journal chưa kiểm chứng vì chưa có phí phải thu. Trước đó từng lỗi `SHEETS_403` khi API chưa bật. Đoạn dưới là ghi chú lúc chưa nối:
+- ~~**Chưa chạy:**~~ hàm trả `NOT_CONFIGURED` vì thiếu secret `GOOGLE_SA_JSON`. Henry đang tự làm: bật Google Sheets API (dự án 33844770263), tạo tài khoản dịch vụ `capi-accounting`, chia sẻ file cho e-mail đó (Người chỉnh sửa), thêm secret `GOOGLE_SA_JSON` vào Supabase. Khi Henry báo "xong": gọi thử hàm qua `net.http_post` trong SQL với khóa lấy từ vault (không in khóa ra), kiểm tra `net._http_response`, rồi xem tab Metrics có số liệu và ô `Metrics!I2` có giờ đồng bộ. Việc ghi vào Sheets CHƯA từng được kiểm chứng.
 
 ## Việc đang chờ
 1. Hoàn tất nối Google (trên).
