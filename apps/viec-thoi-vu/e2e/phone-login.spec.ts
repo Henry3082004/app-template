@@ -13,6 +13,11 @@ for (const port of [PORTS.prodBefore, PORTS.prodAfter]) {
       await expect(qr).toBeVisible()
       await expect(link).toHaveAttribute('href', 'https://zalo.me/s/2847107362388346804/')
     } else { await expect(qr).toHaveCount(0); await expect(link).toHaveCount(0) }
+    if (info.project.name === 'tablet') {
+      await p.setViewportSize({ width: 1366, height: 900 })
+      await expect(qr).toHaveCount(0); await expect(link).toHaveCount(0)
+      await expect(p.getByRole('button', { name: 'Tiếp tục với Google' })).toBeVisible()
+    }
     await h.noHScroll()
     await p.screenshot({ path: `test-results/login-${port}-${info.project.name}.png` })
   })
