@@ -39,7 +39,7 @@ Giới hạn chống lạm dụng; phí dịch vụ + voucher 100% (không thu t
 - ~~**Chưa chạy:**~~ hàm trả `NOT_CONFIGURED` vì thiếu secret `GOOGLE_SA_JSON`. Henry đang tự làm: bật Google Sheets API (dự án 33844770263), tạo tài khoản dịch vụ `capi-accounting`, chia sẻ file cho e-mail đó (Người chỉnh sửa), thêm secret `GOOGLE_SA_JSON` vào Supabase. Khi Henry báo "xong": gọi thử hàm qua `net.http_post` trong SQL với khóa lấy từ vault (không in khóa ra), kiểm tra `net._http_response`, rồi xem tab Metrics có số liệu và ô `Metrics!I2` có giờ đồng bộ. Việc ghi vào Sheets CHƯA từng được kiểm chứng.
 
 ## Việc đang chờ
-1. Hoàn tất nối Google (trên).
+1. ~~Hoàn tất nối Google~~ — XONG 04/11/2026. Còn lại: kiểm chứng tab Journal khi có ca hoàn thành có phí; xem log deploy Vercel của commit `ac7542c`; chạy Playwright cho bản sửa hướng dẫn lần đầu.
 2. Tên miền capiviec.vn: kiểm tra Vercel đã nhận (`get_domain_config`), rồi chuyển hướng viec-thoi-vu.vercel.app sang capiviec.vn. Henry còn phải đặt Supabase Site URL `https://capiviec.vn` và Redirect `https://capiviec.vn/**`, thêm hostname vào Turnstile, thêm origin vào Google OAuth (đang làm).
 3. Deploy Zalo để đưa bản Capi mới lên (khi Henry bảo).
 4. Henry thử đăng ký bằng số điện thoại trên web thật để xác nhận Turnstile chạy.
