@@ -67,6 +67,8 @@
   đã ứng tuyển mới thấy).
 
 ### Nhà tuyển dụng — Đăng tin
+
+- Trong chat Capi, khi hỏi thêm để soạn tin, hiện các lựa chọn trả lời phù hợp để chạm gửi; vẫn cho nhập câu trả lời riêng. Capi không tự đăng tin.
 - Hiện đang làm bằng: đăng nhóm Facebook/Zalo, treo biển — vướng ở: chờ tin nhắn, hỏi từng người.
 - Luồng: `Mở app → Tin của tôi → nút "+ Đăng tin" ở đáy → form tự điền theo tin trước → Đăng → Xong`
   (**2 lần chạm** + phần sửa thông tin). Lần đầu: chọn "Tôi cần tuyển người" → đăng nhập → hồ sơ cơ sở.

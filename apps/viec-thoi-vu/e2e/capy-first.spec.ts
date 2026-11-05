@@ -2,6 +2,20 @@ import { expect, helpers, test } from './fixtures'
 
 test.use({ quizSeen: false })
 
+test('a recruiting visitor can answer Capi by tapping a suggested reply', async ({ page: p }) => {
+  await p.goto('/app')
+  await p.getByRole('button', { name: 'Tuyển người cho quán' }).click()
+  await p.getByRole('button', { name: /Nhờ Capi soạn tin giúp/ }).click()
+  const panel = p.getByRole('dialog', { name: 'Capi' })
+  await panel.getByPlaceholder('Nhập yêu cầu của bạn…').fill('Xin chào')
+  await panel.getByRole('button', { name: 'Gửi' }).click()
+  await expect(panel.getByRole('button', { name: 'Phụ bếp', exact: true })).toBeVisible()
+  await panel.getByRole('button', { name: 'Phụ bếp', exact: true }).click()
+  await expect(panel.locator('.cbub.me').last()).toHaveText('Phụ bếp')
+  await expect(panel.getByPlaceholder('Nhập yêu cầu của bạn…')).toBeEditable()
+  await expect(panel.getByRole('button', { name: 'Phụ bếp', exact: true })).toHaveCount(1)
+})
+
 test('first visit: a visitor who says they need staff is offered to let Capi write the post, and the draft opens in the form with no sign-in', async ({ page: p }) => {
   const h = helpers(p)
   await p.goto('/app'); await h.see('Bạn đến đây để…')

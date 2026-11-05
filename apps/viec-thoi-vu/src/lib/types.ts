@@ -195,7 +195,7 @@ export interface CapyDraft {
   title: string; description: string; category: Category; pay_amount: number | null; pay_unit: PayUnit; slots: number
   start_date: string; end_date: string; shift_note: string; address: string; city: string; is_urgent: boolean
 }
-export interface CapyReply { role: Role; reply: string; search?: CapySearch; draft?: CapyDraft }
+export interface CapyReply { role: Role; reply: string; options?: string[]; search?: CapySearch; draft?: CapyDraft }
 /** Numbers and news for the home banner: counts only, plus links an admin chose. */
 export interface Highlights {
   open_jobs: number; new_jobs_7d: number; urgent_jobs: number; ready_workers: number

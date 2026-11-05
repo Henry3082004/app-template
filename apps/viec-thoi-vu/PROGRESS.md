@@ -208,3 +208,8 @@ Làm theo danh sách "việc 7–28" trong tài liệu chiến lược marketing
 
 ## 02/11/2026 — Đầu việc trong ca
 Quán liệt kê các đầu việc của ca khi đăng tin ("Gọt hàng", "Bưng bê", "Lọc cá"…): bấm chip gợi ý theo loại việc hoặc tự gõ, tối đa 12 việc, mỗi việc 60 ký tự, trùng và rỗng bị bỏ. Người tìm việc thấy ở trang chi tiết tin và trên thẻ ca. Cột `jobs.tasks` (migration `20261112_job_tasks.sql`, áp thành `job_tasks`), trigger chuẩn hóa; lọc cụm đáng ngờ ("đặt cọc"…) đọc cả đầu việc. Test: `supabase/tests/230_job_tasks.sql`, e2e `hiring-tools`. Đăng lại tin cũ giữ nguyên đầu việc.
+# 05/11/2026 — Lựa chọn trả lời trong chat Capi (chưa triển khai)
+
+- Đã sửa giao diện người tuyển và hàm `capy-assistant` để đề xuất câu trả lời có thể bấm; vẫn cho nhập tự do. Cần deploy cả web và Edge Function để dùng đầy đủ.
+- TypeScript, ESLint và kiểm tra CSS đã chạy; Playwright chưa chạy được vì Vite bị từ chối đọc thư mục cha trong môi trường Windows. Cần chạy lại `npm test` và kiểm tra trên điện thoại trước khi triển khai.
+

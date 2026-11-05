@@ -17,7 +17,17 @@ import { SaveButton } from '../jobs/SaveButton'
 import { CapyBot } from './CapyBot'
 import { CapyFigure } from './CapyFigure'
 
-type Item = { role: 'user' | 'assistant'; text: string; search?: CapySearch; draft?: CapyDraft }
+type Item = { role: 'user' | 'assistant'; text: string; options?: string[]; search?: CapySearch; draft?: CapyDraft }
+
+// Support older assistant deployments that do not yet return options.
+function questionOptions(reply: string): string[] {
+  const q = reply.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').toLowerCase()
+  if (/cong viec|lam viec gi|vi tri/.test(q)) return ['Phục vụ', 'Phụ bếp', 'Rửa chén', 'Bán hàng']
+  if (/luong|thu nhap|tien cong/.test(q)) return ['25.000đ/giờ', '30.000đ/giờ', '35.000đ/giờ', 'Thỏa thuận']
+  if (/may nguoi|so nguoi|bao nhieu nguoi/.test(q)) return ['1 người', '2 người', '3 người', '5 người']
+  if (/ngay nao|khi nao|thoi gian|ca lam/.test(q)) return ['Hôm nay', 'Ngày mai', 'Cuối tuần này']
+  return []
+}
 
 /** Capi, the AI helper: a chat bubble in the corner. Job seekers say what they look for and get matching jobs from the real list;
  *  shops say what they need and get a draft post to check and publish. Capi never posts or applies by itself. */
@@ -54,9 +64,10 @@ export function CapyChat() {
     const next: Item[] = [...items, { role: 'user', text: msg }]
     setItems(next); setText(''); setBusy(true); setError(null)
     try {
-      const history: CapyMsg[] = next.slice(-8).map((i) => ({ role: i.role, text: i.text }))
+      const history: CapyMsg[] = next.slice(-20).map((i) => ({ role: i.role, text: i.text }))
       const r = await api.capyChat(history, { device: readQuiz().device, city: profile?.city ?? undefined, role: !profile && guestShop ? 'employer' : undefined })
-      setItems((cur) => [...cur, { role: 'assistant', text: r.reply, search: r.search, draft: r.draft }])
+      const options = r.options?.filter((v): v is string => typeof v === 'string' && !!v.trim()).slice(0, 4)
+      setItems((cur) => [...cur, { role: 'assistant', text: r.reply, options: employer && !r.draft ? (options?.length ? options : questionOptions(r.reply)) : undefined, search: r.search, draft: r.draft }])
     } catch (e) { setError(e) } finally { setBusy(false) }
   }
 
@@ -84,6 +95,7 @@ export function CapyChat() {
               {items.map((i, n) => (
                 <div key={n} className={'cbub ' + (i.role === 'user' ? 'me' : 'bot')}>
                   {i.text}
+                  {employer && n === items.length - 1 && !busy && i.role === 'assistant' && !!i.options?.length && <div className="capysugs" aria-label="Lựa chọn trả lời">{i.options.map((option) => <button key={option} type="button" className="chip" onClick={() => void send(option)}>{option}</button>)}</div>}
                   {i.search && <SearchResult search={i.search} jobs={jobsQ.data} loading={jobsQ.isLoading} onOpen={(id) => { setOpen(false); nav(`/app/viec/${id}`) }} onAll={() => seeAll(i.search!)} />}
                   {i.draft && <DraftCard draft={i.draft} onOpen={() => openDraft(i.draft!, i.text)} locale={locale} />}
                 </div>

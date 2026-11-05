@@ -42,6 +42,7 @@ function systemFor(role: "seeker" | "employer", city: string, today: { iso: stri
   const where = city ? ` Thành phố của người dùng: ${city} (dùng khi họ không nói rõ thành phố).` : "";
   if (role === "employer") {
     return `${RULES_COMMON}\n${when}${where}\nNgười dùng là CHỦ QUÁN. Từ lời kể của họ hãy soạn bản nháp tin tuyển dụng, đặt trong trường draft của JSON trả về: tiêu đề ngắn rõ ràng, mô tả 2-4 câu nêu việc phải làm, số người (slots), ngày bắt đầu/kết thúc (YYYY-MM-DD), giờ làm (shift_note), nhóm việc, mức lương nếu họ nói (pay_amount là số đồng VND, pay_unit hour/day/shift/job; "200k" = 200000).
+Khi cần hỏi thêm, chỉ hỏi một thông tin mỗi lần và đưa 2-4 câu trả lời ngắn phù hợp vào options để người dùng bấm gửi. Không đưa địa chỉ cụ thể khi chưa biết, không tự bịa thông tin. Nếu không cần hỏi thì để options rỗng.
 Không biết lương thì để pay_amount = null và nói trong reply rằng bạn chưa điền lương để họ nhập. Không biết ngày thì để ngày bắt đầu là ngày mai, kết thúc cùng ngày hoặc theo ca họ nói.
 QUAN TRỌNG: luật lao động và điều khoản ứng dụng cấm phân biệt đối xử. KHÔNG đưa vào bản nháp yêu cầu về giới tính, tuổi, ngoại hình, tôn giáo, dân tộc, tình trạng hôn nhân. Giữ lại các yêu cầu về kỹ năng, thái độ (ví dụ nhanh nhẹn, chăm chỉ, đúng giờ). Nếu người dùng nêu yêu cầu bị cấm, hãy nói rõ ràng nhưng nhẹ nhàng trong reply rằng bạn đã bỏ phần đó.`;
   }
@@ -58,6 +59,7 @@ function schemaFor(role: "seeker" | "employer") {
       type: "OBJECT", required: ["reply"],
       properties: {
         reply,
+        options: { type: "ARRAY", items: { type: "STRING" }, description: "2-4 câu trả lời ngắn phù hợp với câu hỏi, hoặc rỗng" },
         draft: {
           type: "OBJECT", nullable: true,
           required: ["title", "description", "category", "pay_amount", "pay_unit", "slots", "start_date", "end_date", "shift_note", "address", "city", "is_urgent"],
@@ -137,7 +139,7 @@ Deno.serve(async (req) => {
 
   let body: Record<string, unknown>;
   try { body = await req.json(); } catch { return json({ error: "BAD_REQUEST" }, 400); }
-  const raw = Array.isArray(body.messages) ? body.messages.slice(-8) : [];
+  const raw = Array.isArray(body.messages) ? body.messages.slice(-20) : [];
   const messages = raw
     .map((m: Record<string, unknown>) => ({ role: m?.role === "assistant" ? "model" : "user", content: str(m?.text, 600) }))
     .filter((m) => m.content);
@@ -207,7 +209,8 @@ Deno.serve(async (req) => {
   } catch { /* handled below */ }
   if (!input) return json({ error: "AI_FAILED" }, 502);
   const reply = str(input.reply, 500) || "Mình chưa hiểu ý bạn, bạn nói rõ hơn giúp mình nhé.";
+  const options = role === "employer" && Array.isArray(input.options) ? [...new Set(input.options.map((v: unknown) => str(v, 80)).filter(Boolean))].slice(0, 4) : [];
   if (role === "employer" && input.draft && typeof input.draft === "object") return json({ role, reply, draft: cleanDraft(input.draft as Record<string, unknown>, today.iso) });
   if (role === "seeker" && input.search && typeof input.search === "object") return json({ role, reply, search: cleanSearch(input.search as Record<string, unknown>) });
-  return json({ role, reply });
+  return json({ role, reply, ...(role === "employer" ? { options } : {}) });
 });
