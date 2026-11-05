@@ -1,11 +1,14 @@
 import { type Api, type BankAccount, type Reputation } from '../types'
 import { sb, fail, rpc, num, uid } from './core'
 
-export const payApi: Pick<Api, 'quote' | 'fund' | 'completeShift' | 'respondNoshow' | 'openDispute' | 'submitReview' | 'reputations' | 'receivedReviews' | 'myBank' | 'saveBank' | 'pendingReviews' | 'sweep'> = {
+export const payApi: Pick<Api, 'quote' | 'chooseDirectPay' | 'fund' | 'completeShift' | 'respondNoshow' | 'openDispute' | 'submitReview' | 'reputations' | 'receivedReviews' | 'myBank' | 'saveBank' | 'pendingReviews' | 'sweep'> = {
   async quote(applicationId, hours) {
     return (await rpc('quote_application', { p_application: applicationId, p_hours: hours ?? null })) as { amount: number; fee: number; net: number }
   },
 
+  async chooseDirectPay(applicationId) {
+    await rpc('choose_direct_pay', { p_application: applicationId })
+  },
   async fund(applicationId, hours) {
     await rpc('fund_application', { p_application: applicationId, p_hours: hours ?? null })
   },

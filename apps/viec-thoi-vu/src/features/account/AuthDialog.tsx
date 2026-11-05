@@ -1,4 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { ZaloEntry } from './ZaloEntry'
+import { useBp } from '../../lib/useBp'
 import { IN_ZALO } from '../../lib/zalo'
 import { getZaloCredentials, type ZaloCredentials } from '../../lib/zaloAuth'
 import { ALLOW_PASSWORD, api, IS_DEMO } from '../../lib/api'
@@ -20,6 +22,7 @@ import { Btn, Dialog, ErrorBox, Fld } from '../../components/ui'
 export function AuthDialog() {
   const { authRequest, closeAuth, setProfile, refresh } = useSession()
   const cfg = useAppConfig()
+  const bp = useBp()
   const { t, locale } = useI18n()
   const [mode, setMode] = useState<'signup' | 'login'>('signup')
   const [f, setF] = useState({ full_name: '', phone: '', password: '', business_name: '', address: '', city: 'TP.HCM' })
@@ -127,32 +130,15 @@ export function AuthDialog() {
   }
 
   const d = DEMO[role === 'seeker' ? 'seeker' : 'employer']
-  if (!IN_ZALO && !ALLOW_PASSWORD && !viaPhone) {
+  if (!IN_ZALO && !ALLOW_PASSWORD) {
     return (
       <Dialog onClose={closeAuth} label={t('loginTitle')}>
         <img className="wavecorner" src={capy('wave')} alt="" />
         <h2>{t('loginTitle')}</h2>
-        {cfg?.zalo_published === 'on' ? (
-          <div className="card stack" style={{ boxShadow: 'none' }}>
-            <b>{t('zaloOpenTitle')}</b>
-            <div className="sub" style={{ fontSize: 14 }}>{t('zaloOpenText')}</div>
-            <a className="btn btn-primary block" href="https://zalo.me/s/2847107362388346804/" target="_blank" rel="noreferrer">{t('zaloOpenBtn')}</a>
-          </div>
-        ) : (
-          <div className="notice info"><b>{t('zaloSoonTitle')}</b><br />{t('zaloSoonText')}</div>
-        )}
-        {googleBtn && (
-          <div className="card stack" style={{ boxShadow: 'none' }}>
-            <b>{t(cfg?.zalo_published === 'on' ? 'intlTitle' : 'googleOnlyTitle')}</b>
-            <div className="sub" style={{ fontSize: 14 }}>{t(cfg?.zalo_published === 'on' ? 'intlText' : 'googleOnlyText')}</div>
-            {googleBtn}
-          </div>
-        )}
+        {bp === 'm' && <ZaloEntry />}
         <div className="card stack" style={{ boxShadow: 'none' }}>
-          <b>{t('authPhoneTitle')}</b>
-          <div className="sub" style={{ fontSize: 14 }}>{t('authPhoneText')}</div>
-          <Btn block onClick={() => { setMode('signup'); setViaPhone(true); setError(null) }}>{t('authPhoneSignup')}</Btn>
-          <Btn v="ghost" block onClick={() => { setMode('login'); setViaPhone(true); setError(null) }}>{t('authPhoneLogin')}</Btn>
+          <b>{locale === 'vi' ? 'Đăng nhập bằng email' : 'Sign in with email'}</b>
+          {googleBtn || <div className="notice info">{locale === 'vi' ? 'Đăng nhập email tạm chưa khả dụng. Vui lòng thử lại sau.' : 'Email sign-in is temporarily unavailable. Please try later.'}</div>}
         </div>
         {error != null && <ErrorBox error={error} where="AuthDialog.web" />}
       </Dialog>

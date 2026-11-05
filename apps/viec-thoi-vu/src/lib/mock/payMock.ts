@@ -3,7 +3,7 @@ import { today } from '../format'
 import { REP_MIN, CFG, SEEKER_TAGS, EMPLOYER_TAGS, now, nid, notify, apps, reviews, banks, current, wait, me, jobOf, revealed, quoteOf, release, freeSlot, sweepFor, myApp } from './core'
 import type { App, Rev } from './core'
 
-export const payMock: Pick<Api, 'quote' | 'fund' | 'completeShift' | 'respondNoshow' | 'openDispute' | 'submitReview' | 'reputations' | 'receivedReviews' | 'myBank' | 'saveBank' | 'pendingReviews' | 'sweep'> = {
+export const payMock: Pick<Api, 'quote' | 'chooseDirectPay' | 'fund' | 'completeShift' | 'respondNoshow' | 'openDispute' | 'submitReview' | 'reputations' | 'receivedReviews' | 'myBank' | 'saveBank' | 'pendingReviews' | 'sweep'> = {
   async quote(id, hours) {
     const p = me()
     const a = apps.find((x) => x.id === id)
@@ -11,11 +11,18 @@ export const payMock: Pick<Api, 'quote' | 'fund' | 'completeShift' | 'respondNos
     if (p.id !== a.seeker_id && p.id !== jobOf(a).employer_id) throw new AppError('FORBIDDEN')
     return wait(quoteOf(a, hours))
   },
+  async chooseDirectPay(id) {
+    const a = myApp(id, 'employer')
+    if (a.status !== 'accepted') throw new AppError('NOT_ACCEPTED')
+    if (a.pay_status !== 'none') throw new AppError('ALREADY_FUNDED')
+    Object.assign(a, { funding_mode: 'off', platform_fee: 0 })
+    return wait(undefined)
+  },
   async fund(id, hours) {
     if (CFG.payment_mode !== 'test') throw new AppError('PAYMENT_NOT_AVAILABLE')
     const a = myApp(id, 'employer')
     if (a.status !== 'accepted') throw new AppError('NOT_ACCEPTED')
-    if (a.pay_status !== 'none') throw new AppError('ALREADY_FUNDED')
+    if (a.pay_status !== 'none' || a.funding_mode === 'off') throw new AppError('ALREADY_FUNDED')
     if (jobOf(a).end_date < today()) throw new AppError('JOB_ENDED')
     const q = quoteOf(a, hours)
     Object.assign(a, { pay_status: 'held', escrow_amount: q.amount, platform_fee: q.fee, funding_mode: 'test' })
@@ -26,7 +33,7 @@ export const payMock: Pick<Api, 'quote' | 'fund' | 'completeShift' | 'respondNos
     if (!['ok', 'late', 'noshow'].includes(attendance)) throw new AppError('BAD_ATTENDANCE')
     if (a.status !== 'accepted') throw new AppError('NOT_ACCEPTED')
     if (a.pay_status === 'none') {
-      if (CFG.payment_mode !== 'off') throw new AppError('NOT_FUNDED')
+      if (CFG.payment_mode !== 'off' && a.funding_mode !== 'off') throw new AppError('NOT_FUNDED')
       Object.assign(a, { escrow_amount: quoteOf(a).amount, platform_fee: 0, funding_mode: 'off' })
     } else if (a.pay_status !== 'held') throw new AppError('ALREADY_SETTLED')
     if (today() < jobOf(a).start_date) throw new AppError('TOO_EARLY')

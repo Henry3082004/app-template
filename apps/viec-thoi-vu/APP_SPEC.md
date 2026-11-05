@@ -175,3 +175,9 @@ Tuyển người (`/app/tin-cua-toi`, `/app/ung-vien`) · Ca làm (`/app/ca-lam`
 
 ### Hợp tác hai bên (28/10/2026)
 Thông báo `/app/thong-bao` · chấm công đến/xong (`check_in`, `check_out`) · `ack_cash_received` · nhắn tin (`send_message`, chỉ ca đã nhận, tối đa 30 tin/giờ/ca) · `report_user` (5/ngày) · `request_account_deletion` · `invite_worker` (20/ngày, chỉ người đã làm xong ca cho quán). Mọi bảng mới đóng, chỉ truy cập qua hàm.
+
+
+## Cập nhật sale 05/11/2026
+- Web thật: không đăng ký/đăng nhập số điện thoại và mật khẩu. Điện thoại hiển thị QR nội bộ dẫn Mini App Capi và nút mở Zalo; máy tính/bảng chỉ Google (email). Trong Mini App vẫn lấy xác thực từ SDK Zalo cho cả hai vai trò. Quét mã mở Mini App, không tạo phiên đăng nhập trên web.
+- Khi nhận ứng viên, cho chọn trả trực tiếp sau ca thay vì nạp trước. Ghi lựa chọn trên từng ca bằng funding_mode=off, không tạo giao dịch Capi; giữ xác nhận hoàn thành, đã trả/đã nhận tiền. Không bật thu tiền thật.
+- Ảnh: giữ nén JPEG 320px và lưu trực tiếp Storage; đánh giá hạn mức thực tế trước khi cam kết lượng người dùng.

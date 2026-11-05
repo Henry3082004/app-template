@@ -208,3 +208,10 @@ Làm theo danh sách "việc 7–28" trong tài liệu chiến lược marketing
 
 ## 02/11/2026 — Đầu việc trong ca
 Quán liệt kê các đầu việc của ca khi đăng tin ("Gọt hàng", "Bưng bê", "Lọc cá"…): bấm chip gợi ý theo loại việc hoặc tự gõ, tối đa 12 việc, mỗi việc 60 ký tự, trùng và rỗng bị bỏ. Người tìm việc thấy ở trang chi tiết tin và trên thẻ ca. Cột `jobs.tasks` (migration `20261112_job_tasks.sql`, áp thành `job_tasks`), trigger chuẩn hóa; lọc cụm đáng ngờ ("đặt cọc"…) đọc cả đầu việc. Test: `supabase/tests/230_job_tasks.sql`, e2e `hiring-tools`. Đăng lại tin cũ giữ nguyên đầu việc.
+
+
+## 05/11/2026 — Chuẩn bị sale (đang kiểm tra)
+- Ảnh hồ sơ: JPEG 320px, Storage thật chặn >300000 byte; hiện 2 ảnh/31054 byte. Không sửa luồng ảnh. Chưa load test, chưa xác nhận quota gói và số upload đồng thời.
+- Web thật: bỏ form phone/password, điện thoại QR nội bộ mở Mini App và link mở Zalo; tablet/desktop chỉ Google/email. Cả hai vai trò dùng chung AuthDialog.
+- Trả trực tiếp sau ca: thêm RPC có khóa hàng/kiểm chủ ca, không tạo payout; funding_mode=off tái sử dụng xác nhận đã trả/đã nhận. Giữ payment_mode=off.
+- PostgreSQL cục bộ: escrow regression + 280_direct_pay PASS (khách/ứng viên bị từ chối, ca pending bị từ chối, chọn lặp an toàn, không chuyển sang nạp sau khi chọn trực tiếp, hoàn thành không payout).

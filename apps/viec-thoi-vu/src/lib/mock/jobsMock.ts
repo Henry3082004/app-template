@@ -60,7 +60,7 @@ export const jobsMock: Pick<Api, 'savedJobIds' | 'saveJobs' | 'unsaveJob' | 'job
     const p = me()
     return wait(apps.filter((a) => a.seeker_id === p.id).reverse().map((a) => {
       const job = jobs.find((j) => j.id === a.job_id)!
-      const funded = CFG.payment_mode === 'off' || ['held', 'released', 'noshow_reported', 'disputed'].includes(a.pay_status)
+      const funded = a.funding_mode === 'off' || CFG.payment_mode === 'off' || ['held', 'released', 'noshow_reported', 'disputed'].includes(a.pay_status)
       return { id: a.id, status: a.status, message: a.message, created_at: a.created_at, job, ...escrowOf(a, p.id), payout: payouts.find((x) => x.application_id === a.id) ? { status: payouts.find((x) => x.application_id === a.id)!.status, reference: payouts.find((x) => x.application_id === a.id)!.reference } : null, employer_phone: a.status === 'accepted' && funded ? users[job.employer_id]?.profile.phone ?? null : null }
     }))
   },

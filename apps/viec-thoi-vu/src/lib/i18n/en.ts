@@ -1,6 +1,7 @@
 import type { Dict } from './vi'
 
 export const en: Dict = {
+  directPayInfo: 'Pay the worker directly after the shift. No advance deposit through Capi.',
   appName: 'Capi',
   navJobs: 'Jobs', navApplied: 'Applied', navAccount: 'Profile', 
   iNeedStaff: 'I need staff', searchPh: 'Search jobs, places, areas…',

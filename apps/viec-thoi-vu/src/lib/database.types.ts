@@ -1268,6 +1268,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      choose_direct_pay: {
+        Args: { p_application: string }
+        Returns: undefined
+      }
       fund_application: {
         Args: { p_application: string; p_hours?: number }
         Returns: {

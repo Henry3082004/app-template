@@ -1,3 +1,4 @@
+import { DirectPay } from '../shifts/escrow/DirectPay'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ContactButtons } from '../../components/ContactButtons'
@@ -134,10 +135,12 @@ export function AcceptedDialog({ accepted, onClose, onFunded }: { accepted: Acce
           <div className="row" style={{ gap: 10, width: '100%' }}><ContactButtons phone={accepted.phone} block /></div>
         </>
       )}
+      {!accepted.fund && <div className="notice info">{t('directPayInfo')}</div>}
       {accepted.fund && (
         <>
           <div className="notice warn" style={{ width: '100%', textAlign: 'left' }}>{t('fundWaitingEmp')}</div>
           <Btn block onClick={() => setPaying(true)}>{t('fundCta')}</Btn>
+          <DirectPay id={accepted.fund.app.id} onDone={() => { onFunded?.(); onClose() }} />
         </>
       )}
       <Btn v="text" onClick={onClose}>{t('done')}</Btn>

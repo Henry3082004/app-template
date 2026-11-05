@@ -39,6 +39,7 @@ export interface Api {
   /** payment_mode: off = free (no deposit step) · test = deposit simulated · live = real money (not built yet) */
   appConfig(): Promise<AppConfig>
   quote(applicationId: string, hours?: number): Promise<Quote>
+  chooseDirectPay(applicationId: string): Promise<void>
   fund(applicationId: string, hours?: number): Promise<void>
   completeShift(applicationId: string, attendance: Attendance): Promise<void>
   respondNoshow(applicationId: string, accept: boolean): Promise<void>

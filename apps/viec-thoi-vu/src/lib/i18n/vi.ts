@@ -1,5 +1,6 @@
 // Vietnamese texts (the source of truth: English must have exactly the same keys).
 export const vi = {
+  directPayInfo: 'Quán trả trực tiếp cho người làm sau ca. Không nạp trước qua Capi.',
   appName: 'Capi',
   // nav
   navJobs: 'Việc làm', navApplied: 'Đã ứng tuyển', navAccount: 'Hồ sơ', 

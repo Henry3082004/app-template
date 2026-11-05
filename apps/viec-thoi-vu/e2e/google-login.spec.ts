@@ -1,4 +1,4 @@
-import { PORTS, expect, helpers, test, url } from './fixtures'
+import { expect, helpers, test } from './fixtures'
 
 test('Google login: first sign-in completes the profile with a country code, returning user, employer', async ({ page: p }) => {
   const h = helpers(p)
@@ -33,21 +33,4 @@ test('Google login: first sign-in completes the profile with a country code, ret
   await p.getByLabel(/Tôi đã đọc và đồng ý/).check(); await p.getByRole('button', { name: 'Tiếp tục', exact: true }).click(); await p.waitForTimeout(600)
   await expect(p.getByLabel('Tên việc')).toHaveValue('Phục vụ quán Bob'); await p.getByRole('button', { name: 'Đăng tin', exact: true }).last().click(); await h.see('Đã đăng tin!') // the typed post was kept
   await h.go('/app/tai-khoan'); await h.see('Bob Cafe')
-})
-
-test('production web login before the Zalo Mini App is public: notice + Google, no password, no dead Zalo link', async ({ page: p }) => {
-  const h = helpers(p)
-  await p.goto(url(PORTS.prodBefore, '/app')); await p.waitForTimeout(500)
-  await h.go('/app/da-ung-tuyen'); await p.getByRole('button', { name: 'Đăng nhập' }).first().click()
-  await h.see('Đăng nhập bằng Zalo sắp có'); await expect(p.getByRole('button', { name: 'Tiếp tục với Google' })).toBeVisible()
-  await expect(p.getByText('Mở trong Zalo')).toHaveCount(0)
-  await expect(p.locator('#a-pass')).toHaveCount(0)
-})
-
-test('production web login after the Zalo Mini App is public: open-in-Zalo link + Google', async ({ page: p }) => {
-  const h = helpers(p)
-  await p.goto(url(PORTS.prodAfter, '/app')); await p.waitForTimeout(500)
-  await h.go('/app/da-ung-tuyen'); await p.getByRole('button', { name: 'Đăng nhập' }).first().click()
-  await h.see('Bạn ở Việt Nam?'); await h.see('Bạn ở nước ngoài?')
-  await expect(p.locator('a[href^="https://zalo.me/s/"]')).not.toHaveCount(0)
 })

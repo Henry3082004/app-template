@@ -52,3 +52,7 @@ Giới hạn chống lạm dụng; phí dịch vụ + voucher 100% (không thu t
 - Gói Supabase Free tự tạm dừng nếu 7 ngày không hoạt động; chưa kiểm tra dự án đang gói nào.
 - Không bật CAPTCHA toàn cục của Supabase (có thể làm hỏng đăng nhập Zalo và Google).
 - `scripts/check-css-classes.mjs` kiểm cả dấu ngoặc `{}` cân bằng; từng có lỗi CSS dang dở làm hỏng giao diện điện thoại.
+
+
+## Bản sửa sale 05/11/2026 (chờ triển khai)
+Web phone: QR mở Mini App; tablet/desktop: Google/email; bỏ form phone/password trên web thật. Có lựa chọn trả trực tiếp sau ca qua choose_direct_pay. Ảnh giữ nguyên JPEG 320px → Storage, bucket thật max 300000 byte, 2 ảnh/31054 byte; chưa load test/quota. Migration 20261118_direct_pay CHƯA áp dụng: auto-review yêu cầu Henry cho phép thay đổi DB thật (thanh toán/quyền liên hệ). Không push main/không bật tiền thật trước khi giải quyết chặn triển khai này.

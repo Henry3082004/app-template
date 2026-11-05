@@ -1,3 +1,4 @@
+import { DirectPay } from './DirectPay'
 import { useState } from 'react'
 import { api } from '../../../lib/api'
 import { money, today } from '../../../lib/format'
@@ -28,6 +29,7 @@ export function EmployerPay({ app, job, onChanged }: { app: Applicant; job: JobT
         {s === 'none' && (
           <>
             <div className="small muted">{t('freeConfirmHint')}</div>
+            <div className="notice info">{locale === 'vi' ? 'Thanh toán trực tiếp cho người làm sau ca — không nạp trước qua Capi.' : 'Pay the worker directly after the shift.'}</div>
             <Btn onClick={() => setDlg('complete')} disabled={early}>{t('completeCta')}</Btn>
             {early && <div className="small muted">{t('completeTooEarly')}</div>}
           </>
@@ -56,6 +58,7 @@ export function EmployerPay({ app, job, onChanged }: { app: Applicant; job: JobT
         <>
           <div className="notice warn">{t('fundWaitingEmp')}</div>
           <Btn block onClick={() => setDlg('fund')}>{t('fundCta')}</Btn>
+          <DirectPay id={app.id} onDone={onChanged} />
         </>
       )}
       {s === 'held' && (

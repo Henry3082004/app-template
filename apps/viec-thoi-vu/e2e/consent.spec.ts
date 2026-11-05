@@ -2,9 +2,8 @@ import { PORTS, expect, helpers, test, url } from './fixtures'
 
 test('sign-up needs the consent box ticked (never pre-ticked) and links to the terms and the privacy policy', async ({ page: p }) => {
   const h = helpers(p)
-  await p.goto(url(PORTS.prodBefore, '/app')); await p.waitForTimeout(500)
+  await p.goto('/app'); await p.waitForTimeout(500)
   await h.go('/app/da-ung-tuyen'); await p.getByRole('button', { name: 'Đăng nhập' }).first().click()
-  await p.getByRole('button', { name: 'Tạo tài khoản bằng số điện thoại' }).click()
   const box = p.getByLabel(/Tôi đã đọc và đồng ý/)
   await expect(box).toBeVisible(); await expect(box).not.toBeChecked()
   await expect(p.locator('.consent a[href="/dieu-khoan"]')).toBeVisible(); await expect(p.locator('.consent a[href="/bao-mat"]')).toBeVisible()
