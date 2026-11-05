@@ -47,6 +47,8 @@ Giới hạn chống lạm dụng; phí dịch vụ + voucher 100% (không thu t
 6. Tùy chọn: bản mô tả dữ liệu cho luật sư.
 
 ## Lưu ý kỹ thuật
+- Chưa giải quyết: hướng dẫn lần đầu có thể hiện bước của người tìm việc khi admin ở chế độ "Chủ quán" mẫu (đã đăng nhập tài khoản quán mẫu). Đã sửa trường hợp khách chưa đăng nhập đã trả lời "cần người" (`Tour.tsx`, `guestShop`) nhưng chưa tìm ra nguyên nhân của trường hợp quán mẫu; cần ảnh chụp kèm địa chỉ trang để điều tra.
+- Làm 2FA admin khi cần (đã ghi ở mục việc của Henry).
 - Gói Supabase Free tự tạm dừng nếu 7 ngày không hoạt động; chưa kiểm tra dự án đang gói nào.
 - Không bật CAPTCHA toàn cục của Supabase (có thể làm hỏng đăng nhập Zalo và Google).
 - `scripts/check-css-classes.mjs` kiểm cả dấu ngoặc `{}` cân bằng; từng có lỗi CSS dang dở làm hỏng giao diện điện thoại.
