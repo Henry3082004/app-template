@@ -219,3 +219,5 @@ Quán liệt kê các đầu việc của ca khi đăng tin ("Gọt hàng", "Bư
 - PR dự thảo: https://github.com/Henry3082004/app-template/pull/1 (nhánh codex/capi-sale-direct-pay-qr). Chưa merge/main, DB thật chưa đổi.
 - Kiểm riêng: QR phone (2 cấu hình published on/off) PASS; Google/email-only trên tablet và desktop 1366px (2 cấu hình) PASS; trả trực tiếp trên ca mới → chuyển trang → hoàn thành trên phone/tablet PASS. Đã xem ảnh chụp màn hình.
 - npm test tổng phát hiện kịch bản cũ dùng Pha chế ca sáng (hết ngày 03/11), chọn ứng viên đầu danh sách thay vì ca mới; không kết luận toàn bộ bộ kiểm thử đều qua. Test direct-pay mới đã sửa dùng ca vừa tạo và chạy riêng PASS trên cả hai thiết bị.
+
+- Kết quả npm test tổng: 131/144 PASS (12.3 phút), 13 FAIL trên snapshot đầu. Một lỗi direct-pay do ca mẫu hết hạn đã sửa và chạy riêng PASS phone/tablet; 12 lỗi khác thuộc các kịch bản collab/commitments/employer/escrow/tabs/trust-safety chưa sửa trong phạm vi này. Không báo bộ kiểm thử tổng xanh. Build production, tsc, lint (1 warning cũ), CSS check PASS. Supabase thật vẫn chưa đổi.
