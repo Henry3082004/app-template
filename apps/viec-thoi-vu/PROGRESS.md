@@ -215,3 +215,7 @@ Quán liệt kê các đầu việc của ca khi đăng tin ("Gọt hàng", "Bư
 - Web thật: bỏ form phone/password, điện thoại QR nội bộ mở Mini App và link mở Zalo; tablet/desktop chỉ Google/email. Cả hai vai trò dùng chung AuthDialog.
 - Trả trực tiếp sau ca: thêm RPC có khóa hàng/kiểm chủ ca, không tạo payout; funding_mode=off tái sử dụng xác nhận đã trả/đã nhận. Giữ payment_mode=off.
 - PostgreSQL cục bộ: escrow regression + 280_direct_pay PASS (khách/ứng viên bị từ chối, ca pending bị từ chối, chọn lặp an toàn, không chuyển sang nạp sau khi chọn trực tiếp, hoàn thành không payout).
+
+- PR dự thảo: https://github.com/Henry3082004/app-template/pull/1 (nhánh codex/capi-sale-direct-pay-qr). Chưa merge/main, DB thật chưa đổi.
+- Kiểm riêng: QR phone (2 cấu hình published on/off) PASS; Google/email-only trên tablet và desktop 1366px (2 cấu hình) PASS; trả trực tiếp trên ca mới → chuyển trang → hoàn thành trên phone/tablet PASS. Đã xem ảnh chụp màn hình.
+- npm test tổng phát hiện kịch bản cũ dùng Pha chế ca sáng (hết ngày 03/11), chọn ứng viên đầu danh sách thay vì ca mới; không kết luận toàn bộ bộ kiểm thử đều qua. Test direct-pay mới đã sửa dùng ca vừa tạo và chạy riêng PASS trên cả hai thiết bị.
