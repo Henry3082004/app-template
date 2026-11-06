@@ -67,16 +67,22 @@ async function zaloIdFromZalo(accessToken: string): Promise<string | null> {
   }
 }
 
-/** Ask Zalo's server for the phone number behind the token pair. */
+/** Ask Zalo's server for the phone number behind the token pair. Failures are logged WITHOUT any token, key or number (only Zalo's error code/message and the field names). */
 async function phoneFromZalo(accessToken: string, phoneToken: string, secret: string): Promise<string | null> {
   try {
     const r = await fetch("https://graph.zalo.me/v2.0/me/info", {
       headers: { access_token: accessToken, code: phoneToken, secret_key: secret },
     });
     const j = await r.json();
-    if (j?.error && j.error !== 0) return null;
-    return normalizePhone(j?.data?.number ?? j?.number);
-  } catch {
+    if (j?.error && j.error !== 0) {
+      console.error("zalo me/info error", r.status, String(j.error), String(j.message ?? "").slice(0, 200));
+      return null;
+    }
+    const n = normalizePhone(j?.data?.number ?? j?.number);
+    if (!n) console.error("zalo me/info no phone", r.status, Object.keys(j ?? {}).join(","), Object.keys(j?.data ?? {}).join(","));
+    return n;
+  } catch (e) {
+    console.error("zalo me/info threw", String(e).slice(0, 200));
     return null;
   }
 }
